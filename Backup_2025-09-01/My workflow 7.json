@@ -1,0 +1,160 @@
+{
+  "createdAt": "2025-08-26T17:51:06.741Z",
+  "updatedAt": "2025-08-29T13:14:49.000Z",
+  "id": "XFzeSA5lmVNI3Rl9",
+  "name": "My workflow 7",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "d61a7193-61ca-4d39-9460-d1ed6720c35c",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b857abbd-db8a-4694-b73c-21616189d4bc",
+      "name": "Webhook",
+      "webhookId": "d61a7193-61ca-4d39-9460-d1ed6720c35c"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.text }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "bae2490d-9d22-4a63-ad02-cf1745f636df",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        144,
+        208
+      ],
+      "id": "783a92ac-ef17-4728-8327-d1b205dc12a6",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "TLy9RuRkIKncoUiy",
+          "name": "OpenRouter Freelance account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={\n  \"message\": \"{{ $json.output }}\"\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        544,
+        0
+      ],
+      "id": "8bf042c4-3509-4631-9728-49b08ee269af",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.srv894857.hstgr.cloud",
+            "user-agent": "python-requests/2.32.5",
+            "content-length": "11",
+            "accept": "*/*",
+            "accept-encoding": "gzip, deflate",
+            "content-type": "application/x-www-form-urlencoded",
+            "x-forwarded-for": "34.93.128.56",
+            "x-forwarded-host": "n8n.srv894857.hstgr.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "746840d2afb8",
+            "x-real-ip": "34.93.128.56"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "text": "gemini"
+          },
+          "webhookUrl": "https://n8n.srv894857.hstgr.cloud/webhook/d61a7193-61ca-4d39-9460-d1ed6720c35c",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "versionId": "2f2bacf6-bb8e-49be-83c0-45a60fc1e04a",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "createdAt": "2025-08-26T17:51:06.748Z",
+      "updatedAt": "2025-08-26T17:51:06.748Z",
+      "role": "workflow:owner",
+      "workflowId": "XFzeSA5lmVNI3Rl9",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "tags": []
+}
