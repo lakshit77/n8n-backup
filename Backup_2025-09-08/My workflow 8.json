@@ -1,0 +1,265 @@
+{
+  "createdAt": "2025-08-27T14:54:46.804Z",
+  "updatedAt": "2025-09-02T18:38:26.000Z",
+  "id": "1nrDLEyyK2TR5eL8",
+  "name": "My workflow 8",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Banana Model Description",
+        "formDescription": "Banana Model",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Action",
+              "placeholder": "Describe what action to perform",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -160,
+        528
+      ],
+      "id": "f4bd393b-e159-4763-8634-d548c2d2a747",
+      "name": "On form submission",
+      "webhookId": "24c05501-1a83-4f69-bb68-d013be7cf15d"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=User Prompt - {{ $('On form submission').item.json.Action }}",
+        "options": {
+          "systemMessage": "=You are an Image Prompt Generator Agent.\nYour task is to take the user’s action or request (short phrase, sentence, or idea) and expand it into a clear, descriptive, and detailed prompt that can be passed into an image generation model (like Banana, ChatGPT images, or Stable Diffusion).\n\n🎯 Instructions:\n\nUnderstand the User Action\n\nIdentify the subject, object, and action.\n\nExample: “dog surfing” → subject = dog, action = surfing, setting = ocean.\n\nExpand with Visual Details\n\nAdd details about environment, perspective, lighting, colors, style, mood, and composition.\n\nExample: “dog surfing” → “A golden retriever surfing on a large wave at sunset, cinematic style, vibrant ocean water splashes, wide-angle shot.”\n\nApply Best Prompting Practices\n\nUse adjectives (cinematic, futuristic, neon, realistic, cartoonish).\n\nAdd style references if useful (digital art, 3D render, anime, cyberpunk, photorealistic).\n\nSuggest camera settings or perspectives if relevant (close-up, aerial view, wide-angle).\n\nOutput Format\n\nReturn only the final expanded prompt (not the explanation).\n\nKeep it 1–2 sentences long but rich in detail.\n\n✅ Example Expansions:\n\nUser Action: “robot cooking food”\nOutput Prompt:\n“A futuristic humanoid robot cooking pasta in a high-tech kitchen, stainless steel surfaces reflecting neon lights, cinematic lighting, ultra-realistic 3D render.”\n\nUser Action: “cat astronaut”\nOutput Prompt:\n“A fluffy white cat wearing a space suit floating inside a spacecraft, Earth visible through the window, soft glow lighting, digital art style.”"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        160,
+        528
+      ],
+      "id": "473be589-79d9-4b30-a523-9e3b9ee0b061",
+      "name": "Image Prompt"
+    },
+    {
+      "parameters": {
+        "url": "=https://queue.fal.run/fal-ai/nano-banana/requests/{{ $json.request_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1296,
+        528
+      ],
+      "id": "d134a71c-4f01-4cb5-b1f7-88c0a2e54960",
+      "name": "Get Image",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "kLkJeU62RTWDWYIU",
+          "name": "Pankaj Fal AI Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://queue.fal.run/fal-ai/nano-banana",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"prompt\": \"{{ $json.output.replace(/\\\"/g, '\\\\\\\"').replace(/\\n/g, '\\\\n') }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        528
+      ],
+      "id": "fc318a0a-148d-4e85-80d7-31f1bf0aa3c7",
+      "name": "Create Image",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "OAZrEcldKeV1euTX",
+          "name": "Fal AI Account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1088,
+        528
+      ],
+      "id": "8ba95d5f-11fc-4474-a15c-42400b3797a0",
+      "name": "Wait",
+      "webhookId": "6566a18e-a779-4702-a27f-12d01583d915"
+    },
+    {
+      "parameters": {
+        "content": "# Google Nano Banana Image Generation",
+        "height": 80,
+        "width": 672
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        240
+      ],
+      "id": "fd3c0a32-76dd-44a4-8ffa-c91fc170aa57",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        32,
+        736
+      ],
+      "id": "2944a708-ff36-4931-8b0d-345b6702b976",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "U0FfOj4uWFY6nYAE",
+          "name": "Pankaj OpenAI Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cb268ce5-d00c-42a1-bf38-33a339cde23b",
+              "name": "prompt",
+              "value": "{   \"type\": \"image_ad\",   \"branding\": {     \"logo_position\": \"top-right\",     \"colors\": [\"#0d1b8c\", \"#ff7a00\"],     \"slogan\": \"Automate Smarter with TezDM\"   },   \"visuals\": {     \"subject\": \"young professional using a smartphone\",     \"style\": \"ultra-realistic\",     \"mood\": \"futuristic and empowering\",     \"composition\": \"cinematic lighting, sharp focus, minimal background\"   },   \"output\": {     \"format\": \"poster\",     \"platform\": \"Instagram\",     \"resolution\": \"1080x1350\"   } }",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        512,
+        528
+      ],
+      "id": "518b0e06-07be-4afa-921d-c64bfbc537d1",
+      "name": "Edit Fields"
+    }
+  ],
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Image Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Prompt": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Image": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Get Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Image Prompt",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Create Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "d2fb7367-82f0-4805-81e1-12d88e533ae5",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "createdAt": "2025-08-27T14:54:46.845Z",
+      "updatedAt": "2025-08-27T14:54:46.845Z",
+      "role": "workflow:owner",
+      "workflowId": "1nrDLEyyK2TR5eL8",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "tags": []
+}
