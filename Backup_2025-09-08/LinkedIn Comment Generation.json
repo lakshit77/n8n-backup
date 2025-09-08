@@ -1,0 +1,203 @@
+{
+  "createdAt": "2025-09-08T11:50:42.931Z",
+  "updatedAt": "2025-09-08T11:58:28.000Z",
+  "id": "HjYS9fwMWJjmYm9w",
+  "name": "LinkedIn Comment Generation",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "linkedin-comment",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -176,
+        -80
+      ],
+      "id": "4fa2bc6e-e038-4583-9aac-5a86876b02fa",
+      "name": "Webhook",
+      "webhookId": "efc2ccfe-dedc-4e2d-bbc8-b1e133ea3ace"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.caption }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        32,
+        -80
+      ],
+      "id": "098a1632-055d-46be-8be4-9d0ea013e9e2",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        160
+      ],
+      "id": "7a3f4a0a-84cc-4857-9271-055fad6a0115",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "TLy9RuRkIKncoUiy",
+          "name": "OpenRouter Freelance account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        384,
+        -80
+      ],
+      "id": "b1d2cdaa-2458-401a-997d-e2cc25885a59",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.body.unique_id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        96,
+        176
+      ],
+      "id": "194563f4-7445-4985-be82-e0e5d6cca7ab",
+      "name": "Simple Memory"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.srv894857.hstgr.cloud",
+            "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
+            "content-length": "628",
+            "accept": "*/*",
+            "accept-encoding": "gzip, deflate, br, zstd",
+            "accept-language": "en-US,en;q=0.9,la;q=0.8",
+            "content-type": "application/json",
+            "origin": "https://www.linkedin.com",
+            "priority": "u=1, i",
+            "referer": "https://www.linkedin.com/",
+            "sec-ch-ua": "\"Chromium\";v=\"140\", \"Not=A?Brand\";v=\"24\", \"Google Chrome\";v=\"140\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "\"macOS\"",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "cross-site",
+            "x-forwarded-for": "45.118.107.220",
+            "x-forwarded-host": "n8n.srv894857.hstgr.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "746840d2afb8",
+            "x-real-ip": "45.118.107.220"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "hint": "",
+            "caption": "How to make $10k/month as a college student using AI (even if you’re broke, inexperienced, and have no audience):1. Why Students Have the Edge2. Why Most Advice Aimed at You is Trash3. What is Leveraged Consulting4. What to Avoid5. What Actually Works6. Why you Have a Shot7. Your $100/Month AI Stack8. How to Get ClientsCheck the carousel for details.Also - dropped a link to a video in the comments.",
+            "tone": "professional",
+            "model": "gpt-4.1-nano",
+            "unique_id": "user_2ggaxtt_urn:li:activity:7370661148909662208",
+            "user_info": {
+              "id": "user_2ggaxtt",
+              "email": "unknown",
+              "name": "unknown",
+              "profile_url": "unknown"
+            }
+          },
+          "webhookUrl": "https://n8n.srv894857.hstgr.cloud/webhook/linkedin-comment",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "versionId": "7339c395-4f11-4b34-988f-39eca06fda08",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "createdAt": "2025-09-08T11:50:42.937Z",
+      "updatedAt": "2025-09-08T11:50:42.937Z",
+      "role": "workflow:owner",
+      "workflowId": "HjYS9fwMWJjmYm9w",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "tags": []
+}
