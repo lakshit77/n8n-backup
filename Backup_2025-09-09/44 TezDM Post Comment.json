@@ -1,0 +1,103 @@
+{
+  "createdAt": "2025-09-08T18:12:34.435Z",
+  "updatedAt": "2025-09-08T18:54:54.000Z",
+  "id": "ssgmixYW4s27TBui",
+  "name": "44 TezDM Post Comment",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Get Your Free Content - Almost There! 🚀",
+        "formDescription": "Thanks for following! Just one more step to get your exclusive content delivered straight to your inbox. This takes less than 30 seconds ⏰",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Full Name",
+              "placeholder": "Your Full Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email Id",
+              "fieldType": "email",
+              "placeholder": "Email Address - We'll send your content here",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false,
+          "buttonLabel": "Get Content",
+          "customCss": ":root {\n\t--font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;\n\t--font-weight-normal: 400;\n\t--font-weight-bold: 600;\n\t--font-size-body: 14px;\n\t--font-size-label: 15px;\n\t--font-size-test-notice: 13px;\n\t--font-size-input: 16px;\n\t--font-size-header: 24px;\n\t--font-size-paragraph: 15px;\n\t--font-size-link: 14px;\n\t--font-size-error: 13px;\n\t--font-size-html-h1: 32px;\n\t--font-size-html-h2: 24px;\n\t--font-size-html-h3: 20px;\n\t--font-size-html-h4: 16px;\n\t--font-size-html-h5: 14px;\n\t--font-size-html-h6: 12px;\n\t--font-size-subheader: 16px;\n\t/* Colors */\n\t--color-background: #f8fafc;\n\t--color-test-notice-text: #f59e0b;\n\t--color-test-notice-bg: #fffbeb;\n\t--color-test-notice-border: #fed7aa;\n\t--color-card-bg: #ffffff;\n\t--color-card-border: #e2e8f0;\n\t--color-card-shadow: rgba(59, 130, 246, 0.08);\n\t--color-link: #3b82f6;\n\t--color-header: #1e293b;\n\t--color-label: #374151;\n\t--color-input-border: #d1d5db;\n\t--color-input-text: #1f2937;\n\t--color-focus-border: #3b82f6;\n\t--color-submit-btn-bg: #3b82f6;\n\t--color-submit-btn-text: #ffffff;\n\t--color-error: #ef4444;\n\t--color-required: #8b5cf6;\n\t--color-clear-button-bg: #6b7280;\n\t--color-html-text: #374151;\n\t--color-html-link: #3b82f6;\n\t--color-header-subtext: #64748b;\n\t/* Border Radii */\n\t--border-radius-card: 16px;\n\t--border-radius-input: 12px;\n\t--border-radius-clear-btn: 50%;\n\t--card-border-radius: 16px;\n\t/* Spacing */\n\t--padding-container-top: 32px;\n\t--padding-card: 32px;\n\t--padding-test-notice-vertical: 16px;\n\t--padding-test-notice-horizontal: 20px;\n\t--margin-bottom-card: 24px;\n\t--padding-form-input: 16px;\n\t--card-padding: 32px;\n\t--card-margin-bottom: 24px;\n\t/* Dimensions */\n\t--container-width: 480px;\n\t--submit-btn-height: 56px;\n\t--checkbox-size: 20px;\n\t/* Others */\n\t--box-shadow-card: 0px 8px 32px 0px var(--color-card-shadow);\n\t--opacity-placeholder: 0.6;\n}"
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -208,
+        -64
+      ],
+      "id": "81b01a4b-2d0d-435a-b74b-9278f729789f",
+      "name": "On form submission",
+      "webhookId": "c90a6b59-9fd1-4992-836b-7dafbf18871c"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json['Email Id'] }}",
+        "subject": "Here's the Resource You Requested on Instagram 🎉",
+        "message": "=<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Your Free Content is Ready!</title>\n    <style>\n        * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n        }\n        \n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            line-height: 1.6;\n            color: #333;\n            background-color: #f8fafc;\n        }\n        \n        .email-container {\n            max-width: 600px;\n            margin: 0 auto;\n            background-color: #ffffff;\n            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);\n        }\n        \n        .header {\n            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);\n            color: white;\n            text-align: center;\n            padding: 40px 30px;\n        }\n        \n        .header h1 {\n            font-size: 28px;\n            margin-bottom: 10px;\n            font-weight: 700;\n        }\n        \n        .header p {\n            font-size: 16px;\n            opacity: 0.9;\n        }\n        \n        .content {\n            padding: 40px 30px;\n        }\n        \n        .greeting {\n            font-size: 18px;\n            margin-bottom: 20px;\n            color: #1f2937;\n        }\n        \n        .main-message {\n            font-size: 16px;\n            margin-bottom: 30px;\n            color: #4b5563;\n            line-height: 1.7;\n        }\n        \n        .cta-button {\n            display: inline-block;\n            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);\n            color: white;\n            text-decoration: none;\n            padding: 15px 30px;\n            border-radius: 8px;\n            font-weight: 600;\n            font-size: 16px;\n            margin: 20px 0;\n            transition: transform 0.2s;\n            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);\n        }\n        \n        .cta-button:hover {\n            transform: translateY(-2px);\n            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);\n        }\n        \n        .divider {\n            height: 1px;\n            background: linear-gradient(90deg, transparent, #e5e7eb, transparent);\n            margin: 40px 0;\n        }\n        \n        .promotion-section {\n            background-color: #f9fafb;\n            padding: 30px;\n            border-radius: 12px;\n            margin: 30px 0;\n            border-left: 4px solid #8b5cf6;\n        }\n        \n        .promotion-section h2 {\n            color: #1f2937;\n            font-size: 20px;\n            margin-bottom: 15px;\n            display: flex;\n            align-items: center;\n        }\n        \n        .promotion-section h2::before {\n            content: \"🎁\";\n            margin-right: 8px;\n        }\n        \n        .promo-links {\n            display: flex;\n            flex-direction: column;\n            gap: 15px;\n            margin-top: 20px;\n        }\n        \n        .promo-link {\n            display: flex;\n            align-items: center;\n            padding: 15px;\n            background: white;\n            border-radius: 8px;\n            text-decoration: none;\n            color: #374151;\n            border: 1px solid #e5e7eb;\n            transition: all 0.2s;\n        }\n        \n        .promo-link:hover {\n            border-color: #3b82f6;\n            transform: translateY(-1px);\n            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);\n        }\n        \n        .promo-icon {\n            width: 40px;\n            height: 40px;\n            border-radius: 8px;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n            margin-right: 15px;\n            font-size: 18px;\n        }\n        \n        .youtube-icon {\n            background: #ff0000;\n            color: white;\n        }\n        \n        .community-icon {\n            background: #8b5cf6;\n            color: white;\n        }\n        \n        .promo-text h3 {\n            font-size: 16px;\n            margin-bottom: 4px;\n            color: #1f2937;\n        }\n        \n        .promo-text p {\n            font-size: 14px;\n            color: #6b7280;\n        }\n        \n        .footer {\n            background-color: #1f2937;\n            color: #9ca3af;\n            text-align: center;\n            padding: 30px;\n            font-size: 14px;\n        }\n        \n        .footer p {\n            margin-bottom: 10px;\n        }\n        \n        .social-links {\n            margin-top: 20px;\n        }\n        \n        .social-links a {\n            color: #3b82f6;\n            text-decoration: none;\n            margin: 0 10px;\n        }\n        \n        @media (max-width: 600px) {\n            .email-container {\n                margin: 0;\n                width: 100%;\n            }\n            \n            .header, .content, .promotion-section {\n                padding: 20px;\n            }\n            \n            .header h1 {\n                font-size: 24px;\n            }\n            \n            .promo-links {\n                gap: 10px;\n            }\n            \n            .promo-link {\n                padding: 12px;\n            }\n        }\n    </style>\n</head>\n<body>\n    <div class=\"email-container\">\n        <!-- Header -->\n        <div class=\"header\">\n            <h1>🎉 Your Free Content is Ready!</h1>\n            <p>Thank you for joining our community</p>\n        </div>\n        \n        <!-- Main Content -->\n        <div class=\"content\">\n            <div class=\"greeting\">\n                Hi {{ $json['Full Name'] }},\n            </div>\n            \n            <div class=\"main-message\">\n                Thank you so much for signing up! I'm excited to share this valuable content with you. This resource has helped thousands of people just like you, and I know you're going to find it incredibly useful.\n                \n                <br><br>\n                \n                Click the button below to access your free content right away:\n            </div>\n            \n            <div style=\"text-align: center;\">\n                <a href=\"https://docs.google.com/document/d/1CQvFNGrxqH0WUGwqX7fPn2Hd2gnzywutKo7izaZIoaU/edit?usp=sharing\" class=\"cta-button\">\n                    📥 Get Your Free Content Now\n                </a>\n            </div>\n            \n            <div class=\"main-message\">\n                <strong>Pro Tip:</strong> Bookmark this email or save the link - you'll have lifetime access to this content!\n            </div>\n            \n            <div class=\"divider\"></div>\n            \n            <!-- Promotion Section -->\n            <div class=\"promotion-section\">\n                <h2>Want More Free Content?</h2>\n                <p style=\"color: #6b7280; margin-bottom: 20px;\">\n                    I regularly share valuable tips, tutorials, and insights across my platforms. Here's where you can find more free content:\n                </p>\n                \n                <div class=\"promo-links\">\n                    <a href=\"[YOUTUBE_CHANNEL_LINK]\" class=\"promo-link\">\n                        <div class=\"promo-icon youtube-icon\">▶️</div>\n                        <div class=\"promo-text\">\n                            <h3>YouTube Channel</h3>\n                            <p>Weekly tutorials, tips, and behind-the-scenes content</p>\n                        </div>\n                    </a>\n                    \n                    <a href=\"[COMMUNITY_LINK]\" class=\"promo-link\">\n                        <div class=\"promo-icon community-icon\">👥</div>\n                        <div class=\"promo-text\">\n                            <h3>School Community</h3>\n                            <p>Join our exclusive community for discussions and networking</p>\n                        </div>\n                    </a>\n                </div>\n            </div>\n            \n            <div style=\"margin-top: 30px; padding: 20px; background-color: #fef3c7; border-radius: 8px; border-left: 4px solid #f59e0b;\">\n                <p style=\"color: #92400e; margin: 0;\">\n                    <strong>🔥 Quick Start Tip:</strong> For the best results, implement what you learn in the free content within the next 24 hours. Action creates momentum!\n                </p>\n            </div>\n            \n            <div style=\"margin-top: 30px; color: #6b7280;\">\n                <p>Thanks again for joining us, and I look forward to seeing your success!</p>\n                <p style=\"margin-top: 15px;\">\n                    Best regards,<br>\n                    <strong style=\"color: #1f2937;\">Lakshit</strong>\n                </p>\n            </div>\n        </div>\n        \n        <!-- Footer -->\n        <div class=\"footer\">\n            <p>© 2025 [YOUR_COMPANY_NAME]. All rights reserved.</p>\n            <p>You received this email because you signed up for our free content.</p>\n            <div class=\"social-links\">\n                <a href=\"[UNSUBSCRIBE_LINK]\">Unsubscribe</a> |\n                <a href=\"[CONTACT_LINK]\">Contact Us</a>\n            </div>\n        </div>\n    </div>\n</body>\n</html>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        -64
+      ],
+      "id": "39b852b8-fd5f-489a-92e1-38b03f40de8e",
+      "name": "Send a message",
+      "webhookId": "1c6aa6cb-dac3-4b4f-b27f-f963adc9f924",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9nQEWKuEYxxtGaYe",
+          "name": "Lakshit Gmail"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "bb7b7bcf-52fc-4231-a545-dbce5730c459",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "createdAt": "2025-09-08T18:12:34.441Z",
+      "updatedAt": "2025-09-08T18:12:34.441Z",
+      "role": "workflow:owner",
+      "workflowId": "ssgmixYW4s27TBui",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "tags": []
+}
