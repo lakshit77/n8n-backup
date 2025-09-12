@@ -1,0 +1,28 @@
+{
+  "createdAt": "2025-09-11T19:46:03.505Z",
+  "updatedAt": "2025-09-11T19:46:03.000Z",
+  "id": "1EvbrhQ67Sz4DHwE",
+  "name": "45 Instagram AI Agent Voice & Vision",
+  "active": false,
+  "isArchived": false,
+  "nodes": [],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "41982866-bb83-444a-bcef-bca4118663a7",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "createdAt": "2025-09-11T19:46:03.512Z",
+      "updatedAt": "2025-09-11T19:46:03.512Z",
+      "role": "workflow:owner",
+      "workflowId": "1EvbrhQ67Sz4DHwE",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "tags": []
+}
