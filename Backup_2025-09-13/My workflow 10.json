@@ -1,0 +1,45 @@
+{
+  "createdAt": "2025-09-10T18:42:13.436Z",
+  "updatedAt": "2025-09-10T18:42:13.436Z",
+  "id": "6VZz3SzNGO0k320H",
+  "name": "My workflow 10",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Get Your Free Content - Almost There! 🚀",
+        "formDescription": "Thanks for following! Just one more step to get your exclusive content delivered.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ba844c39-264a-4d1a-aa9d-a0e64e6c5d38",
+      "name": "On form submission",
+      "webhookId": "529ddb7f-2aa7-4cd8-a924-0b0eea04197b"
+    }
+  ],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "1fa848f2-8a8a-4bfd-8042-4ee76dc9195c",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "createdAt": "2025-09-10T18:42:13.443Z",
+      "updatedAt": "2025-09-10T18:42:13.443Z",
+      "role": "workflow:owner",
+      "workflowId": "6VZz3SzNGO0k320H",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "tags": []
+}
