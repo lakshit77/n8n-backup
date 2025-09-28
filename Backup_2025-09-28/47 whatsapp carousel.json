@@ -1,0 +1,30 @@
+{
+  "createdAt": "2025-09-20T13:56:39.033Z",
+  "updatedAt": "2025-09-20T19:18:32.000Z",
+  "id": "cev38DFey0YJIDdN",
+  "name": "47 whatsapp carousel",
+  "active": false,
+  "isArchived": true,
+  "nodes": [],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "6d9b656e-499e-4a99-9b54-899b97a80262",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "createdAt": "2025-09-20T13:56:39.038Z",
+      "updatedAt": "2025-09-20T13:56:39.038Z",
+      "role": "workflow:owner",
+      "workflowId": "cev38DFey0YJIDdN",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "tags": []
+}
