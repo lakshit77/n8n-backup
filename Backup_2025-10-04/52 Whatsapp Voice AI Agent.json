@@ -1,0 +1,28 @@
+{
+  "createdAt": "2025-10-04T10:55:29.426Z",
+  "updatedAt": "2025-10-04T10:56:01.000Z",
+  "id": "I3MGknHf6voo10QN",
+  "name": "52 Whatsapp Voice AI Agent",
+  "active": false,
+  "isArchived": false,
+  "nodes": [],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "1273236e-010b-477c-9ab9-b7152c56f381",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "createdAt": "2025-10-04T10:55:29.434Z",
+      "updatedAt": "2025-10-04T10:55:29.434Z",
+      "role": "workflow:owner",
+      "workflowId": "I3MGknHf6voo10QN",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "tags": []
+}
