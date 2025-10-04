@@ -1,0 +1,441 @@
+{
+  "createdAt": "2025-10-04T10:55:51.490Z",
+  "updatedAt": "2025-10-04T11:40:56.000Z",
+  "id": "2rztD0y3TrpeldoB",
+  "name": "51 Sora 2 Video Generation",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        96
+      ],
+      "id": "8fe3872a-fa1e-4a56-9ceb-37794dea42cc",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1HuB47wdJj_550hHhDsnAqlw40H0UEXO0Pd6SLWxTx9Y",
+          "mode": "list",
+          "cachedResultName": "Video Generation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HuB47wdJj_550hHhDsnAqlw40H0UEXO0Pd6SLWxTx9Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HuB47wdJj_550hHhDsnAqlw40H0UEXO0Pd6SLWxTx9Y/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Status",
+              "lookupValue": "pending"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        96
+      ],
+      "id": "ffdf1820-d228-42be-bd12-5e71d7ae444c",
+      "name": "Get Entry",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cZc9FZPSLRtIq9IL",
+          "name": "Lakshit77 Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.kie.ai/api/v1/jobs/createTask",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"sora-2-text-to-video\",\n  \"input\": {\n    \"prompt\": \"{{ $json['Video Prompt'] }}\",\n    \"aspect_ratio\": \"{{ $json['Aspect Ratio'] }}\",\n    \"quality\": \"{{ $json.Quality }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        448,
+        96
+      ],
+      "id": "2ad7c921-9b3f-481d-864f-6ae55fd06972",
+      "name": "Create Task",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "nvqlPqWbXBin9fgC",
+          "name": "Lakshit Kie API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.kie.ai/api/v1/jobs/recordInfo?taskId={{ $json.data.taskId}}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_API_KEY"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        672,
+        96
+      ],
+      "id": "567051d7-30d9-418c-90f0-5dd63e9d7866",
+      "name": "Query Task",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "nvqlPqWbXBin9fgC",
+          "name": "Lakshit Kie API"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1120,
+        192
+      ],
+      "id": "db07a2ef-df98-4372-812b-91e6d69867cd",
+      "name": "Wait",
+      "webhookId": "070665bc-15b5-487d-ab0a-dc6c31361781"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "success",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "290d0ca0-5cee-4a46-912f-929affc9f36f"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Success"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "01661ed5-02ce-4be0-af2d-3c433d780bfe",
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "fail",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Fail"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "35ea73f8-a9de-412b-abcd-12b1710cb0b0",
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Waiting"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        896,
+        0
+      ],
+      "id": "3aac99b6-331a-4051-a1df-55c6e7619862",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1HuB47wdJj_550hHhDsnAqlw40H0UEXO0Pd6SLWxTx9Y",
+          "mode": "list",
+          "cachedResultName": "Video Generation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HuB47wdJj_550hHhDsnAqlw40H0UEXO0Pd6SLWxTx9Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HuB47wdJj_550hHhDsnAqlw40H0UEXO0Pd6SLWxTx9Y/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Get Entry').item.json.row_number }}",
+            "Status": "fail"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Video Prompt",
+              "displayName": "Video Prompt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Aspect Ratio",
+              "displayName": "Aspect Ratio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Quality",
+              "displayName": "Quality",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Video Link",
+              "displayName": "Video Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1120,
+        -32
+      ],
+      "id": "6709ef0c-3908-4152-a266-f8f7db0cc7e5",
+      "name": "Mark Status as Fail",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cZc9FZPSLRtIq9IL",
+          "name": "Lakshit77 Account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get Entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Entry": {
+      "main": [
+        [
+          {
+            "node": "Create Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Task": {
+      "main": [
+        [
+          {
+            "node": "Query Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query Task": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Query Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Mark Status as Fail",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Get Entry": [
+      {
+        "json": {
+          "row_number": 2,
+          "Video Prompt": "A futuristic stage in front of a massive holographic globe spinning with glowing data streams. @sama walks onto the stage in a sharp suit, illuminated by neon blue and purple lights. The crowd is cheering, camera flashes sparkle. As he raises his hand, the holographic globe transforms into floating AI robots, drones, and futuristic cities. Cinematic lighting, ultra-realistic detail, smooth dolly camera movement, epic music video style.",
+          "Aspect Ratio": "portrait",
+          "Quality": "hd",
+          "Status": "pending",
+          "Video Link": ""
+        }
+      }
+    ]
+  },
+  "versionId": "af129018-a30d-4b17-8e3b-cf27aefeb972",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "createdAt": "2025-10-04T10:55:51.493Z",
+      "updatedAt": "2025-10-04T10:55:51.493Z",
+      "role": "workflow:owner",
+      "workflowId": "2rztD0y3TrpeldoB",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "tags": []
+}
