@@ -1,0 +1,28 @@
+{
+  "createdAt": "2025-11-01T12:58:59.678Z",
+  "updatedAt": "2025-11-01T12:58:59.000Z",
+  "id": "1jI8IKLoIkNZzEQ8",
+  "name": "58 Whatsapp account connect with Permanent Token",
+  "active": false,
+  "isArchived": false,
+  "nodes": [],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "dd815db5-ae57-4d0d-a8f0-1d9c4a1d75d6",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "createdAt": "2025-11-01T12:58:59.683Z",
+      "updatedAt": "2025-11-01T12:58:59.683Z",
+      "role": "workflow:owner",
+      "workflowId": "1jI8IKLoIkNZzEQ8",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "tags": []
+}
