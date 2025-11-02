@@ -1,0 +1,54 @@
+{
+  "updatedAt": "2025-11-02T07:47:48.000Z",
+  "createdAt": "2025-11-01T12:58:59.678Z",
+  "id": "1jI8IKLoIkNZzEQ8",
+  "name": "59 Whatsapp account connect with Permanent Token",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5b844f0b-ca2b-4c53-b4a5-01e089910450",
+      "name": "WhatsApp Trigger",
+      "webhookId": "61eac84f-4d1d-43bc-9018-bbc275338a59",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "iAH92FLxlDHNqMm6",
+          "name": "WhatsApp OAuth account"
+        }
+      }
+    }
+  ],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "e3925859-d8ba-4833-84ce-94c353a798c8",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-11-01T12:58:59.683Z",
+      "createdAt": "2025-11-01T12:58:59.683Z",
+      "role": "workflow:owner",
+      "workflowId": "1jI8IKLoIkNZzEQ8",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "tags": []
+}
