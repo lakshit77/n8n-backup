@@ -1,0 +1,804 @@
+{
+  "updatedAt": "2025-11-06T12:59:05.000Z",
+  "createdAt": "2025-11-06T12:52:57.318Z",
+  "id": "e3sQ8p68vugyWAGL",
+  "name": "61 something whatsapp",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "path": "2b7f85b2-f581-46d9-8d22-172f7a9933c0",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        160,
+        224
+      ],
+      "id": "c559234c-651a-4a86-9ea1-50a617db5504",
+      "name": "Webhook",
+      "webhookId": "2b7f85b2-f581-46d9-8d22-172f7a9933c0"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.query[\"hub.challenge\"] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        480,
+        32
+      ],
+      "id": "49c9da27-212e-411e-9bf9-defaa3802b1e",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        480,
+        512
+      ],
+      "id": "bddbd714-0c5b-411f-a935-69ffe864fa3a",
+      "name": "WhatsApp Trigger",
+      "webhookId": "e57e8925-ccd3-4cfa-8a84-60bff5909af1",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "nQbla4DtMJIZMbEt",
+          "name": "n8n-test-2 account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Map result').item.json.combined_message }}",
+        "options": {
+          "systemMessage": "=Name: Kady\nRole: You are an expert receptionist for Toothsi Clinic. Your job is to communicate with your user, serve them properly, and solve their task. \n\n\nNote:\n1. User message has multiple message seperated by '|' and for each message there is ID:\n2. Output your response as a List JSON object with between one and three messages, where possible, default to fewer messages.\n3. With that message I want message id which user has passed\n4. This will help me to tag that particular message and reply to it \n\nSince you are an SMS assistant, your output usually spans multiple ‘texts’. Feel free to use emojis in messages, and if it makes sense, some messages can be emojis only.\n\nExample:\n\n[\n  {\n    \"message\": \"Hi there!\",\n    \"message_id\": \"wamid:kvneknknv\"\n  }\n]"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        2720,
+        32
+      ],
+      "id": "2467fef5-ea31-49a0-a611-e5c188972507",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        2736,
+        256
+      ],
+      "id": "053b4519-c3e0-474c-b80d-2e4a6f5c26c1",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "TLy9RuRkIKncoUiy",
+          "name": "OpenRouter Freelance account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ef6c2837-9317-4ef6-afae-fdfa885c71c6",
+              "name": "message",
+              "value": "={{ $json.messages[0].text.body }}",
+              "type": "string"
+            },
+            {
+              "id": "625cec94-67c9-458b-8d58-b7851f8bcec5",
+              "name": "number",
+              "value": "={{ $json.messages[0].from }}",
+              "type": "string"
+            },
+            {
+              "id": "e8745982-aacb-422c-b003-fb7eb4c23303",
+              "name": "message_id",
+              "value": "={{ $json.messages[0].id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        704,
+        224
+      ],
+      "id": "f8d5da6f-d1ad-4065-bedd-baf2ea3be0f9",
+      "name": "Variable mapping"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "aNkqPGZsrwVsVTiZ",
+          "mode": "list",
+          "cachedResultName": "Msg Batch Processing",
+          "cachedResultUrl": "/projects/iOyc3VpWKvgHH9fv/datatables/aNkqPGZsrwVsVTiZ"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "message": "={{ $json.message }}",
+            "message_status": "in_queue",
+            "number": "={{ $json.number }}",
+            "message_id": "={{ $json.message_id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "message_status",
+              "displayName": "message_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "number",
+              "displayName": "number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "message_id",
+              "displayName": "message_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1152,
+        224
+      ],
+      "id": "e0fce49c-2331-49a1-be27-334c18ad07d9",
+      "name": "Insert row"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1376,
+        224
+      ],
+      "id": "8e6f9b30-3df6-4bb0-bc59-08f3b92e38c7",
+      "name": "Wait",
+      "webhookId": "b7fbb284-0a1d-4bd9-a6b2-bf507939b737"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1824,
+        224
+      ],
+      "id": "ff63981d-edf9-45a6-bbae-b048357eb85a",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2048,
+        32
+      ],
+      "id": "0d2b040b-17bd-4d93-a130-14546ae04a6a",
+      "name": "Done Processing"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "aNkqPGZsrwVsVTiZ",
+          "mode": "list",
+          "cachedResultName": "Msg Batch Processing",
+          "cachedResultUrl": "/projects/iOyc3VpWKvgHH9fv/datatables/aNkqPGZsrwVsVTiZ"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "number",
+              "keyValue": "={{ $('Variable mapping').item.json.number }}"
+            },
+            {
+              "keyName": "message_status",
+              "keyValue": "in_queue"
+            }
+          ]
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        224
+      ],
+      "id": "b0e46254-d5b3-41e8-bcc2-76b5f375c2c9",
+      "name": "Get row(s)"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Map result').item.json.number }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        2864,
+        256
+      ],
+      "id": "f96fee53-e469-4d8c-8dc4-41298cae775f",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        3296,
+        32
+      ],
+      "id": "c1f5941e-384a-4d92-b716-065e2133dcfb",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8170b840-eff6-4baf-b107-7a6222b57ee4",
+              "leftValue": "={{ $json.message }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        928,
+        224
+      ],
+      "id": "10eb6057-10cc-4b6e-814b-562527ff778c",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v22.0/902774616244718/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"status\": \"read\",\n  \"message_id\": \"{{ $json.message_id }}\"\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2048,
+        224
+      ],
+      "id": "514c24aa-aff8-4276-ae82-564b355ba1fc",
+      "name": "Read message",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "iR5q4Pc809XWa04V",
+          "name": "whatsapp n8n-test-2 app Lakshit"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v22.0/902774616244718/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"status\": \"read\",\n  \"message_id\": \"{{ $node['update entry'].json.message_id }}\",\n  \"typing_indicator\": {\n    \"type\": \"text\"\n  }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2496,
+        32
+      ],
+      "id": "cebb93c8-ffd3-4e0d-8ab6-5e4e3d443e02",
+      "name": "Typing Indicator",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "iR5q4Pc809XWa04V",
+          "name": "whatsapp n8n-test-2 app Lakshit"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const combinedMessage = items\n  .map(msg => `${msg.json.message} (ID: ${msg.json.message_id})`)\n  .join(' | '); // use '\\n' for line breaks or ' | ' for single line\n\nconst number = items[0].json.number\n\nreturn [\n  {\n    json: {\n      number: number,\n      combined_message: combinedMessage,\n    },\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2272,
+        32
+      ],
+      "id": "8aa92435-f879-4066-b012-934c5d843945",
+      "name": "Map result"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse JSON string from the \"output\" field and convert messages into an array of objects\n\nconst rawOutput = items[0].json.output; // get the string\nconst parsed = JSON.parse(rawOutput);   // parse the JSON string\n\n// Convert key-value pairs into list of objects\n// const messageList = Object.entries(parsed).map(([key, value]) => ({\n//   key,\n//   message: value\n// }));\n\n// return messageList.map(msg => ({ json: msg }));\nreturn parsed\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3072,
+        32
+      ],
+      "id": "93133346-6426-4bf5-83bb-602538a4a870",
+      "name": "Parse Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v22.0/902774616244718/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"918655991300\",\n  \"type\": \"text\",\n  \"context\": {\n    \"message_id\": \"{{ $json.message_id }}\"\n  },\n  \"text\": {\n    \"body\": \"{{ $json.message }}\"\n  }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3520,
+        32
+      ],
+      "id": "9ead0681-3a32-4996-a445-679ed21de5f9",
+      "name": "Send msg",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "iR5q4Pc809XWa04V",
+          "name": "whatsapp n8n-test-2 app Lakshit"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "aNkqPGZsrwVsVTiZ",
+          "mode": "list",
+          "cachedResultName": "Msg Batch Processing",
+          "cachedResultUrl": "/projects/iOyc3VpWKvgHH9fv/datatables/aNkqPGZsrwVsVTiZ"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "={{ $('Loop Over Items').item.json.id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "message_status": "processed"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "message_status",
+              "displayName": "message_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "number",
+              "displayName": "number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        2272,
+        288
+      ],
+      "id": "20986e9e-ab92-4446-bdcc-0b384ed04740",
+      "name": "update entry"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Variable mapping",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WhatsApp Trigger": {
+      "main": [
+        []
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Parse Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Variable mapping": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert row": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Get row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Done Processing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Read message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Done Processing": {
+      "main": [
+        [
+          {
+            "node": "Map result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s)": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send msg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read message": {
+      "main": [
+        [
+          {
+            "node": "update entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Typing Indicator": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map result": {
+      "main": [
+        [
+          {
+            "node": "Typing Indicator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Data": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send msg": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "update entry": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {
+    "WhatsApp Trigger": [
+      {
+        "json": {
+          "messaging_product": "whatsapp",
+          "metadata": {
+            "display_phone_number": "15556590601",
+            "phone_number_id": "902774616244718"
+          },
+          "contacts": [
+            {
+              "profile": {
+                "name": "Mosmi Patel"
+              },
+              "wa_id": "918655991300"
+            }
+          ],
+          "messages": [
+            {
+              "from": "918655991300",
+              "id": "wamid.HBgMOTE4NjU1OTkxMzAwFQIAEhgWM0VCMEQ5QzlBRDg1NzVDNjUyQkE3NwA=",
+              "timestamp": "1762421516",
+              "text": {
+                "body": "Hey"
+              },
+              "type": "text"
+            }
+          ],
+          "field": "messages"
+        }
+      }
+    ]
+  },
+  "versionId": "4e741190-7074-4579-86f6-9e9c7d9732e3",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-11-06T12:52:57.325Z",
+      "createdAt": "2025-11-06T12:52:57.325Z",
+      "role": "workflow:owner",
+      "workflowId": "e3sQ8p68vugyWAGL",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "tags": []
+}
