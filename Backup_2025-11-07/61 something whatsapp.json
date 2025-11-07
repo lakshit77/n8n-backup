@@ -1,0 +1,1671 @@
+{
+  "updatedAt": "2025-11-07T12:25:52.000Z",
+  "createdAt": "2025-11-06T12:52:57.318Z",
+  "id": "e3sQ8p68vugyWAGL",
+  "name": "61 something whatsapp",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        368,
+        800
+      ],
+      "id": "bddbd714-0c5b-411f-a935-69ffe864fa3a",
+      "name": "WhatsApp Trigger",
+      "webhookId": "e57e8925-ccd3-4cfa-8a84-60bff5909af1",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "nQbla4DtMJIZMbEt",
+          "name": "n8n-test-2 account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Map result').item.json.combined_message }}",
+        "options": {
+          "systemMessage": "=Name: Kady\nRole: You are an expert receptionist for Toothsi Clinic. Your job is to communicate with your user, serve them properly, and solve their task. \n\n\nNote:\n1. User message has multiple message seperated by '|' and for each message there is ID:\n2. Output your response as a List JSON object with between one and three messages, where possible, default to fewer messages.\n3. With that message I want message id which user has passed\n4. This will help me to tag that particular message and reply to it \n\nSince you are an SMS assistant, your output usually spans multiple ‘texts’. Feel free to use emojis in messages, and if it makes sense, some messages can be emojis only.\n\nExample:\n\n[\n  {\n    \"message\": \"Hi there!\",\n    \"message_id\": \"wamid:kvneknknv\"\n  }\n]"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        2384,
+        304
+      ],
+      "id": "2467fef5-ea31-49a0-a611-e5c188972507",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        2400,
+        528
+      ],
+      "id": "053b4519-c3e0-474c-b80d-2e4a6f5c26c1",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "TLy9RuRkIKncoUiy",
+          "name": "OpenRouter Freelance account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ef6c2837-9317-4ef6-afae-fdfa885c71c6",
+              "name": "message",
+              "value": "={{ $json.body.entry[0].changes[0].value.messages[0].text.body }}",
+              "type": "string"
+            },
+            {
+              "id": "625cec94-67c9-458b-8d58-b7851f8bcec5",
+              "name": "number",
+              "value": "={{ $json.body.entry[0].changes[0].value.contacts[0].wa_id }}",
+              "type": "string"
+            },
+            {
+              "id": "e8745982-aacb-422c-b003-fb7eb4c23303",
+              "name": "message_id",
+              "value": "={{ $json.body.entry[0].changes[0].value.messages[0].id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        368,
+        496
+      ],
+      "id": "f8d5da6f-d1ad-4065-bedd-baf2ea3be0f9",
+      "name": "Variable mapping"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "aNkqPGZsrwVsVTiZ",
+          "mode": "list",
+          "cachedResultName": "Msg Batch Processing",
+          "cachedResultUrl": "/projects/iOyc3VpWKvgHH9fv/datatables/aNkqPGZsrwVsVTiZ"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "message": "={{ $json.message }}",
+            "message_status": "in_queue",
+            "number": "={{ $json.number }}",
+            "message_id": "={{ $json.message_id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "message_status",
+              "displayName": "message_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "number",
+              "displayName": "number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "message_id",
+              "displayName": "message_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        816,
+        496
+      ],
+      "id": "e0fce49c-2331-49a1-be27-334c18ad07d9",
+      "name": "Insert row"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1040,
+        496
+      ],
+      "id": "8e6f9b30-3df6-4bb0-bc59-08f3b92e38c7",
+      "name": "Wait",
+      "webhookId": "b7fbb284-0a1d-4bd9-a6b2-bf507939b737"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1488,
+        496
+      ],
+      "id": "ff63981d-edf9-45a6-bbae-b048357eb85a",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1712,
+        304
+      ],
+      "id": "0d2b040b-17bd-4d93-a130-14546ae04a6a",
+      "name": "Done Processing"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "aNkqPGZsrwVsVTiZ",
+          "mode": "list",
+          "cachedResultName": "Msg Batch Processing",
+          "cachedResultUrl": "/projects/iOyc3VpWKvgHH9fv/datatables/aNkqPGZsrwVsVTiZ"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "number",
+              "keyValue": "={{ $('Variable mapping').item.json.number }}"
+            },
+            {
+              "keyName": "message_status",
+              "keyValue": "in_queue"
+            }
+          ]
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        496
+      ],
+      "id": "b0e46254-d5b3-41e8-bcc2-76b5f375c2c9",
+      "name": "Get row(s)"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Map result').item.json.number }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        2528,
+        528
+      ],
+      "id": "f96fee53-e469-4d8c-8dc4-41298cae775f",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2960,
+        304
+      ],
+      "id": "c1f5941e-384a-4d92-b716-065e2133dcfb",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8170b840-eff6-4baf-b107-7a6222b57ee4",
+              "leftValue": "={{ $json.message }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        592,
+        496
+      ],
+      "id": "10eb6057-10cc-4b6e-814b-562527ff778c",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v22.0/902774616244718/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"status\": \"read\",\n  \"message_id\": \"{{ $json.message_id }}\"\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1712,
+        496
+      ],
+      "id": "514c24aa-aff8-4276-ae82-564b355ba1fc",
+      "name": "Read message",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "iR5q4Pc809XWa04V",
+          "name": "whatsapp n8n-test-2 app Lakshit"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v22.0/902774616244718/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"status\": \"read\",\n  \"message_id\": \"{{ $node['update entry'].json.message_id }}\",\n  \"typing_indicator\": {\n    \"type\": \"text\"\n  }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2160,
+        304
+      ],
+      "id": "cebb93c8-ffd3-4e0d-8ab6-5e4e3d443e02",
+      "name": "Typing Indicator",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "iR5q4Pc809XWa04V",
+          "name": "whatsapp n8n-test-2 app Lakshit"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const combinedMessage = items\n  .map(msg => `${msg.json.message} (ID: ${msg.json.message_id})`)\n  .join(' | '); // use '\\n' for line breaks or ' | ' for single line\n\nconst number = items[0].json.number\n\nreturn [\n  {\n    json: {\n      number: number,\n      combined_message: combinedMessage,\n    },\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1936,
+        304
+      ],
+      "id": "8aa92435-f879-4066-b012-934c5d843945",
+      "name": "Map result"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse JSON string from the \"output\" field and convert messages into an array of objects\n\nconst rawOutput = items[0].json.output; // get the string\nconst parsed = JSON.parse(rawOutput);   // parse the JSON string\n\n// Convert key-value pairs into list of objects\n// const messageList = Object.entries(parsed).map(([key, value]) => ({\n//   key,\n//   message: value\n// }));\n\n// return messageList.map(msg => ({ json: msg }));\nreturn parsed\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2736,
+        304
+      ],
+      "id": "93133346-6426-4bf5-83bb-602538a4a870",
+      "name": "Parse Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v22.0/902774616244718/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"918655991300\",\n  \"type\": \"text\",\n  \"context\": {\n    \"message_id\": \"{{ $json.message_id }}\"\n  },\n  \"text\": {\n    \"body\": \"{{ $json.message }}\"\n  }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3184,
+        304
+      ],
+      "id": "9ead0681-3a32-4996-a445-679ed21de5f9",
+      "name": "Send msg",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "iR5q4Pc809XWa04V",
+          "name": "whatsapp n8n-test-2 app Lakshit"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "aNkqPGZsrwVsVTiZ",
+          "mode": "list",
+          "cachedResultName": "Msg Batch Processing",
+          "cachedResultUrl": "/projects/iOyc3VpWKvgHH9fv/datatables/aNkqPGZsrwVsVTiZ"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "={{ $('Loop Over Items').item.json.id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "message_status": "processed"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "message_status",
+              "displayName": "message_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "number",
+              "displayName": "number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1936,
+        576
+      ],
+      "id": "20986e9e-ab92-4446-bdcc-0b384ed04740",
+      "name": "update entry"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appIVKUMcUAkjByfT",
+          "mode": "list",
+          "cachedResultName": "Whatsapp Interface Base",
+          "cachedResultUrl": "https://airtable.com/appIVKUMcUAkjByfT"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblT67XcU6cttdy4z",
+          "mode": "list",
+          "cachedResultName": "Contact",
+          "cachedResultUrl": "https://airtable.com/appIVKUMcUAkjByfT/tblT67XcU6cttdy4z"
+        },
+        "filterByFormula": "=({phone_number}='{{ $json.body.entry[0].changes[0].value.contacts[0].wa_id }}')",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        464,
+        -560
+      ],
+      "id": "cca5b42a-de9a-4a6b-bdcf-202f2a2ede1d",
+      "name": "Search records",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "T7yxqTbXYpbUVPcS",
+          "name": "Ukani lakshit Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6baed76e-512c-4395-af66-7c81882d12ce",
+              "leftValue": "={{ $('Search records').item.json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        688,
+        -560
+      ],
+      "id": "fbd479d2-1b4b-4cf7-a17a-6e4e8212b403",
+      "name": "Check User Exist"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appIVKUMcUAkjByfT",
+          "mode": "list",
+          "cachedResultName": "Whatsapp Interface Base",
+          "cachedResultUrl": "https://airtable.com/appIVKUMcUAkjByfT"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblvBwl8f2z5vSs6e",
+          "mode": "list",
+          "cachedResultName": "User Message",
+          "cachedResultUrl": "https://airtable.com/appIVKUMcUAkjByfT/tblvBwl8f2z5vSs6e"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "message_id": "={{ $('Whatsapp Bot Webhook').item.json.body.entry[0].changes[0].value.messages[0].id }}",
+            "from": "={{ $('Whatsapp Bot Webhook').item.json.body.entry[0].changes[0].value.messages[0].from }}",
+            "to": "={{ $('Whatsapp Bot Webhook').item.json.body.entry[0].changes[0].value.metadata.display_phone_number }}",
+            "direction": "inbound",
+            "timestamp": "={{ new Date($('Whatsapp Bot Webhook').item.json.body.entry[0].changes[0].value.messages[0].timestamp*1000).toISOString() }}",
+            "status": "delivered",
+            "conversation_id": "={{ $('Whatsapp Bot Webhook').item.json.body.entry[0].changes[0].value.messages[0].from }}",
+            "text": "={{ $('Whatsapp Bot Webhook').item.json.body.entry[0].changes[0].value.messages[0].text.body }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "unique_id",
+              "displayName": "unique_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "message_id",
+              "displayName": "message_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "text",
+              "displayName": "text",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "from",
+              "displayName": "from",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "to",
+              "displayName": "to",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "direction",
+              "displayName": "direction",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "inbound",
+                  "value": "inbound"
+                },
+                {
+                  "name": "outbound",
+                  "value": "outbound"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "media_url",
+              "displayName": "media_url",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "delivered",
+                  "value": "delivered"
+                },
+                {
+                  "name": "read",
+                  "value": "read"
+                },
+                {
+                  "name": "sent",
+                  "value": "sent"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "conversation_id",
+              "displayName": "conversation_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1168,
+        -576
+      ],
+      "id": "49437464-b95b-409b-bb90-98ee35c28394",
+      "name": "Create Message Entry",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "T7yxqTbXYpbUVPcS",
+          "name": "Ukani lakshit Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appIVKUMcUAkjByfT",
+          "mode": "list",
+          "cachedResultName": "Whatsapp Interface Base",
+          "cachedResultUrl": "https://airtable.com/appIVKUMcUAkjByfT"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblT67XcU6cttdy4z",
+          "mode": "list",
+          "cachedResultName": "Contact",
+          "cachedResultUrl": "https://airtable.com/appIVKUMcUAkjByfT/tblT67XcU6cttdy4z"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "phone_number": "={{ $('Whatsapp Bot Webhook').item.json.body.entry[0].changes[0].value.contacts[0].wa_id }}",
+            "name": "={{ $('Whatsapp Bot Webhook').item.json.body.entry[0].changes[0].value.contacts[0].profile.name }}",
+            "last_message_preview": "={{ $('Whatsapp Bot Webhook').item.json.body.entry[0].changes[0].value.messages[0].text.body }}",
+            "last_message_timestamp": "={{ new Date($('Whatsapp Bot Webhook').item.json.body.entry[0].changes[0].value.messages[0].timestamp*1000).toISOString() }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "phone_number",
+              "displayName": "phone_number",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "unique_id",
+              "displayName": "unique_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "last_message_preview",
+              "displayName": "last_message_preview",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "last_message_timestamp",
+              "displayName": "last_message_timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        912,
+        -496
+      ],
+      "id": "197ca246-d166-43c8-89e8-0fa847cd9a29",
+      "name": "Create Contact Entry",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "T7yxqTbXYpbUVPcS",
+          "name": "Ukani lakshit Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "path": "whatsapp_send",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        240,
+        -656
+      ],
+      "id": "c559234c-651a-4a86-9ea1-50a617db5504",
+      "name": "Whatsapp Bot Webhook",
+      "webhookId": "2b7f85b2-f581-46d9-8d22-172f7a9933c0"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.query[\"hub.challenge\"] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        464,
+        -752
+      ],
+      "id": "49c9da27-212e-411e-9bf9-defaa3802b1e",
+      "name": "Verify Webhook"
+    },
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "path": "whatsapp/api",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        256,
+        -64
+      ],
+      "id": "84cd98a2-49de-4442-96cf-d8d8fefb2309",
+      "name": "UI Rendering API",
+      "webhookId": "e241dcd8-b235-4fbb-a9c2-b25efa7e8ab6"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "43bc103e-0dd8-4526-a33c-2708b2853e84",
+              "leftValue": "={{ $json.query }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        464,
+        -240
+      ],
+      "id": "876a66d9-0bf2-4f6d-af4b-76e2a1b17fc3",
+      "name": "Check Query Param Exist or not"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appIVKUMcUAkjByfT",
+          "mode": "list",
+          "cachedResultName": "Whatsapp Interface Base",
+          "cachedResultUrl": "https://airtable.com/appIVKUMcUAkjByfT"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblT67XcU6cttdy4z",
+          "mode": "list",
+          "cachedResultName": "Contact",
+          "cachedResultUrl": "https://airtable.com/appIVKUMcUAkjByfT/tblT67XcU6cttdy4z"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        720,
+        -352
+      ],
+      "id": "c8228666-a05e-4537-9ba3-aa522eff6dc4",
+      "name": "Get all Contacts",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "T7yxqTbXYpbUVPcS",
+          "name": "Ukani lakshit Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appIVKUMcUAkjByfT",
+          "mode": "list",
+          "cachedResultName": "Whatsapp Interface Base",
+          "cachedResultUrl": "https://airtable.com/appIVKUMcUAkjByfT"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblvBwl8f2z5vSs6e",
+          "mode": "list",
+          "cachedResultName": "User Message",
+          "cachedResultUrl": "https://airtable.com/appIVKUMcUAkjByfT/tblvBwl8f2z5vSs6e"
+        },
+        "filterByFormula": "=({conversation_id} = '{{ $json.query.conversation_id }}')",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        720,
+        -144
+      ],
+      "id": "b12f7580-166a-4376-8d72-6d65117c735c",
+      "name": "Get Single Contact Message",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "T7yxqTbXYpbUVPcS",
+          "name": "Ukani lakshit Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1024,
+        -240
+      ],
+      "id": "c91e4298-f8a0-40d8-93ae-8d927ab0c368",
+      "name": "Response back to API"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appIVKUMcUAkjByfT",
+          "mode": "list",
+          "cachedResultName": "Whatsapp Interface Base",
+          "cachedResultUrl": "https://airtable.com/appIVKUMcUAkjByfT"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblvBwl8f2z5vSs6e",
+          "mode": "list",
+          "cachedResultName": "User Message",
+          "cachedResultUrl": "https://airtable.com/appIVKUMcUAkjByfT/tblvBwl8f2z5vSs6e"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "text": "={{ $json.body.text }}",
+            "from": "={{ $json.body.from }}",
+            "to": "={{ $json.body.to }}",
+            "direction": "={{ $json.body.direction }}",
+            "timestamp": "={{ $json.body.timestamp }}",
+            "status": "={{ $json.body.status }}",
+            "conversation_id": "={{ $json.body.conversation_id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "unique_id",
+              "displayName": "unique_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "message_id",
+              "displayName": "message_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "text",
+              "displayName": "text",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "from",
+              "displayName": "from",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "to",
+              "displayName": "to",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "direction",
+              "displayName": "direction",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "inbound",
+                  "value": "inbound"
+                },
+                {
+                  "name": "outbound",
+                  "value": "outbound"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "media_url",
+              "displayName": "media_url",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "delivered",
+                  "value": "delivered"
+                },
+                {
+                  "name": "read",
+                  "value": "read"
+                },
+                {
+                  "name": "sent",
+                  "value": "sent"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "conversation_id",
+              "displayName": "conversation_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        464,
+        32
+      ],
+      "id": "64079ffe-3252-45c1-89ff-b2f05cf0334a",
+      "name": "Create a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "T7yxqTbXYpbUVPcS",
+          "name": "Ukani lakshit Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v22.0/902774616244718/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('UI Rendering API').item.json.body.to }}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"{{ $('UI Rendering API').item.json.body.text }}\"\n  }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        736,
+        32
+      ],
+      "id": "dd19458b-2e78-43a9-98c9-85ee4e68495d",
+      "name": "Send msg1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "iR5q4Pc809XWa04V",
+          "name": "whatsapp n8n-test-2 app Lakshit"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "WhatsApp Trigger": {
+      "main": [
+        []
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Parse Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Variable mapping": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert row": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Get row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Done Processing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Read message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Done Processing": {
+      "main": [
+        [
+          {
+            "node": "Map result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s)": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send msg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read message": {
+      "main": [
+        [
+          {
+            "node": "update entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Typing Indicator": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map result": {
+      "main": [
+        [
+          {
+            "node": "Typing Indicator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Data": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send msg": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "update entry": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search records": {
+      "main": [
+        [
+          {
+            "node": "Check User Exist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check User Exist": {
+      "main": [
+        [
+          {
+            "node": "Create Message Entry",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Contact Entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Contact Entry": {
+      "main": [
+        [
+          {
+            "node": "Create Message Entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Whatsapp Bot Webhook": {
+      "main": [
+        [
+          {
+            "node": "Verify Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Search records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UI Rendering API": {
+      "main": [
+        [
+          {
+            "node": "Check Query Param Exist or not",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Query Param Exist or not": {
+      "main": [
+        [
+          {
+            "node": "Get all Contacts",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Single Contact Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get all Contacts": {
+      "main": [
+        [
+          {
+            "node": "Response back to API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Single Contact Message": {
+      "main": [
+        [
+          {
+            "node": "Response back to API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a record": {
+      "main": [
+        [
+          {
+            "node": "Send msg1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "WhatsApp Trigger": [
+      {
+        "json": {
+          "messaging_product": "whatsapp",
+          "metadata": {
+            "display_phone_number": "15556590601",
+            "phone_number_id": "902774616244718"
+          },
+          "contacts": [
+            {
+              "profile": {
+                "name": "Mosmi Patel"
+              },
+              "wa_id": "918655991300"
+            }
+          ],
+          "messages": [
+            {
+              "from": "918655991300",
+              "id": "wamid.HBgMOTE4NjU1OTkxMzAwFQIAEhgWM0VCMEQ5QzlBRDg1NzVDNjUyQkE3NwA=",
+              "timestamp": "1762421516",
+              "text": {
+                "body": "Hey"
+              },
+              "type": "text"
+            }
+          ],
+          "field": "messages"
+        }
+      }
+    ],
+    "UI Rendering API": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.srv894857.hstgr.cloud",
+            "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+            "content-length": "203",
+            "accept": "*/*",
+            "accept-encoding": "gzip, deflate, br, zstd",
+            "accept-language": "en-US,en;q=0.9,la;q=0.8",
+            "content-type": "application/json",
+            "origin": "http://localhost:5174",
+            "priority": "u=1, i",
+            "referer": "http://localhost:5174/",
+            "sec-ch-ua": "\"Google Chrome\";v=\"141\", \"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"141\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "\"macOS\"",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "cross-site",
+            "x-forwarded-for": "203.194.96.191",
+            "x-forwarded-host": "n8n.srv894857.hstgr.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "fcbbf0f5f817",
+            "x-real-ip": "203.194.96.191"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "message_id": null,
+            "from": "15556590601",
+            "to": "918655991300",
+            "direction": "outbound",
+            "text": "hello",
+            "media_url": null,
+            "timestamp": "2025-11-07T11:52:51.466Z",
+            "status": "sent",
+            "conversation_id": "918655991300"
+          },
+          "webhookUrl": "https://n8n.srv894857.hstgr.cloud/webhook/whatsapp/api",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "versionId": "ab1697c9-963a-4f5c-91b7-e2f20dc1c2d2",
+  "triggerCount": 2,
+  "shared": [
+    {
+      "updatedAt": "2025-11-06T12:52:57.325Z",
+      "createdAt": "2025-11-06T12:52:57.325Z",
+      "role": "workflow:owner",
+      "workflowId": "e3sQ8p68vugyWAGL",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "tags": []
+}
