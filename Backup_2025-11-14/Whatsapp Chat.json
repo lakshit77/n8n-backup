@@ -1,0 +1,592 @@
+{
+  "updatedAt": "2025-11-14T13:00:18.000Z",
+  "createdAt": "2025-11-13T11:34:53.834Z",
+  "id": "V1GolwUDxcGbl6aY",
+  "name": "Whatsapp Chat",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "a2ef0698-a3a2-4cca-954a-43a6ab0d7162",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -832,
+        -320
+      ],
+      "id": "b40b9b51-7521-4d2b-826b-8874d1e730de",
+      "name": "Webhook",
+      "webhookId": "a2ef0698-a3a2-4cca-954a-43a6ab0d7162"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.twilio.com/2010-04-01/Accounts/AC512855366730e39b4a0857b16fb14f27/Messages.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "To",
+              "value": "={{ $json.body.From }}"
+            },
+            {
+              "name": "From",
+              "value": "={{ $json.body.To }}"
+            },
+            {
+              "name": "ContentSid",
+              "value": "HX67dec374c3290ba042afc2e69e75f8c1"
+            },
+            {
+              "name": "ContentVariables",
+              "value": "={\"1\":\"{{ $json.body.ProfileName }}\"}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        80,
+        -96
+      ],
+      "id": "827f7c7e-60cd-4b31-b7c8-79b92825bfd7",
+      "name": "Send Initial Template",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "WsQzmrY4u3R3NvDi",
+          "name": "Twillio cred 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c285b704-a505-4d8a-a018-83f7cc0070f0",
+              "leftValue": "={{ $json.body.MessageType }}",
+              "rightValue": "interactive",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -592,
+        -320
+      ],
+      "id": "1047b585-12d9-4f4d-94a6-fcea6537f400",
+      "name": "Check if Template"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1qNcwhfZ3p9c6UdqmrroMieFeawXX_UND-OMsRnEjbSU",
+          "mode": "list",
+          "cachedResultName": "catalog_products",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qNcwhfZ3p9c6UdqmrroMieFeawXX_UND-OMsRnEjbSU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1401568257,
+          "mode": "list",
+          "cachedResultName": "demo sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qNcwhfZ3p9c6UdqmrroMieFeawXX_UND-OMsRnEjbSU/edit#gid=1401568257"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        96,
+        -784
+      ],
+      "id": "94d72d0f-a105-4cad-8bdb-05f815312402",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cZc9FZPSLRtIq9IL",
+          "name": "Lakshit77 Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://content.twilio.com/v1/Content",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"friendly_name\": \"baby_product_template\",\n  \"language\": \"en\",\n  \"types\": {\n    \"twilio/list-picker\": {\n      \"body\": \"Choose a product to view the details\",\n      \"button\": \"Select Product\",\n      \"items\": {{$node[\"mapping_item\"].json[\"items_stringified\"]}}\n    }\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        464,
+        -784
+      ],
+      "id": "355d4ec5-ffca-45bb-984a-b54b02327e38",
+      "name": "Create List picker template OG",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "XbgCnjmIOf3tN8o7",
+          "name": "Twillio cred 2"
+        },
+        "httpBasicAuth": {
+          "id": "r3Hp5Vy6qya7XL5n",
+          "name": "Twillio Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Convert Excel rows → PROPER JSON array ready for Twilio\nconst MAX_ITEMS = 10;\n  const TITLE_MAX = 24;\nconst DESC_MAX = 72;\n\nconst rows = $input.all().map(i => i.json);\n\nfunction trunc(s,n){ \n  if (!s) return \"\"; \n  s = String(s); \n  return s.length<=n ? s : s.slice(0,n-1)+\"…\"; \n}\n\n// Order by in-stock first\nconst inStock = rows.filter(r => (r.availability || '').toLowerCase() === 'in stock');\nconst others   = rows.filter(r => !inStock.includes(r));\nconst ordered  = inStock.concat(others).slice(0, MAX_ITEMS);\n\n// Build Twilio List Picker items\nconst listItems = ordered.map(p => {\n  const id = String(p.id);\n  const title = trunc(p.title, TITLE_MAX);\n  const description = trunc(p.description ?? `₹${p.price} • ${p.availability}`, DESC_MAX);\n  return {\n    item: title,\n    description: description,\n    id: id\n  };\n});\n\n// Return BOTH versions:\n// 1. Normal JSON array\n// 2. Stringified JSON array (for display)\nreturn [{\n  json: {\n    items: listItems,\n    items_stringified: JSON.stringify(listItems, null, 2)\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        -784
+      ],
+      "id": "2a670e03-2f63-416f-a240-6772e5987ca4",
+      "name": "mapping_item"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.ButtonPayload }}",
+                    "rightValue": "browse_product",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "a7c6ca04-7747-406d-ab76-cd29c0e07c09"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Browse Product"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a082f7c7-a09f-4524-8298-89fadaaf58c6",
+                    "leftValue": "={{ $json.body.Body }}",
+                    "rightValue": "_",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "No of Quantity"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "623c6501-41f9-456d-864f-72f89f0ec8a6",
+                    "leftValue": "={{ $json.body.MessageType }}",
+                    "rightValue": "interactive",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Ask Quantity"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -176,
+        -592
+      ],
+      "id": "07b0d4a1-0940-4d90-9e55-0903d622edab",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.body.Body }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "Numeric",
+              "description": "This route will contain the value in numeric. "
+            },
+            {
+              "category": "Text",
+              "description": "This route will contain all the messages which are in text format. "
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        -656,
+        -32
+      ],
+      "id": "748f5117-ec07-40f8-ad52-411b59897b46",
+      "name": "Text Classifier",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -384,
+        -32
+      ],
+      "id": "f01aae0e-f92a-4b17-b08b-f6ee9c570590",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "TLy9RuRkIKncoUiy",
+          "name": "OpenRouter Freelance account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.twilio.com/2010-04-01/Accounts/AC512855366730e39b4a0857b16fb14f27/Messages.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "To",
+              "value": "={{ $node['Webhook'].json.body.From }}"
+            },
+            {
+              "name": "From",
+              "value": "={{ $node['Webhook'].json.body.To }}"
+            },
+            {
+              "name": "ContentSid",
+              "value": "={{ $json.sid }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        656,
+        -784
+      ],
+      "id": "0900b854-6c30-4ae3-82db-7ab40be0f30c",
+      "name": "Send Template",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "WsQzmrY4u3R3NvDi",
+          "name": "Twillio cred 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://content.twilio.com/v1/Content",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"friendly_name\": \"baby_product_template\",\n  \"language\": \"en\",\n  \"types\": {\n    \"twilio/list-picker\": {\n      \"body\": \"{{ $json.body }}\",\n      \"button\": \"{{ $json.button }}\",\n      \"items\": {{$node[\"list_quantity\"].json[\"items_stringified\"]}}\n    }\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        272,
+        -320
+      ],
+      "id": "c2908f8e-371a-49a0-8708-f5f024e3d9a1",
+      "name": "Create List Quantity picker ",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "XbgCnjmIOf3tN8o7",
+          "name": "Twillio cred 2"
+        },
+        "httpBasicAuth": {
+          "id": "r3Hp5Vy6qya7XL5n",
+          "name": "Twillio Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.twilio.com/2010-04-01/Accounts/AC512855366730e39b4a0857b16fb14f27/Messages.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "To",
+              "value": "={{ $node['Webhook'].json.body.From }}"
+            },
+            {
+              "name": "From",
+              "value": "={{ $node['Webhook'].json.body.To }}"
+            },
+            {
+              "name": "ContentSid",
+              "value": "={{ $json.sid }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        464,
+        -320
+      ],
+      "id": "799a7aba-091a-4d48-963c-c0dc1d2e539f",
+      "name": "Send Quantity Template",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "WsQzmrY4u3R3NvDi",
+          "name": "Twillio cred 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Function node: Quantity List Builder\n// Input: previous node is your Twilio webhook (so product selection data is in $json)\n// Output: { body, button, items_stringified }\n\n// --- Config\nconst MAX_Q = 10;\nconst BUTTON_TEXT = 'Select Qty';     // <=20 chars\nconst BODY_PREFIX = 'You selected';   // used to build the message\n\n// --- Helpers\nfunction trunc(s, n=60){ if (s===undefined||s===null) return ''; s=String(s); return s.length<=n? s : s.slice(0,n-1)+'…'; }\n\n// --- Extract product identifier from common Twilio webhook fields\n// Try a few common locations: (adjust if your webhook stores elsewhere)\n\n// Common Twilio places seen in screenshots: payload.Body, payload.ListTitle, payload.body.ListTitle, payload.body.Body\nlet productIdentifier = $input.first().json.body.Body;\nlet productTitle = $input.first().json.body.ListTitle;\n\n\n// --- Build items array (1..MAX_Q). Use small 'item' titles and descriptions\nconst items = [];\nfor (let q = 1; q <= MAX_Q; q++) {\n  const idObj = `${q}_${productIdentifier}`;\n  items.push({\n    item: String(q),                    // label shown to the user\n    description: q === 1 ? '1 unit' : `${q} units`,\n    // id is a safe encoded JSON string (decode on webhook parse)\n    id: idObj\n  });\n}\n\n// Build output fields\nconst body = `${BODY_PREFIX} '${trunc(productTitle, 36)}'. How many units do you want?`;\nconst button = BUTTON_TEXT;\nconst items_stringified = JSON.stringify(items); // stringified JSON array as requested\n\nreturn [{\n  json: {\n    body,\n    button,\n    items_stringified\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        80,
+        -320
+      ],
+      "id": "65d80e60-876b-482a-ae6d-26cf9ad8bb46",
+      "name": "list_quantity"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check if Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if Template": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Initial Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "mapping_item",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create List picker template OG": {
+      "main": [
+        [
+          {
+            "node": "Send Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "mapping_item": {
+      "main": [
+        [
+          {
+            "node": "Create List picker template OG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [
+          {
+            "node": "list_quantity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier": {
+      "main": [
+        [],
+        []
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create List Quantity picker ": {
+      "main": [
+        [
+          {
+            "node": "Send Quantity Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "list_quantity": {
+      "main": [
+        [
+          {
+            "node": "Create List Quantity picker ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "3fdd7502-fa0e-418e-be1c-6a77d2f87768",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-11-13T11:34:53.842Z",
+      "createdAt": "2025-11-13T11:34:53.842Z",
+      "role": "workflow:owner",
+      "workflowId": "V1GolwUDxcGbl6aY",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "tags": [
+    {
+      "updatedAt": "2025-11-14T10:19:51.673Z",
+      "createdAt": "2025-11-14T10:19:51.673Z",
+      "id": "ZeV32hHhoNphIlCK",
+      "name": "mayank"
+    }
+  ]
+}
