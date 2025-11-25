@@ -1,0 +1,1251 @@
+{
+  "updatedAt": "2025-11-25T10:45:30.000Z",
+  "createdAt": "2025-11-13T11:34:53.834Z",
+  "id": "V1GolwUDxcGbl6aY",
+  "name": "Whatsapp Chat",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "a2ef0698-a3a2-4cca-954a-43a6ab0d7162",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -832,
+        -384
+      ],
+      "id": "b40b9b51-7521-4d2b-826b-8874d1e730de",
+      "name": "Webhook",
+      "webhookId": "a2ef0698-a3a2-4cca-954a-43a6ab0d7162"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.twilio.com/2010-04-01/Accounts/AC512855366730e39b4a0857b16fb14f27/Messages.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "To",
+              "value": "={{ $json.body.From }}"
+            },
+            {
+              "name": "From",
+              "value": "={{ $json.body.To }}"
+            },
+            {
+              "name": "ContentSid",
+              "value": "HX67dec374c3290ba042afc2e69e75f8c1"
+            },
+            {
+              "name": "ContentVariables",
+              "value": "={\"1\":\"{{ $json.body.ProfileName }}\"}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -384,
+        -144
+      ],
+      "id": "827f7c7e-60cd-4b31-b7c8-79b92825bfd7",
+      "name": "Send Initial Template",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "WsQzmrY4u3R3NvDi",
+          "name": "Twillio cred 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c285b704-a505-4d8a-a018-83f7cc0070f0",
+              "leftValue": "={{ $json.body.MessageType }}",
+              "rightValue": "interactive",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -608,
+        -384
+      ],
+      "id": "1047b585-12d9-4f4d-94a6-fcea6537f400",
+      "name": "Check if Template"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1qNcwhfZ3p9c6UdqmrroMieFeawXX_UND-OMsRnEjbSU",
+          "mode": "list",
+          "cachedResultName": "catalog_products",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qNcwhfZ3p9c6UdqmrroMieFeawXX_UND-OMsRnEjbSU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1401568257,
+          "mode": "list",
+          "cachedResultName": "demo sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qNcwhfZ3p9c6UdqmrroMieFeawXX_UND-OMsRnEjbSU/edit#gid=1401568257"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -80,
+        -784
+      ],
+      "id": "94d72d0f-a105-4cad-8bdb-05f815312402",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cZc9FZPSLRtIq9IL",
+          "name": "Lakshit77 Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://content.twilio.com/v1/Content",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"friendly_name\": \"baby_product_template\",\n  \"language\": \"en\",\n  \"types\": {\n    \"twilio/list-picker\": {\n      \"body\": \"Choose a product to view the details\",\n      \"button\": \"Select Product\",\n      \"items\": {{$node[\"mapping_item\"].json[\"items_stringified\"]}}\n    }\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        368,
+        -784
+      ],
+      "id": "355d4ec5-ffca-45bb-984a-b54b02327e38",
+      "name": "Create List picker template OG",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "XbgCnjmIOf3tN8o7",
+          "name": "Twillio cred 2"
+        },
+        "httpBasicAuth": {
+          "id": "r3Hp5Vy6qya7XL5n",
+          "name": "Twillio Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Convert Excel rows → PROPER JSON array ready for Twilio\nconst MAX_ITEMS = 10;\n  const TITLE_MAX = 24;\nconst DESC_MAX = 72;\n\nconst rows = $input.all().map(i => i.json);\n\nfunction trunc(s,n){ \n  if (!s) return \"\"; \n  s = String(s); \n  return s.length<=n ? s : s.slice(0,n-1)+\"…\"; \n}\n\n// Order by in-stock first\nconst inStock = rows.filter(r => (r.availability || '').toLowerCase() === 'in stock');\nconst others   = rows.filter(r => !inStock.includes(r));\nconst ordered  = inStock.concat(others).slice(0, MAX_ITEMS);\n\n// Build Twilio List Picker items\nconst listItems = ordered.map(p => {\n  const id = String(p.id);\n  const title = trunc(p.title, TITLE_MAX);\n  const description = trunc(p.description ?? `₹${p.price} • ${p.availability}`, DESC_MAX);\n  return {\n    item: title,\n    description: description,\n    id: id\n  };\n});\n\n// Return BOTH versions:\n// 1. Normal JSON array\n// 2. Stringified JSON array (for display)\nreturn [{\n  json: {\n    items: listItems,\n    items_stringified: JSON.stringify(listItems, null, 2)\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        144,
+        -784
+      ],
+      "id": "2a670e03-2f63-416f-a240-6772e5987ca4",
+      "name": "mapping_item"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.ButtonPayload }}",
+                    "rightValue": "browse_product",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "a7c6ca04-7747-406d-ab76-cd29c0e07c09"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Browse Product"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b9ce7a61-a4ac-410d-a657-cc2043987041",
+                    "leftValue": "={{ $json.body.ButtonPayload }}",
+                    "rightValue": "confirm",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Confirm Order"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "fa8a5bb5-2908-4bee-b7f7-b7d6cd329182",
+                    "leftValue": "={{ $json.body.ButtonPayload }}",
+                    "rightValue": "ask_faqs",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Ask FAQs"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "1ac966a0-815a-4c1b-9c9c-2af2834b903f",
+                    "leftValue": "={{ $json.body.ButtonPayload }}",
+                    "rightValue": "cancel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Cancel Order"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a082f7c7-a09f-4524-8298-89fadaaf58c6",
+                    "leftValue": "={{ $json.body.Body }}",
+                    "rightValue": "_",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "No of Quantity"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "623c6501-41f9-456d-864f-72f89f0ec8a6",
+                    "leftValue": "={{ $json.body.MessageType }}",
+                    "rightValue": "interactive",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Ask Quantity"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -384,
+        -528
+      ],
+      "id": "07b0d4a1-0940-4d90-9e55-0903d622edab",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.body.Body }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "Numeric",
+              "description": "This route will contain the value in numeric. "
+            },
+            {
+              "category": "Text",
+              "description": "This route will contain all the messages which are in text format. "
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        -832,
+        128
+      ],
+      "id": "748f5117-ec07-40f8-ad52-411b59897b46",
+      "name": "Text Classifier",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -768,
+        352
+      ],
+      "id": "f01aae0e-f92a-4b17-b08b-f6ee9c570590",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "TLy9RuRkIKncoUiy",
+          "name": "OpenRouter Freelance account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.twilio.com/2010-04-01/Accounts/AC512855366730e39b4a0857b16fb14f27/Messages.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "To",
+              "value": "={{ $node['Webhook'].json.body.From }}"
+            },
+            {
+              "name": "From",
+              "value": "={{ $node['Webhook'].json.body.To }}"
+            },
+            {
+              "name": "ContentSid",
+              "value": "={{ $json.sid }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        592,
+        -784
+      ],
+      "id": "0900b854-6c30-4ae3-82db-7ab40be0f30c",
+      "name": "Send Template",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "WsQzmrY4u3R3NvDi",
+          "name": "Twillio cred 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://content.twilio.com/v1/Content",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"friendly_name\": \"baby_product_template\",\n  \"language\": \"en\",\n  \"types\": {\n    \"twilio/list-picker\": {\n      \"body\": \"{{ $json.body }}\",\n      \"button\": \"{{ $json.button }}\",\n      \"items\": {{$node[\"list_quantity\"].json[\"items_stringified\"]}}\n    }\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        144,
+        144
+      ],
+      "id": "c2908f8e-371a-49a0-8708-f5f024e3d9a1",
+      "name": "Create List Quantity picker ",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "XbgCnjmIOf3tN8o7",
+          "name": "Twillio cred 2"
+        },
+        "httpBasicAuth": {
+          "id": "r3Hp5Vy6qya7XL5n",
+          "name": "Twillio Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.twilio.com/2010-04-01/Accounts/AC512855366730e39b4a0857b16fb14f27/Messages.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "To",
+              "value": "={{ $node['Webhook'].json.body.From }}"
+            },
+            {
+              "name": "From",
+              "value": "={{ $node['Webhook'].json.body.To }}"
+            },
+            {
+              "name": "ContentSid",
+              "value": "={{ $json.sid }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        368,
+        144
+      ],
+      "id": "799a7aba-091a-4d48-963c-c0dc1d2e539f",
+      "name": "Send Quantity Template",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "WsQzmrY4u3R3NvDi",
+          "name": "Twillio cred 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Function node: Quantity List Builder\n// Input: previous node is your Twilio webhook (so product selection data is in $json)\n// Output: { body, button, items_stringified }\n\n// --- Config\nconst MAX_Q = 10;\nconst BUTTON_TEXT = 'Select Qty';     // <=20 chars\nconst BODY_PREFIX = 'You selected';   // used to build the message\n\n// --- Helpers\nfunction trunc(s, n=60){ if (s===undefined||s===null) return ''; s=String(s); return s.length<=n? s : s.slice(0,n-1)+'…'; }\n\n// --- Extract product identifier from common Twilio webhook fields\n// Try a few common locations: (adjust if your webhook stores elsewhere)\n\n// Common Twilio places seen in screenshots: payload.Body, payload.ListTitle, payload.body.ListTitle, payload.body.Body\nlet productIdentifier = $input.first().json.body.Body;\nlet productTitle = $input.first().json.body.ListTitle;\n\n\n// --- Build items array (1..MAX_Q). Use small 'item' titles and descriptions\nconst items = [];\nfor (let q = 1; q <= MAX_Q; q++) {\n  const idObj = `${q}_${productIdentifier}`;\n  items.push({\n    item: String(q),                    // label shown to the user\n    description: q === 1 ? '1 unit' : `${q} units`,\n    // id is a safe encoded JSON string (decode on webhook parse)\n    id: idObj\n  });\n}\n\n// Build output fields\nconst body = `${BODY_PREFIX} '${trunc(productTitle, 36)}'. How many units do you want?`;\nconst button = BUTTON_TEXT;\nconst items_stringified = JSON.stringify(items); // stringified JSON array as requested\n\nreturn [{\n  json: {\n    body,\n    button,\n    items_stringified\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        144
+      ],
+      "id": "65d80e60-876b-482a-ae6d-26cf9ad8bb46",
+      "name": "list_quantity"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0ea277a-b6fc-4818-8787-bae7b6768ddc",
+              "name": "item_id",
+              "value": "={{ $json.body.ListId.split('_')[1] }}",
+              "type": "string"
+            },
+            {
+              "id": "d331bf07-e522-4f03-8752-f7b332b1f648",
+              "name": "quantity",
+              "value": "={{ $json.body.ListTitle }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -80,
+        -48
+      ],
+      "id": "821ae4ab-89a3-40a7-a39f-6cc8cb2a923a",
+      "name": "Get Item ID"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1qNcwhfZ3p9c6UdqmrroMieFeawXX_UND-OMsRnEjbSU",
+          "mode": "list",
+          "cachedResultName": "catalog_products",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qNcwhfZ3p9c6UdqmrroMieFeawXX_UND-OMsRnEjbSU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1401568257,
+          "mode": "list",
+          "cachedResultName": "demo sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qNcwhfZ3p9c6UdqmrroMieFeawXX_UND-OMsRnEjbSU/edit#gid=1401568257"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "id",
+              "lookupValue": "={{ $json.item_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        144,
+        -48
+      ],
+      "id": "456f52c3-22f4-4350-84a9-fb7381c49bcf",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cZc9FZPSLRtIq9IL",
+          "name": "Lakshit77 Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://content.twilio.com/v1/Content",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"friendly_name\": \"confirm_order\",\n  \"language\": \"en\",\n  \"types\": {\n    \"twilio/quick-reply\": {\n      \"body\": \"Confirm your order: \\n • Product: {{ $json.title }} \\n • Quantity: {{ $('Get Item ID').item.json.quantity }}\",\n      \"actions\": [\n        {\n          \"title\": \"Confirm\",\n          \"id\": \"confirm_{{ $('Get Item ID').item.json.item_id }}_{{ $('Get Item ID').item.json.quantity }}\"\n        },\n        {\n          \"title\": \"Cancel\",\n          \"id\": \"cancel\"\n        }\n      ]\n    }\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        368,
+        -48
+      ],
+      "id": "9d5a9e93-da3c-444f-9688-d3f2f5d11d30",
+      "name": "Confirmation Template",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "r3Hp5Vy6qya7XL5n",
+          "name": "Twillio Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.twilio.com/2010-04-01/Accounts/AC512855366730e39b4a0857b16fb14f27/Messages.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "To",
+              "value": "={{ $node['Webhook'].json.body.From }}"
+            },
+            {
+              "name": "From",
+              "value": "={{ $node['Webhook'].json.body.To }}"
+            },
+            {
+              "name": "ContentSid",
+              "value": "={{ $json.sid }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        592,
+        -48
+      ],
+      "id": "b794c898-6ebd-4a3b-bbe0-0fc81e1d7b15",
+      "name": "Send Confirm Template",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "WsQzmrY4u3R3NvDi",
+          "name": "Twillio cred 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.twilio.com/2010-04-01/Accounts/AC512855366730e39b4a0857b16fb14f27/Messages.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "To",
+              "value": "={{ $('Webhook').item.json.body.From }}"
+            },
+            {
+              "name": "From",
+              "value": "={{ $('Webhook').item.json.body.To }}"
+            },
+            {
+              "name": "ContentSid",
+              "value": "HX67dec374c3290ba042afc2e69e75f8c1"
+            },
+            {
+              "name": "ContentVariables",
+              "value": "={\"1\":\"{{ $('Webhook').item.json.body.ProfileName }}\"}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        144,
+        -240
+      ],
+      "id": "e4636f0d-3d9b-45f6-97b3-aea38371dda5",
+      "name": "Send Initial Template1",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "WsQzmrY4u3R3NvDi",
+          "name": "Twillio cred 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.twilio.com/2010-04-01/Accounts/AC512855366730e39b4a0857b16fb14f27/Messages.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "To",
+              "value": "={{ $('Check if Template').item.json.body.From }}"
+            },
+            {
+              "name": "From",
+              "value": "={{ $('Check if Template').item.json.body.To }}"
+            },
+            {
+              "name": "Body",
+              "value": "=Your Order Has Been Cancel\nIf you want inital menu, type \"Menu\""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -80,
+        -240
+      ],
+      "id": "24d8d59c-5d24-4a4f-b3bf-29b9d67d305d",
+      "name": "Send Normal Message",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "r3Hp5Vy6qya7XL5n",
+          "name": "Twillio Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "00a9c062-dd4a-46e1-aca8-543cae3c6dca",
+              "name": "item_id",
+              "value": "={{ $json.body.ButtonPayload.split(\"_\")[1] }}",
+              "type": "string"
+            },
+            {
+              "id": "951c7c53-da08-4ec7-84f0-4bbc5433d52a",
+              "name": "quantity",
+              "value": "={{ $json.body.ButtonPayload.split(\"_\")[2] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -80,
+        -608
+      ],
+      "id": "802434ea-635f-4c2c-9ed7-fbc60ff18135",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1qNcwhfZ3p9c6UdqmrroMieFeawXX_UND-OMsRnEjbSU",
+          "mode": "list",
+          "cachedResultName": "catalog_products",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qNcwhfZ3p9c6UdqmrroMieFeawXX_UND-OMsRnEjbSU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1401568257,
+          "mode": "list",
+          "cachedResultName": "demo sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qNcwhfZ3p9c6UdqmrroMieFeawXX_UND-OMsRnEjbSU/edit#gid=1401568257"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "id",
+              "lookupValue": "={{ $json.item_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        144,
+        -608
+      ],
+      "id": "831d592b-01b4-4ded-b349-7730aa3973f2",
+      "name": "Get row(s) in sheet2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cZc9FZPSLRtIq9IL",
+          "name": "Lakshit77 Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1qNcwhfZ3p9c6UdqmrroMieFeawXX_UND-OMsRnEjbSU",
+          "mode": "list",
+          "cachedResultName": "catalog_products",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qNcwhfZ3p9c6UdqmrroMieFeawXX_UND-OMsRnEjbSU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 38109468,
+          "mode": "list",
+          "cachedResultName": "Order List",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qNcwhfZ3p9c6UdqmrroMieFeawXX_UND-OMsRnEjbSU/edit#gid=38109468"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Phone Number": "={{ $('Webhook').item.json.body.WaId }}",
+            "User": "={{ $('Webhook').item.json.body.ProfileName }}",
+            "Item_id": "={{ $('Edit Fields').item.json.item_id }}",
+            "Item": "={{ $json.title }}",
+            "Quantity": "={{ $('Edit Fields').item.json.quantity }}",
+            "Date": "={{ $now.setZone('Asia/Kolkata').format('yyyy-MM-dd T') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Phone Number",
+              "displayName": "Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "User",
+              "displayName": "User",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Item_id",
+              "displayName": "Item_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Item",
+              "displayName": "Item",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Quantity",
+              "displayName": "Quantity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        352,
+        -608
+      ],
+      "id": "e63b5675-06e4-4c4e-a8e7-67c5190725cd",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cZc9FZPSLRtIq9IL",
+          "name": "Lakshit77 Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.twilio.com/2010-04-01/Accounts/AC512855366730e39b4a0857b16fb14f27/Messages.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "To",
+              "value": "={{ $('Check if Template').item.json.body.From }}"
+            },
+            {
+              "name": "From",
+              "value": "={{ $('Check if Template').item.json.body.To }}"
+            },
+            {
+              "name": "Body",
+              "value": "=Your Order Has Been Added in our Database\nIf you want inital menu, type \"Menu\""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        592,
+        -608
+      ],
+      "id": "85025d4d-0fe9-4a5e-b47d-41f4020ac3d2",
+      "name": "Send Normal Message1",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "r3Hp5Vy6qya7XL5n",
+          "name": "Twillio Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.twilio.com/2010-04-01/Accounts/AC512855366730e39b4a0857b16fb14f27/Messages.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "To",
+              "value": "={{ $('Check if Template').item.json.body.From }}"
+            },
+            {
+              "name": "From",
+              "value": "={{ $('Check if Template').item.json.body.To }}"
+            },
+            {
+              "name": "Body",
+              "value": "=This Feature is under Development\nIf you want inital menu, type \"Menu\""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -80,
+        -416
+      ],
+      "id": "05d90907-b4dd-42b2-b517-7ba9771f87f4",
+      "name": "Send Normal Message2",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "r3Hp5Vy6qya7XL5n",
+          "name": "Twillio Credential"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check if Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if Template": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Initial Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "mapping_item",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create List picker template OG": {
+      "main": [
+        [
+          {
+            "node": "Send Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "mapping_item": {
+      "main": [
+        [
+          {
+            "node": "Create List picker template OG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Normal Message2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Normal Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Item ID",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "list_quantity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier": {
+      "main": [
+        [],
+        []
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create List Quantity picker ": {
+      "main": [
+        [
+          {
+            "node": "Send Quantity Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "list_quantity": {
+      "main": [
+        [
+          {
+            "node": "Create List Quantity picker ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Item ID": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Confirmation Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirmation Template": {
+      "main": [
+        [
+          {
+            "node": "Send Confirm Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Normal Message": {
+      "main": [
+        [
+          {
+            "node": "Send Initial Template1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet2": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send Normal Message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "969832b6-06ec-470f-aef0-fd4b6f965dd1",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-11-13T11:34:53.842Z",
+      "createdAt": "2025-11-13T11:34:53.842Z",
+      "role": "workflow:owner",
+      "workflowId": "V1GolwUDxcGbl6aY",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "tags": [
+    {
+      "updatedAt": "2025-11-14T10:19:51.673Z",
+      "createdAt": "2025-11-14T10:19:51.673Z",
+      "id": "ZeV32hHhoNphIlCK",
+      "name": "mayank"
+    }
+  ]
+}
