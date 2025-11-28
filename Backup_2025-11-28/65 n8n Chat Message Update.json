@@ -1,0 +1,215 @@
+{
+  "updatedAt": "2025-11-28T12:59:38.000Z",
+  "createdAt": "2025-11-28T12:56:29.459Z",
+  "id": "CCobHeAnRuOCL1MR",
+  "name": "65 n8n Chat Message Update",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -240,
+        -176
+      ],
+      "id": "3ecf4bc4-f132-469e-a38c-c79a815dd63f",
+      "name": "When chat message received",
+      "webhookId": "4763f6d8-e3ef-46ba-87ea-6393bf120703"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -32,
+        -176
+      ],
+      "id": "00c748d1-1bc3-48db-808e-53f542315889",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        368,
+        -176
+      ],
+      "id": "557339e6-3768-490a-aba0-fcf684544b43",
+      "name": "Respond to Chat"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {
+          "webSearch": {
+            "searchContextSize": "medium"
+          }
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -176,
+        80
+      ],
+      "id": "585609dd-bcfd-4f10-99d4-dd5688ed6c73",
+      "name": "LLM + Web Search",
+      "credentials": {
+        "openAiApi": {
+          "id": "U0FfOj4uWFY6nYAE",
+          "name": "Pankaj OpenAI Account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -32,
+        112
+      ],
+      "id": "8ff6ac5c-3007-48ca-aa8f-89bb00f430dc",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTool",
+      "typeVersion": 1,
+      "position": [
+        128,
+        192
+      ],
+      "id": "74493569-07a2-4fec-9d2d-ff8259d2947b",
+      "name": "Respond to Chat1"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        336,
+        80
+      ],
+      "id": "50a75008-4cb3-4f7c-a20f-fe8e7f69ffae",
+      "name": "Send message and wait for response in Gmail",
+      "webhookId": "99a77a65-1d19-4386-ae4d-2efedda0394f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9nQEWKuEYxxtGaYe",
+          "name": "Lakshit Gmail"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LLM + Web Search": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Chat1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message and wait for response in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "c04c3e1b-dca3-48db-b93f-471fb26a5355",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-11-28T12:56:29.463Z",
+      "createdAt": "2025-11-28T12:56:29.463Z",
+      "role": "workflow:owner",
+      "workflowId": "CCobHeAnRuOCL1MR",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "tags": []
+}
