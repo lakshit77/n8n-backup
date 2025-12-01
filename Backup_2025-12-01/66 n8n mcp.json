@@ -1,0 +1,78 @@
+{
+  "updatedAt": "2025-12-01T11:17:23.000Z",
+  "createdAt": "2025-12-01T07:19:14.336Z",
+  "id": "VDXM2xPF0Ubs1z0r",
+  "name": "66 n8n mcp",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "path": "mcp-test",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -192,
+        -64
+      ],
+      "id": "11f6a5b3-9dd2-442d-8ee0-80e0649ecaad",
+      "name": "Webhook",
+      "webhookId": "435c5ee3-c667-47f8-b860-fafec40cf1c4"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "5oZv9S5VggSkc7Ty",
+          "mode": "list",
+          "cachedResultName": "mcp-test-datatable",
+          "cachedResultUrl": "/projects/iOyc3VpWKvgHH9fv/datatables/5oZv9S5VggSkc7Ty"
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        16,
+        -64
+      ],
+      "id": "d5e2f7ab-a360-4a21-8160-07c9c671dbe4",
+      "name": "Get row(s)"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "78778dbb-a36f-4c63-8b72-9dce0b6923ad",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-12-01T07:19:14.341Z",
+      "createdAt": "2025-12-01T07:19:14.341Z",
+      "role": "workflow:owner",
+      "workflowId": "VDXM2xPF0Ubs1z0r",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "tags": []
+}
