@@ -1,0 +1,157 @@
+{
+  "updatedAt": "2025-12-01T12:11:18.000Z",
+  "createdAt": "2025-12-01T11:17:41.981Z",
+  "id": "Gtb7zuIYaii9co60",
+  "name": "68 Instagram Template API",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "path": "ig-template",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -352,
+        16
+      ],
+      "id": "8b369561-9e25-4ec9-9374-fe0b828711b2",
+      "name": "Webhook",
+      "webhookId": "267b007d-eae1-4696-9fcc-5607b9b01607"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3d1b4f5f-ec21-41b4-b820-c1882115ab65",
+              "leftValue": "={{ $json.query['hub.mode'] }}",
+              "rightValue": "subscribe",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "4c7e8b61-35ae-46a7-a848-4f9323d85e3e",
+              "leftValue": "={{ $json.query['hub.verify_token'] }}",
+              "rightValue": "lakshit",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -144,
+        -80
+      ],
+      "id": "da09568c-3fcb-416c-a170-352be9ea1474",
+      "name": "confirm webhook"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $('Webhook').item.json.query['hub.challenge'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        64,
+        -80
+      ],
+      "id": "827891b5-7834-4b5e-8f19-9b6d3d6cbcac",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "url": "https:google,.com",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -144,
+        112
+      ],
+      "id": "f8dea584-6fc8-4a0d-877c-d5b23d4b1186",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "4D4dwMb1eQ7ksBLb",
+          "name": "template tutorial iig app AT"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "confirm webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "confirm webhook": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "fab1175e-f3eb-4161-bc98-5ceb8f578fb0",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-12-01T11:17:41.993Z",
+      "createdAt": "2025-12-01T11:17:41.993Z",
+      "role": "workflow:owner",
+      "workflowId": "Gtb7zuIYaii9co60",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "tags": []
+}
