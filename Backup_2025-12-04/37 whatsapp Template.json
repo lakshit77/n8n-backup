@@ -1,0 +1,782 @@
+{
+  "updatedAt": "2025-11-14T10:45:42.000Z",
+  "createdAt": "2025-08-08T18:36:12.953Z",
+  "id": "iXnVBQoySTXvS9do",
+  "name": "37 whatsapp Template",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c285b704-a505-4d8a-a018-83f7cc0070f0",
+              "leftValue": "={{ $json.body.MessageType }}",
+              "rightValue": "interactive",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -496,
+        1248
+      ],
+      "id": "415ebc66-12f6-42cd-b913-261f9ee41381",
+      "name": "Check if Template"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.twilio.com/2010-04-01/Accounts/AC512855366730e39b4a0857b16fb14f27/Messages.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "To",
+              "value": "={{ $json.body.From }}"
+            },
+            {
+              "name": "From",
+              "value": "={{ $json.body.To }}"
+            },
+            {
+              "name": "ContentSid",
+              "value": "HX1e61379c3b952c91f8c8889eff674b3b"
+            },
+            {
+              "name": "ContentVariables",
+              "value": "={\"user_name\":\"{{ $json.body.ProfileName }}\"}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        80,
+        1392
+      ],
+      "id": "2a15fe12-37cd-4d19-b06a-07019e1d6b68",
+      "name": "Send Template",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "r3Hp5Vy6qya7XL5n",
+          "name": "Twillio Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.ButtonPayload }}",
+                    "rightValue": "buy_ticket",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "a7c6ca04-7747-406d-ab76-cd29c0e07c09"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Buy Ticket"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "623c6501-41f9-456d-864f-72f89f0ec8a6",
+                    "leftValue": "={{ $json.body.ButtonPayload }}",
+                    "rightValue": "retrieve_ticket",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Retrieve Ticket"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "891a1b62-8d96-4598-8013-2777b047abc2",
+                    "leftValue": "={{ $json.body.ButtonPayload }}",
+                    "rightValue": "last_transaction",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Last Transaction"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "6205daa5-5cf0-4496-8253-fc8038b62824",
+                    "leftValue": "={{ $json.body.ButtonPayload }}",
+                    "rightValue": "main_menu",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Main Menu"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -272,
+        1072
+      ],
+      "id": "922c8826-4c65-4d5e-9f81-38259fc8a58f",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "path": "buy-ticket",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -720,
+        1616
+      ],
+      "id": "f9d0442d-9217-42e6-94f1-f67194060229",
+      "name": "Buy Ticket",
+      "webhookId": "5ea75425-fe06-4446-acb0-d853031293b8"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.twilio.com/2010-04-01/Accounts/AC512855366730e39b4a0857b16fb14f27/Messages.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "To",
+              "value": "={{ $json.body.From }}"
+            },
+            {
+              "name": "From",
+              "value": "={{ $json.body.To }}"
+            },
+            {
+              "name": "ContentSid",
+              "value": "HX579573426c1b81f85c59ee8cba0b9629"
+            },
+            {
+              "name": "ContentVariables",
+              "value": "={\"wid\":\"{{ $json.body.WaId }}\"}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        160,
+        784
+      ],
+      "id": "e6f0a30c-08da-4c79-9848-fd5f62e9870a",
+      "name": "Buy Ticket Template",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "r3Hp5Vy6qya7XL5n",
+          "name": "Twillio Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1aFDhUmbHtRMKU7JHcUvC1H6AfXktl7tA5mGJ8n9POrE",
+          "mode": "list",
+          "cachedResultName": "Transaction DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1aFDhUmbHtRMKU7JHcUvC1H6AfXktl7tA5mGJ8n9POrE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1aFDhUmbHtRMKU7JHcUvC1H6AfXktl7tA5mGJ8n9POrE/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "WID": "={{ $json.query.wid }}",
+            "Date": "={{ $now }}",
+            "Status ": "success",
+            "Station A": "Andheri",
+            "Station B ": "Bandra",
+            "Paid Amount": "30"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "WID",
+              "displayName": "WID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status ",
+              "displayName": "Status ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Station A",
+              "displayName": "Station A",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Station B ",
+              "displayName": "Station B ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Paid Amount",
+              "displayName": "Paid Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -496,
+        1616
+      ],
+      "id": "c33a95c4-4325-461a-990a-b380a6148d15",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Nn6MoNvB7CWuaQp9",
+          "name": "Lakshit Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.twilio.com/2010-04-01/Accounts/AC512855366730e39b4a0857b16fb14f27/Messages.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "To",
+              "value": "={{ $('Check if Template').item.json.body.From }}"
+            },
+            {
+              "name": "From",
+              "value": "={{ $('Check if Template').item.json.body.To }}"
+            },
+            {
+              "name": "Body",
+              "value": "={{ JSON.parse($json.output).output }}\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        640,
+        1088
+      ],
+      "id": "4d8853bc-5cc5-4dd5-861d-5ac8f4a8d827",
+      "name": "Send Normal Message",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "r3Hp5Vy6qya7XL5n",
+          "name": "Twillio Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.twilio.com/2010-04-01/Accounts/AC512855366730e39b4a0857b16fb14f27/Messages.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "To",
+              "value": "=whatsapp:+{{ $json.WID }}"
+            },
+            {
+              "name": "From",
+              "value": "=whatsapp:+12678395989"
+            },
+            {
+              "name": "ContentSid",
+              "value": "HX00bf86d0e991e947493cd40b785e23f9"
+            },
+            {
+              "name": "ContentVariables",
+              "value": "={\"user_message\":\"To check your latest status of Ticket 👇.\"}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -272,
+        1616
+      ],
+      "id": "cd202a37-1e00-47e1-b145-28f25add5e9f",
+      "name": "Main Menu Template",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "r3Hp5Vy6qya7XL5n",
+          "name": "Twillio Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=user_wid: {{ $json.body.From.replace('whatsapp:+','') }}\nuser_text: {{ $json.body.ButtonPayload }}\n\nUse the appropriate tool as per the system instructions and return ONLY:\n{\"output\":\"<message>\"}\n",
+        "options": {
+          "systemMessage": "=You are the backend logic for the Maha Mumbai Metro (M³) WhatsApp chatbot.\n\nGoal\nDecide intent from user_text (Retrieve Ticket or Last Transaction), call the correct tool, format a WhatsApp-ready message, and return exactly one raw JSON object:\n{\"output\":\"<message>\"}\nNo other text, markdown, or keys.\n\nRules\n\nDetect intent (case-insensitive):\n\n“Retrieve Ticket” → intent = RETRIEVE_TICKET → call only retrieve_ticket\n\n“Last Transaction” → intent = LAST_TRANSACTION → call only last_transaction\n\nOtherwise: do not call tools; set message = \"Please select Retrieve Ticket or Last Transaction.\"\n\nTool usage:\n\nretrieve_ticket: filter WID = user_wid AND Status = \"success\", order by Date desc, limit 1.\n\nlast_transaction: filter WID = user_wid, order by Date desc, limit 1.\n\nFormatting:\n\nConvert ISO Date to Asia/Kolkata as \"DD MMM YYYY, hh:mm a\".\n\nMessages:\n\nRetrieve Ticket (success):\n✅ Ticket Found\nFrom: {Station A}\nTo: {Station B}\nAmount: ₹{Paid Amount}\nDate: {Local Date}\nWID: {WID}\n\nLast Transaction (success):\n✅ Last Transaction: SUCCESS\nFrom: {Station A}\nTo: {Station B}\nAmount: ₹{Paid Amount}\nDate: {Local Date}\nWID: {WID}\n\nLast Transaction (failure/other):\n❗ Last Transaction: {STATUS}\nDate: {Local Date}\nWID: {WID}\n\nNo data:\nWe couldn’t find any matching record. Please try “Buy Ticket” or check again later.\n\nFinal output requirement (critical):\n\nRespond with a single raw JSON object exactly like:\n{\"output\":\"<final WhatsApp message with \\n line breaks>\"}\n\nDo not wrap the JSON in quotes, do not add code fences, do not add explanations, tool traces, or extra keys."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        112,
+        992
+      ],
+      "id": "9e4e3610-77ef-4b7e-ac11-c7d04e8a1bf8",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        112,
+        1216
+      ],
+      "id": "4a5fa37c-b3ea-4d4c-b9f5-f2555bc68026",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "TLy9RuRkIKncoUiy",
+          "name": "OpenRouter Freelance account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1aFDhUmbHtRMKU7JHcUvC1H6AfXktl7tA5mGJ8n9POrE",
+          "mode": "list",
+          "cachedResultName": "Transaction DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1aFDhUmbHtRMKU7JHcUvC1H6AfXktl7tA5mGJ8n9POrE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1aFDhUmbHtRMKU7JHcUvC1H6AfXktl7tA5mGJ8n9POrE/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "WID",
+              "lookupValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('values0_Value', ``, 'string') }}"
+            },
+            {
+              "lookupColumn": "Status ",
+              "lookupValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('values1_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        240,
+        1216
+      ],
+      "id": "f5d45b74-2456-4848-a26f-518b554faf9e",
+      "name": "retrieve_ticket",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Nn6MoNvB7CWuaQp9",
+          "name": "Lakshit Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1aFDhUmbHtRMKU7JHcUvC1H6AfXktl7tA5mGJ8n9POrE",
+          "mode": "list",
+          "cachedResultName": "Transaction DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1aFDhUmbHtRMKU7JHcUvC1H6AfXktl7tA5mGJ8n9POrE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1aFDhUmbHtRMKU7JHcUvC1H6AfXktl7tA5mGJ8n9POrE/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "WID",
+              "lookupValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('values0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        368,
+        1216
+      ],
+      "id": "70bc7352-e211-4784-ac39-b3bbf8c682b7",
+      "name": "last_transaction",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Nn6MoNvB7CWuaQp9",
+          "name": "Lakshit Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "message-come",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -784,
+        1152
+      ],
+      "id": "2240275b-7d4b-46bb-af76-974581b229c3",
+      "name": "Message callback",
+      "webhookId": "439c0991-f274-48d2-b7ef-adddd721e8cf"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "a2ef0698-a3a2-4cca-954a-43a6ab0d7162",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -704,
+        1392
+      ],
+      "id": "ecabb763-33c7-48ca-bf1e-2dec48880c71",
+      "name": "Webhook",
+      "webhookId": "a2ef0698-a3a2-4cca-954a-43a6ab0d7162"
+    }
+  ],
+  "connections": {
+    "Check if Template": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Buy Ticket Template",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buy Ticket": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Main Menu Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buy Ticket Template": {
+      "main": [
+        []
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send Normal Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "retrieve_ticket": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "last_transaction": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message callback": {
+      "main": [
+        []
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check if Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Twilio Trigger": {
+      "sinkId": "DGa82483679ea2b761229004317ddc5d12",
+      "subscriptionId": "DF52521e415742a4256355ba8481af5c03"
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "7da45583-639e-478f-ad40-b55b0879bcfb",
+  "activeVersionId": null,
+  "triggerCount": 2,
+  "shared": [
+    {
+      "updatedAt": "2025-08-08T18:36:12.961Z",
+      "createdAt": "2025-08-08T18:36:12.961Z",
+      "role": "workflow:owner",
+      "workflowId": "iXnVBQoySTXvS9do",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
