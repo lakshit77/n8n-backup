@@ -1,0 +1,168 @@
+{
+  "updatedAt": "2025-12-04T12:55:29.000Z",
+  "createdAt": "2025-12-04T12:54:12.682Z",
+  "id": "SyfijCYGTgAk5x04",
+  "name": "LakshitUkani Cal Booking",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "events": [
+          "BOOKING_CREATED"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.calTrigger",
+      "typeVersion": 2,
+      "position": [
+        -64,
+        0
+      ],
+      "id": "36ba1cf2-063d-4a34-a5ed-78257acc7a9f",
+      "name": "LakshitUkani Cal",
+      "webhookId": "da3796c5-8e63-48a3-bb48-d0427155b6b4",
+      "credentials": {
+        "calApi": {
+          "id": "R3RXNppOEIgWfkAo",
+          "name": "LakshitUkani Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0A1BTD6867",
+          "mode": "list",
+          "cachedResultName": "work-notification"
+        },
+        "messageType": "block",
+        "blocksUi": "={\n\"blocks\": [\n  {\n    \"type\": \"header\",\n    \"text\": {\n      \"type\": \"plain_text\",\n      \"text\": \"📧 New Email Received\",\n      \"emoji\": true\n    }\n  },\n  {\n    \"type\": \"section\",\n    \"text\": {\n      \"type\": \"mrkdwn\",\n      \"text\": \"You have received a new email. Here are the details:\"\n    }\n  },\n  {\n    \"type\": \"divider\"\n  },\n  {\n    \"type\": \"section\",\n    \"fields\": [\n      {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*From:*\\n{{ $json.From }}\"\n      },\n      {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*Received At:*\\n{{ $now.setZone('Asia/Kolkata').toFormat('dd MMM yyyy, hh:mm a') }}\"\n      }\n    ]\n  },\n  {\n    \"type\": \"section\",\n    \"text\": {\n      \"type\": \"mrkdwn\",\n      \"text\": \"*Subject:*\\n{{ $json.Subject }}\"\n    }\n  },\n  {\n    \"type\": \"divider\"\n  },\n  {\n    \"type\": \"section\",\n    \"text\": {\n      \"type\": \"mrkdwn\",\n      \"text\": \"*Email Body:*\\n{{ $json.snippet }}\"\n    }\n  },\n  {\n    \"type\": \"divider\"\n  },\n  {\n    \"type\": \"context\",\n    \"elements\": [\n      {\n        \"type\": \"mrkdwn\",\n        \"text\": \"📬 Gmail Trigger | Processed by n8n automation\"\n      }\n    ]\n  }\n]\n}",
+        "text": "📧 New Email Received",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        160,
+        0
+      ],
+      "id": "7c1650ea-c3a6-456d-a8dc-12709049c4ae",
+      "name": "Send a message",
+      "webhookId": "2f855d1e-c00f-485a-a8f7-dc5bb9fc0dd5",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "ZC8Jm1dyTNehWjKR",
+          "name": "Slack account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "LakshitUkani Cal": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:LakshitUkani Cal": {
+      "webhookId": "e0e06a14-f012-4ab0-bd4b-efaae3181ec6"
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "a20a5cc8-660a-4367-9219-a603b28b75ee",
+  "activeVersionId": "a20a5cc8-660a-4367-9219-a603b28b75ee",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-12-04T12:54:12.687Z",
+      "createdAt": "2025-12-04T12:54:12.687Z",
+      "role": "workflow:owner",
+      "workflowId": "SyfijCYGTgAk5x04",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2025-12-04T12:55:29.707Z",
+    "createdAt": "2025-12-04T12:55:29.707Z",
+    "versionId": "a20a5cc8-660a-4367-9219-a603b28b75ee",
+    "workflowId": "SyfijCYGTgAk5x04",
+    "nodes": [
+      {
+        "parameters": {
+          "events": [
+            "BOOKING_CREATED"
+          ],
+          "options": {}
+        },
+        "type": "n8n-nodes-base.calTrigger",
+        "typeVersion": 2,
+        "position": [
+          -64,
+          0
+        ],
+        "id": "36ba1cf2-063d-4a34-a5ed-78257acc7a9f",
+        "name": "LakshitUkani Cal",
+        "webhookId": "da3796c5-8e63-48a3-bb48-d0427155b6b4",
+        "credentials": {
+          "calApi": {
+            "id": "R3RXNppOEIgWfkAo",
+            "name": "LakshitUkani Account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "authentication": "oAuth2",
+          "select": "channel",
+          "channelId": {
+            "__rl": true,
+            "value": "C0A1BTD6867",
+            "mode": "list",
+            "cachedResultName": "work-notification"
+          },
+          "messageType": "block",
+          "blocksUi": "={\n\"blocks\": [\n  {\n    \"type\": \"header\",\n    \"text\": {\n      \"type\": \"plain_text\",\n      \"text\": \"📧 New Email Received\",\n      \"emoji\": true\n    }\n  },\n  {\n    \"type\": \"section\",\n    \"text\": {\n      \"type\": \"mrkdwn\",\n      \"text\": \"You have received a new email. Here are the details:\"\n    }\n  },\n  {\n    \"type\": \"divider\"\n  },\n  {\n    \"type\": \"section\",\n    \"fields\": [\n      {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*From:*\\n{{ $json.From }}\"\n      },\n      {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*Received At:*\\n{{ $now.setZone('Asia/Kolkata').toFormat('dd MMM yyyy, hh:mm a') }}\"\n      }\n    ]\n  },\n  {\n    \"type\": \"section\",\n    \"text\": {\n      \"type\": \"mrkdwn\",\n      \"text\": \"*Subject:*\\n{{ $json.Subject }}\"\n    }\n  },\n  {\n    \"type\": \"divider\"\n  },\n  {\n    \"type\": \"section\",\n    \"text\": {\n      \"type\": \"mrkdwn\",\n      \"text\": \"*Email Body:*\\n{{ $json.snippet }}\"\n    }\n  },\n  {\n    \"type\": \"divider\"\n  },\n  {\n    \"type\": \"context\",\n    \"elements\": [\n      {\n        \"type\": \"mrkdwn\",\n        \"text\": \"📬 Gmail Trigger | Processed by n8n automation\"\n      }\n    ]\n  }\n]\n}",
+          "text": "📧 New Email Received",
+          "otherOptions": {}
+        },
+        "type": "n8n-nodes-base.slack",
+        "typeVersion": 2.3,
+        "position": [
+          160,
+          0
+        ],
+        "id": "7c1650ea-c3a6-456d-a8dc-12709049c4ae",
+        "name": "Send a message",
+        "webhookId": "2f855d1e-c00f-485a-a8f7-dc5bb9fc0dd5",
+        "credentials": {
+          "slackOAuth2Api": {
+            "id": "ZC8Jm1dyTNehWjKR",
+            "name": "Slack account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "LakshitUkani Cal": {
+        "main": [
+          []
+        ]
+      }
+    },
+    "authors": "Lakshit Ukani",
+    "name": null,
+    "description": null
+  },
+  "tags": []
+}
