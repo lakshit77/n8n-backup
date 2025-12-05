@@ -1,0 +1,361 @@
+{
+  "updatedAt": "2025-09-20T11:39:27.000Z",
+  "createdAt": "2025-08-27T14:54:46.804Z",
+  "id": "1nrDLEyyK2TR5eL8",
+  "name": "ugc",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=User Prompt - {{ $('On form submission').item.json.Action }}",
+        "options": {
+          "systemMessage": "=You are an Image Prompt Generator Agent.\nYour task is to take the user’s action or request (short phrase, sentence, or idea) and expand it into a clear, descriptive, and detailed prompt that can be passed into an image generation model (like Banana, ChatGPT images, or Stable Diffusion).\n\n🎯 Instructions:\n\nUnderstand the User Action\n\nIdentify the subject, object, and action.\n\nExample: “dog surfing” → subject = dog, action = surfing, setting = ocean.\n\nExpand with Visual Details\n\nAdd details about environment, perspective, lighting, colors, style, mood, and composition.\n\nExample: “dog surfing” → “A golden retriever surfing on a large wave at sunset, cinematic style, vibrant ocean water splashes, wide-angle shot.”\n\nApply Best Prompting Practices\n\nUse adjectives (cinematic, futuristic, neon, realistic, cartoonish).\n\nAdd style references if useful (digital art, 3D render, anime, cyberpunk, photorealistic).\n\nSuggest camera settings or perspectives if relevant (close-up, aerial view, wide-angle).\n\nOutput Format\n\nReturn only the final expanded prompt (not the explanation).\n\nKeep it 1–2 sentences long but rich in detail.\n\n✅ Example Expansions:\n\nUser Action: “robot cooking food”\nOutput Prompt:\n“A futuristic humanoid robot cooking pasta in a high-tech kitchen, stainless steel surfaces reflecting neon lights, cinematic lighting, ultra-realistic 3D render.”\n\nUser Action: “cat astronaut”\nOutput Prompt:\n“A fluffy white cat wearing a space suit floating inside a spacecraft, Earth visible through the window, soft glow lighting, digital art style.”"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -224,
+        512
+      ],
+      "id": "473be589-79d9-4b30-a523-9e3b9ee0b061",
+      "name": "Image Prompt"
+    },
+    {
+      "parameters": {
+        "url": "=https://queue.fal.run/fal-ai/bytedance/requests/{{ $json.request_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1232,
+        528
+      ],
+      "id": "d134a71c-4f01-4cb5-b1f7-88c0a2e54960",
+      "name": "Get Image",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "kLkJeU62RTWDWYIU",
+          "name": "Pankaj Fal AI Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://queue.fal.run/fal-ai/bytedance/seedream/v4/edit",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"prompt\": \"{{ $json.prompt }}\",\n  \"image_urls\": [\n   \"https://v3.fal.media/files/koala/wxk-iawmU3YJV98VjdTxs_4c7c4a0865534c57b08776a62bf234fb.png\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        768,
+        528
+      ],
+      "id": "fc318a0a-148d-4e85-80d7-31f1bf0aa3c7",
+      "name": "Create Image",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "kLkJeU62RTWDWYIU",
+          "name": "Pankaj Fal AI Key"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1008,
+        528
+      ],
+      "id": "8ba95d5f-11fc-4474-a15c-42400b3797a0",
+      "name": "Wait",
+      "webhookId": "6566a18e-a779-4702-a27f-12d01583d915"
+    },
+    {
+      "parameters": {
+        "content": "# Google Nano Banana Image Generation",
+        "height": 80,
+        "width": 672
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        240
+      ],
+      "id": "fd3c0a32-76dd-44a4-8ffa-c91fc170aa57",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -384,
+        416
+      ],
+      "id": "2944a708-ff36-4931-8b0d-345b6702b976",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "U0FfOj4uWFY6nYAE",
+          "name": "Pankaj OpenAI Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cb268ce5-d00c-42a1-bf38-33a339cde23b",
+              "name": "prompt",
+              "value": "=a relatable Indian IT professional, late 20s, wearing smart casuals, sitting with a laptop and coffee at a bustling modern cafe; looks bored and lost in thought; warm daylight, vibrant background with people chatting and plants. Make sure character style, face, outfit should remain same, nothing should change. ",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        512,
+        528
+      ],
+      "id": "518b0e06-07be-4afa-921d-c64bfbc537d1",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        272,
+        640
+      ],
+      "id": "ac951f25-6fe9-46fd-ac36-9038a41510f2",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "=https://queue.fal.run/fal-ai/bytedance/requests/{{ $json.request_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1280,
+        704
+      ],
+      "id": "9f511287-4e91-4525-b594-f4deeda11d03",
+      "name": "Get Image1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "kLkJeU62RTWDWYIU",
+          "name": "Pankaj Fal AI Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://queue.fal.run/fal-ai/bytedance/seedream/v4/edit",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"prompt\": \"{{ $json.prompt }}\",\n  \"image_urls\": [\n   \"https://v3.fal.media/files/koala/wxk-iawmU3YJV98VjdTxs_4c7c4a0865534c57b08776a62bf234fb.png\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        816,
+        704
+      ],
+      "id": "a11dba64-f3bf-4e79-bf8e-4a361d1a38af",
+      "name": "Create Image1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "kLkJeU62RTWDWYIU",
+          "name": "Pankaj Fal AI Key"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1056,
+        704
+      ],
+      "id": "19f68bb5-59be-4a5c-833b-53000f99b2b2",
+      "name": "Wait1",
+      "webhookId": "6566a18e-a779-4702-a27f-12d01583d915"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cb268ce5-d00c-42a1-bf38-33a339cde23b",
+              "name": "prompt",
+              "value": "=a relatable Indian IT professional, late 20s, wearing smart casuals, sitting with a laptop and coffee at a bustling modern cafe; looks bored and lost in thought; warm daylight, vibrant background with people chatting and plants. Make sure character style, face, outfit should remain same, nothing should change. ",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        704
+      ],
+      "id": "69bd72c7-dc47-4244-aff6-13a30f248ba8",
+      "name": "Edit Fields1"
+    }
+  ],
+  "connections": {
+    "Image Prompt": {
+      "main": [
+        []
+      ]
+    },
+    "Create Image": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Get Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Image Prompt",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Create Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Image1": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Get Image1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Create Image1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "a85675d2-e268-4a1f-aa9d-b352e9bff00f",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-08-27T14:54:46.845Z",
+      "createdAt": "2025-08-27T14:54:46.845Z",
+      "role": "workflow:owner",
+      "workflowId": "1nrDLEyyK2TR5eL8",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
