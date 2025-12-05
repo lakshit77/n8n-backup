@@ -1,0 +1,169 @@
+{
+  "updatedAt": "2025-11-12T11:51:40.000Z",
+  "createdAt": "2025-08-26T17:51:06.741Z",
+  "id": "XFzeSA5lmVNI3Rl9",
+  "name": "My workflow 7",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "d61a7193-61ca-4d39-9460-d1ed6720c35c",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b857abbd-db8a-4694-b73c-21616189d4bc",
+      "name": "Webhook",
+      "webhookId": "d61a7193-61ca-4d39-9460-d1ed6720c35c"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.message }}",
+        "options": {
+          "systemMessage": "=You are a multilingual conversational assistant.\nYou must always reply in the same language that the user is using.\n\nRules:\n\nSupported languages: Hindi, Gujarati, Marathi, English.\n\nDetect the language of the user’s message and respond in that exact language.\n\nMaintain a natural, fluent, and respectful tone in each language.\n\nIf the user mixes multiple languages, reply in the dominant language of the message.\n\nNever switch to another language unless the user changes their input language.\n\nIf the user asks explicitly, you may also translate or provide multilingual comparisons.\n\n✨ Examples:\n\nUser (Hindi): भारत की राजधानी क्या है?\nAssistant: भारत की राजधानी नई दिल्ली है।\n\nUser (Gujarati): અમદાવાદમાં કાલે વાતાવરણ કેમ રહેશે?\nAssistant: અમદાવાદમાં કાલે હવામાન ગરમ અને સૂકું રહેવાની શક્યતા છે।\n\nUser (Marathi): मला पुण्यातील प्रसिद्ध किल्ल्यांची माहिती हवी आहे.\nAssistant: पुण्यातील प्रसिद्ध किल्ल्यांमध्ये शनिवारवाडा, सिंहगड, तोरणा व राजगड यांचा समावेश होतो.\n\nUser (English): Can you tell me about Discover Resort packages?\nAssistant: Sure! We offer Deluxe Rooms, Ocean View Suites, and Presidential Villas, each with curated packages including meals, spa, and activities.\n\nNote:\n- Write your response in **under 700 characters** (including spaces and newlines).  \nMake sure to include at least one special character (e.g., !, @, #, $, %, &, *) in the text.  \n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "bae2490d-9d22-4a63-ad02-cf1745f636df",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        144,
+        208
+      ],
+      "id": "783a92ac-ef17-4728-8327-d1b205dc12a6",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "TLy9RuRkIKncoUiy",
+          "name": "OpenRouter Freelance account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={\n  \"message\": \"{{ $json.output.replace(/\\\"/g, '\\\\\\\"').replace(/\\n/g, '\\\\n') }}\"\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        544,
+        0
+      ],
+      "id": "8bf042c4-3509-4631-9728-49b08ee269af",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.srv894857.hstgr.cloud",
+            "user-agent": "python-requests/2.32.5",
+            "content-length": "11",
+            "accept": "*/*",
+            "accept-encoding": "gzip, deflate",
+            "content-type": "application/x-www-form-urlencoded",
+            "x-forwarded-for": "34.93.128.56",
+            "x-forwarded-host": "n8n.srv894857.hstgr.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "746840d2afb8",
+            "x-real-ip": "34.93.128.56"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "text": "gemini"
+          },
+          "webhookUrl": "https://n8n.srv894857.hstgr.cloud/webhook/d61a7193-61ca-4d39-9460-d1ed6720c35c",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "versionId": "a1a3ad1c-cb72-4563-894b-f0ab2b634a36",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-08-26T17:51:06.748Z",
+      "createdAt": "2025-08-26T17:51:06.748Z",
+      "role": "workflow:owner",
+      "workflowId": "XFzeSA5lmVNI3Rl9",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
