@@ -1,0 +1,30 @@
+{
+  "updatedAt": "2025-07-20T13:33:34.000Z",
+  "createdAt": "2025-07-13T10:29:03.434Z",
+  "id": "EbrJmHvXVDeWJRGR",
+  "name": "28_Retell Inbound AI agent",
+  "active": false,
+  "isArchived": true,
+  "nodes": [],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "266d07b0-6433-46a6-bdfe-065096af5e90",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-07-13T10:29:03.447Z",
+      "createdAt": "2025-07-13T10:29:03.447Z",
+      "role": "workflow:owner",
+      "workflowId": "EbrJmHvXVDeWJRGR",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
