@@ -1,0 +1,32 @@
+{
+  "updatedAt": "2025-10-18T18:30:27.000Z",
+  "createdAt": "2025-10-18T18:29:30.942Z",
+  "id": "8vAYboiNULi9TzAF",
+  "name": "55 Veo 3.1",
+  "active": false,
+  "isArchived": false,
+  "nodes": [],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "747881c4-983d-428c-a189-824dba360e30",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-10-18T18:29:30.952Z",
+      "createdAt": "2025-10-18T18:29:30.952Z",
+      "role": "workflow:owner",
+      "workflowId": "8vAYboiNULi9TzAF",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
