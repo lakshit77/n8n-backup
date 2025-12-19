@@ -1,0 +1,150 @@
+{
+  "updatedAt": "2025-09-27T12:14:46.000Z",
+  "createdAt": "2025-09-08T18:12:34.435Z",
+  "id": "ssgmixYW4s27TBui",
+  "name": "44 TezDM Post Comment",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Get Your Free Content - Almost There! 🚀",
+        "formDescription": "Thanks for following! Just one more step to get your exclusive content delivered straight to your inbox. This takes less than 30 seconds ⏰",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Full Name",
+              "placeholder": "Your Full Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email Id",
+              "fieldType": "email",
+              "placeholder": "Email Address - We'll send your content here",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false,
+          "buttonLabel": "Get Content",
+          "respondWithOptions": {
+            "values": {
+              "respondWith": "redirect",
+              "redirectUrl": "https://lily-lobster-cc9.notion.site/Linkedin-Automation-269b06aa7d2e80a8b658d9e06b18cdc1?pvs=74"
+            }
+          },
+          "customCss": ":root {\n\t--font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;\n\t--font-weight-normal: 400;\n\t--font-weight-bold: 600;\n\t--font-size-body: 14px;\n\t--font-size-label: 15px;\n\t--font-size-test-notice: 13px;\n\t--font-size-input: 16px;\n\t--font-size-header: 24px;\n\t--font-size-paragraph: 15px;\n\t--font-size-link: 14px;\n\t--font-size-error: 13px;\n\t--font-size-html-h1: 32px;\n\t--font-size-html-h2: 24px;\n\t--font-size-html-h3: 20px;\n\t--font-size-html-h4: 16px;\n\t--font-size-html-h5: 14px;\n\t--font-size-html-h6: 12px;\n\t--font-size-subheader: 16px;\n\t/* Colors */\n\t--color-background: #f8fafc;\n\t--color-test-notice-text: #f59e0b;\n\t--color-test-notice-bg: #fffbeb;\n\t--color-test-notice-border: #fed7aa;\n\t--color-card-bg: #ffffff;\n\t--color-card-border: #e2e8f0;\n\t--color-card-shadow: rgba(59, 130, 246, 0.08);\n\t--color-link: #3b82f6;\n\t--color-header: #1e293b;\n\t--color-label: #374151;\n\t--color-input-border: #d1d5db;\n\t--color-input-text: #1f2937;\n\t--color-focus-border: #3b82f6;\n\t--color-submit-btn-bg: #3b82f6;\n\t--color-submit-btn-text: #ffffff;\n\t--color-error: #ef4444;\n\t--color-required: #8b5cf6;\n\t--color-clear-button-bg: #6b7280;\n\t--color-html-text: #374151;\n\t--color-html-link: #3b82f6;\n\t--color-header-subtext: #64748b;\n\t/* Border Radii */\n\t--border-radius-card: 16px;\n\t--border-radius-input: 12px;\n\t--border-radius-clear-btn: 50%;\n\t--card-border-radius: 16px;\n\t/* Spacing */\n\t--padding-container-top: 32px;\n\t--padding-card: 32px;\n\t--padding-test-notice-vertical: 16px;\n\t--padding-test-notice-horizontal: 20px;\n\t--margin-bottom-card: 24px;\n\t--padding-form-input: 16px;\n\t--card-padding: 32px;\n\t--card-margin-bottom: 24px;\n\t/* Dimensions */\n\t--container-width: 480px;\n\t--submit-btn-height: 56px;\n\t--checkbox-size: 20px;\n\t/* Others */\n\t--box-shadow-card: 0px 8px 32px 0px var(--color-card-shadow);\n\t--opacity-placeholder: 0.6;\n}"
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -208,
+        -64
+      ],
+      "id": "81b01a4b-2d0d-435a-b74b-9278f729789f",
+      "name": "On form submission",
+      "webhookId": "c90a6b59-9fd1-4992-836b-7dafbf18871c"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1iry9JxOYa91EmOoX_y_WiQSjFHR8eX2d2hXnhno0qj0",
+          "mode": "list",
+          "cachedResultName": "Lead generation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1iry9JxOYa91EmOoX_y_WiQSjFHR8eX2d2hXnhno0qj0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1iry9JxOYa91EmOoX_y_WiQSjFHR8eX2d2hXnhno0qj0/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json['Full Name'] }}",
+            "Email": "={{ $json['Email Id'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        32,
+        -64
+      ],
+      "id": "79896aae-551b-4afd-9da2-4e10b381b4f6",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cZc9FZPSLRtIq9IL",
+          "name": "Lakshit77 Account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "6b4800eb-709e-4934-85e9-dc4d71694aab",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-09-08T18:12:34.441Z",
+      "createdAt": "2025-09-08T18:12:34.441Z",
+      "role": "workflow:owner",
+      "workflowId": "ssgmixYW4s27TBui",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
