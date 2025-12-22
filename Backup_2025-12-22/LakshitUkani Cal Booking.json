@@ -1,0 +1,342 @@
+{
+  "updatedAt": "2025-12-19T18:29:38.000Z",
+  "createdAt": "2025-12-04T12:54:12.682Z",
+  "id": "SyfijCYGTgAk5x04",
+  "name": "LakshitUkani Cal Booking",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "events": [
+          "BOOKING_CREATED"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.calTrigger",
+      "typeVersion": 2,
+      "position": [
+        -64,
+        0
+      ],
+      "id": "36ba1cf2-063d-4a34-a5ed-78257acc7a9f",
+      "name": "LakshitUkani Cal",
+      "webhookId": "da3796c5-8e63-48a3-bb48-d0427155b6b4",
+      "credentials": {
+        "calApi": {
+          "id": "R3RXNppOEIgWfkAo",
+          "name": "LakshitUkani Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0A1BTD6867",
+          "mode": "list",
+          "cachedResultName": "work-notification"
+        },
+        "messageType": "block",
+        "blocksUi": "={\n\"blocks\": [\n  {\n    \"type\": \"header\",\n    \"text\": {\n      \"type\": \"plain_text\",\n      \"text\": \"📧 New Meeting Scheduled\",\n      \"emoji\": true\n    }\n  },\n  {\n    \"type\": \"section\",\n    \"text\": {\n      \"type\": \"mrkdwn\",\n      \"text\": \"You have received a new email. Here are the details:\"\n    }\n  },\n  {\n    \"type\": \"divider\"\n  },\n  {\n    \"type\": \"section\",\n    \"fields\": [\n      {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*From:*\\n{{ $json.attendees[0].email }}\"\n      },\n      {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*Received At:*\\n{{ $json.attendees[0].phoneNumber }}\"\n      }\n    ]\n  },\n  {\n    \"type\": \"section\",\n    \"fields\": [\n      {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*Subject:*\\n{{ $json.attendees[0].name }}\"\n      },\n      {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*Meeting Time:*\\n{{ DateTime.fromISO($json.startTime).setZone('Asia/Kolkata').toFormat('dd MMM yyyy, hh:mm a') }}\"\n      }\n    ]\n  },\n  {\n    \"type\": \"section\",\n    \"fields\": [\n      {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*Reason For Meeting Schedule:*\\n{{ $json.responses['Reason-for-Scheduling-the-meet'].value }}\"\n      }\n    ]\n  },\n  {\n    \"type\": \"divider\"\n  },\n  {\n    \"type\": \"context\",\n    \"elements\": [\n      {\n        \"type\": \"mrkdwn\",\n        \"text\": \"📬 Gmail Trigger | Processed by n8n automation\"\n      }\n    ]\n  }\n]\n}",
+        "text": "📧 New Meeting Scheduled",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        160,
+        0
+      ],
+      "id": "7c1650ea-c3a6-456d-a8dc-12709049c4ae",
+      "name": "Send a message",
+      "webhookId": "2f855d1e-c00f-485a-a8f7-dc5bb9fc0dd5",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "ZC8Jm1dyTNehWjKR",
+          "name": "Slack account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "LakshitUkani Cal": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:LakshitUkani Cal": {
+      "webhookId": "898507fd-8281-4347-9f99-71320c625f5a"
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "LakshitUkani Cal": [
+      {
+        "json": {
+          "triggerEvent": "BOOKING_CREATED",
+          "createdAt": "2025-12-19T18:27:01.806Z",
+          "bookerUrl": "https://cal.com",
+          "title": "Let’s Automate Your Work between lakshit ukani and lakshit ukani",
+          "startTime": "2025-12-20T13:30:00Z",
+          "endTime": "2025-12-20T14:30:00Z",
+          "additionalNotes": "",
+          "type": "60min",
+          "description": "I help creators and businesses automate their workflows, systems, and client operations using smart AI and n8n automations.",
+          "eventTypeId": 4076861,
+          "hideCalendarNotes": false,
+          "hideCalendarEventDetails": false,
+          "hideOrganizerEmail": false,
+          "schedulingType": null,
+          "seatsPerTimeSlot": null,
+          "seatsShowAttendees": true,
+          "seatsShowAvailabilityCount": true,
+          "customReplyToEmail": null,
+          "disableRescheduling": false,
+          "disableCancelling": false,
+          "organizer": {
+            "id": 1968728,
+            "name": "lakshit ukani",
+            "email": "lakshit@lakshitukani.com",
+            "username": "lakshit-ukani-77",
+            "timeZone": "Asia/Calcutta",
+            "language": {
+              "locale": "en"
+            },
+            "timeFormat": "h:mma",
+            "utcOffset": 330
+          },
+          "attendees": [
+            {
+              "email": "freelance3015@gmail.com",
+              "name": "lakshit ukani",
+              "phoneNumber": "+918898764490",
+              "firstName": "",
+              "lastName": "",
+              "timeZone": "Asia/Calcutta",
+              "language": {
+                "locale": "en"
+              },
+              "utcOffset": 330
+            }
+          ],
+          "customInputs": {},
+          "responses": {
+            "name": {
+              "label": "your_name",
+              "value": "lakshit ukani",
+              "isHidden": false
+            },
+            "email": {
+              "label": "email_address",
+              "value": "freelance3015@gmail.com",
+              "isHidden": false
+            },
+            "attendeePhoneNumber": {
+              "label": "phone_number",
+              "value": "+918898764490",
+              "isHidden": false
+            },
+            "location": {
+              "label": "location",
+              "value": {
+                "value": "integrations:google:meet",
+                "optionValue": ""
+              },
+              "isHidden": false
+            },
+            "title": {
+              "label": "Reason for Scheduling the meet",
+              "isHidden": true
+            },
+            "Reason-for-Scheduling-the-meet": {
+              "label": "Reason for Scheduling the meet",
+              "value": "Just testing it",
+              "isHidden": false
+            },
+            "notes": {
+              "label": "additional_notes",
+              "isHidden": true
+            },
+            "guests": {
+              "label": "additional_guests",
+              "value": [],
+              "isHidden": false
+            },
+            "rescheduleReason": {
+              "label": "reason_for_reschedule",
+              "isHidden": true
+            }
+          },
+          "userFieldsResponses": {
+            "Reason-for-Scheduling-the-meet": {
+              "label": "Reason for Scheduling the meet",
+              "value": "Just testing it",
+              "isHidden": false
+            }
+          },
+          "location": "integrations:google:meet",
+          "destinationCalendar": [
+            {
+              "id": 997197,
+              "integration": "google_calendar",
+              "externalId": "lakshit@lakshitukani.com",
+              "primaryEmail": "lakshit@lakshitukani.com",
+              "userId": 1968728,
+              "eventTypeId": null,
+              "credentialId": 1584335,
+              "createdAt": "2025-12-04T12:33:27.738Z",
+              "updatedAt": "2025-12-04T12:33:27.738Z",
+              "delegationCredentialId": null,
+              "domainWideDelegationCredentialId": null
+            }
+          ],
+          "iCalUID": "jK7HBMEYdWhhnpGN3Nt3zB@Cal.com",
+          "iCalSequence": 0,
+          "requiresConfirmation": false,
+          "oneTimePassword": null,
+          "hashedLink": null,
+          "uid": "jK7HBMEYdWhhnpGN3Nt3zB",
+          "conferenceData": {
+            "createRequest": {
+              "requestId": "8a0ce172-f69a-51b5-8481-93feb73d58e2"
+            }
+          },
+          "appsStatus": [
+            {
+              "appName": "google-calendar",
+              "type": "google_calendar",
+              "success": 1,
+              "failures": 0,
+              "errors": [],
+              "warnings": []
+            },
+            {
+              "appName": "Google Meet",
+              "type": "conferencing",
+              "success": 1,
+              "failures": 0,
+              "errors": []
+            }
+          ],
+          "eventTitle": "Let’s Automate Your Work",
+          "eventDescription": "I help creators and businesses automate their workflows, systems, and client operations using smart AI and n8n automations.",
+          "price": 0,
+          "currency": "usd",
+          "length": 60,
+          "bookingId": 13934338,
+          "metadata": {
+            "videoCallUrl": "https://meet.google.com/zhh-zmuw-bcm"
+          },
+          "status": "ACCEPTED"
+        }
+      }
+    ]
+  },
+  "versionId": "9ae77f6b-d118-48c9-bcaf-242b4db3e3c4",
+  "activeVersionId": "9ae77f6b-d118-48c9-bcaf-242b4db3e3c4",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-12-04T12:54:12.687Z",
+      "createdAt": "2025-12-04T12:54:12.687Z",
+      "role": "workflow:owner",
+      "workflowId": "SyfijCYGTgAk5x04",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2025-12-19T18:29:38.849Z",
+    "createdAt": "2025-12-19T18:29:38.849Z",
+    "versionId": "9ae77f6b-d118-48c9-bcaf-242b4db3e3c4",
+    "workflowId": "SyfijCYGTgAk5x04",
+    "nodes": [
+      {
+        "parameters": {
+          "events": [
+            "BOOKING_CREATED"
+          ],
+          "options": {}
+        },
+        "type": "n8n-nodes-base.calTrigger",
+        "typeVersion": 2,
+        "position": [
+          -64,
+          0
+        ],
+        "id": "36ba1cf2-063d-4a34-a5ed-78257acc7a9f",
+        "name": "LakshitUkani Cal",
+        "webhookId": "da3796c5-8e63-48a3-bb48-d0427155b6b4",
+        "credentials": {
+          "calApi": {
+            "id": "R3RXNppOEIgWfkAo",
+            "name": "LakshitUkani Account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "authentication": "oAuth2",
+          "select": "channel",
+          "channelId": {
+            "__rl": true,
+            "value": "C0A1BTD6867",
+            "mode": "list",
+            "cachedResultName": "work-notification"
+          },
+          "messageType": "block",
+          "blocksUi": "={\n\"blocks\": [\n  {\n    \"type\": \"header\",\n    \"text\": {\n      \"type\": \"plain_text\",\n      \"text\": \"📧 New Meeting Scheduled\",\n      \"emoji\": true\n    }\n  },\n  {\n    \"type\": \"section\",\n    \"text\": {\n      \"type\": \"mrkdwn\",\n      \"text\": \"You have received a new email. Here are the details:\"\n    }\n  },\n  {\n    \"type\": \"divider\"\n  },\n  {\n    \"type\": \"section\",\n    \"fields\": [\n      {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*From:*\\n{{ $json.attendees[0].email }}\"\n      },\n      {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*Received At:*\\n{{ $json.attendees[0].phoneNumber }}\"\n      }\n    ]\n  },\n  {\n    \"type\": \"section\",\n    \"fields\": [\n      {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*Subject:*\\n{{ $json.attendees[0].name }}\"\n      },\n      {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*Meeting Time:*\\n{{ DateTime.fromISO($json.startTime).setZone('Asia/Kolkata').toFormat('dd MMM yyyy, hh:mm a') }}\"\n      }\n    ]\n  },\n  {\n    \"type\": \"section\",\n    \"fields\": [\n      {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*Reason For Meeting Schedule:*\\n{{ $json.responses['Reason-for-Scheduling-the-meet'].value }}\"\n      }\n    ]\n  },\n  {\n    \"type\": \"divider\"\n  },\n  {\n    \"type\": \"context\",\n    \"elements\": [\n      {\n        \"type\": \"mrkdwn\",\n        \"text\": \"📬 Gmail Trigger | Processed by n8n automation\"\n      }\n    ]\n  }\n]\n}",
+          "text": "📧 New Meeting Scheduled",
+          "otherOptions": {}
+        },
+        "type": "n8n-nodes-base.slack",
+        "typeVersion": 2.3,
+        "position": [
+          160,
+          0
+        ],
+        "id": "7c1650ea-c3a6-456d-a8dc-12709049c4ae",
+        "name": "Send a message",
+        "webhookId": "2f855d1e-c00f-485a-a8f7-dc5bb9fc0dd5",
+        "credentials": {
+          "slackOAuth2Api": {
+            "id": "ZC8Jm1dyTNehWjKR",
+            "name": "Slack account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "LakshitUkani Cal": {
+        "main": [
+          [
+            {
+              "node": "Send a message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Lakshit Ukani",
+    "name": null,
+    "description": null
+  },
+  "tags": []
+}
