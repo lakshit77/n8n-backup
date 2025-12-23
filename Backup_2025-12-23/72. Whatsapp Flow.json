@@ -1,0 +1,225 @@
+{
+  "updatedAt": "2025-12-22T10:09:57.000Z",
+  "createdAt": "2025-12-14T09:52:26.822Z",
+  "id": "Jh2Q27arUSybgJuV",
+  "name": "72. Whatsapp Flow",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "path": "whatsapp-flow",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -576,
+        48
+      ],
+      "id": "aa2e4bb6-e6df-4513-aa89-ee997b66ff72",
+      "name": "Webhook",
+      "webhookId": "739e3070-e4e5-4d15-b048-5529c8c523bb"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cb84fa11-ec27-4877-83ea-3a11a195fc92",
+              "leftValue": "={{ $json.query['hub.mode'] }}",
+              "rightValue": "subscribe",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "cc0f2c01-431e-4fc0-9386-3c31b52fec46",
+              "leftValue": "={{ $json.query['hub.verify_token'] }}",
+              "rightValue": "lakshit",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -368,
+        -128
+      ],
+      "id": "bea97ed8-e695-4f09-b541-5b368b961976",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.query['hub.challenge'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -160,
+        -128
+      ],
+      "id": "1e5a6b01-59a0-49ea-8978-613f19727b43",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/{{ $('Edit Fields').item.json.app_version }}/{{ $('Edit Fields').item.json.phone_number_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Edit Fields').item.json.user_number }}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"This message is from Bot\"\n  }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -160,
+        144
+      ],
+      "id": "9fa70c3e-3b55-4b9d-b0e2-6f84e9bcee97",
+      "name": "Send msg1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "iR5q4Pc809XWa04V",
+          "name": "whatsapp wa-agent-alister app Lakshit"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8adf164e-e24e-4693-ad9c-540031adbc66",
+              "name": "phone_number_id",
+              "value": "={{ $json.body.entry[0].changes[0].value.metadata.phone_number_id }}",
+              "type": "string"
+            },
+            {
+              "id": "e90a0536-0be2-43e2-9580-4fd111f19d57",
+              "name": "user_number",
+              "value": "={{ $json.body.entry[0].changes[0].value.statuses[0].recipient_id }}",
+              "type": "string"
+            },
+            {
+              "id": "ffe41fb9-29de-4fbc-8855-209c48946961",
+              "name": "agent_number",
+              "value": "={{ $json.body.entry[0].changes[0].value.metadata.display_phone_number }}",
+              "type": "string"
+            },
+            {
+              "id": "678e1e3f-c93a-4339-bd3a-77f3b6a2f832",
+              "name": "WABA_id",
+              "value": "={{ $json.body.entry[0].id }}",
+              "type": "string"
+            },
+            {
+              "id": "1dfdb50b-aae0-4614-9923-d73c50aa9cc9",
+              "name": "app_version",
+              "value": "v24.0",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -368,
+        144
+      ],
+      "id": "95a8f096-d23b-40d6-8bcb-944ab1bb9f55",
+      "name": "Edit Fields"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Send msg1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "b5e8c5f5-8337-4b51-8ff7-fd9f26d9f152",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-12-14T09:52:26.830Z",
+      "createdAt": "2025-12-14T09:52:26.830Z",
+      "role": "workflow:owner",
+      "workflowId": "Jh2Q27arUSybgJuV",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
