@@ -1,0 +1,331 @@
+{
+  "updatedAt": "2025-11-28T16:34:43.000Z",
+  "createdAt": "2025-11-28T12:56:29.459Z",
+  "id": "CCobHeAnRuOCL1MR",
+  "name": "65 n8n Chat Message Update",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "responseMode": "responseNodes"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -240,
+        -176
+      ],
+      "id": "3ecf4bc4-f132-469e-a38c-c79a815dd63f",
+      "name": "When chat message received",
+      "webhookId": "4763f6d8-e3ef-46ba-87ea-6393bf120703"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=When you are asked about the weather, use the \"Respond and go\" tool to send a quick message that you are going to respond. \n\nUse the \"Get data\" tool call to return the user's information. \n\nDuring your run, If you need to ask a clarifying question, use the \"Respond and wait\" tool to ask the question, wait for the response, and then keep progressing with your run. \n\nIf the user asks a question about a discount, first use the 'Respond and Go' to send a quick message that you are checking with your manager. Then use the human confirmation to ask if the discount is possible. "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -32,
+        -176
+      ],
+      "id": "00c748d1-1bc3-48db-808e-53f542315889",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.output }}}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        368,
+        -176
+      ],
+      "id": "557339e6-3768-490a-aba0-fcf684544b43",
+      "name": "Respond to Chat"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "builtInTools": {
+          "webSearch": {
+            "searchContextSize": "medium"
+          }
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -288,
+        80
+      ],
+      "id": "585609dd-bcfd-4f10-99d4-dd5688ed6c73",
+      "name": "LLM + Web Search",
+      "credentials": {
+        "openAiApi": {
+          "id": "48jg0IN7QfVXoF59",
+          "name": "OpenAi Freelance"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -144,
+        112
+      ],
+      "id": "8ff6ac5c-3007-48ca-aa8f-89bb00f430dc",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Send a message to Chat and do not wait for a response. Just keep going. ",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "waitUserReply": false
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTool",
+      "typeVersion": 1,
+      "position": [
+        0,
+        112
+      ],
+      "id": "74493569-07a2-4fec-9d2d-ff8259d2947b",
+      "name": "Respond and Go"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "sendTo": "=ukanilakshit77@gmail.com",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        464,
+        64
+      ],
+      "id": "50a75008-4cb3-4f7c-a20f-fe8e7f69ffae",
+      "name": "Human Confirmation",
+      "webhookId": "99a77a65-1d19-4386-ae4d-2efedda0394f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9nQEWKuEYxxtGaYe",
+          "name": "Lakshit Gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use this when you want to ask clarifying question to user. ",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTool",
+      "typeVersion": 1,
+      "position": [
+        272,
+        80
+      ],
+      "id": "fb6be739-30fa-4fee-8760-199b205d2d86",
+      "name": "Respond and Wait"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "h8WW5UNQu7Yw58cd",
+          "mode": "list",
+          "cachedResultName": "Test DB",
+          "cachedResultUrl": "/projects/iOyc3VpWKvgHH9fv/datatables/h8WW5UNQu7Yw58cd"
+        },
+        "returnAll": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_All', ``, 'boolean') }}"
+      },
+      "type": "n8n-nodes-base.dataTableTool",
+      "typeVersion": 1,
+      "position": [
+        128,
+        96
+      ],
+      "id": "4663419e-8bf5-41bd-87cf-b4a6122c65e5",
+      "name": "Get Data"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        576,
+        -176
+      ],
+      "id": "7174b7a3-6f36-41d3-94e0-4714dfedcf81",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        928,
+        -176
+      ],
+      "id": "afc769c1-ad88-46ff-af4c-91f82253a178",
+      "name": "Respond to Chat1"
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LLM + Web Search": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond and Go": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Human Confirmation": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond and Wait": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Data": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Chat": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Chat1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "00bed578-4c3b-491e-bf3b-94cf20f1ec21",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-11-28T12:56:29.463Z",
+      "createdAt": "2025-11-28T12:56:29.463Z",
+      "role": "workflow:owner",
+      "workflowId": "CCobHeAnRuOCL1MR",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
