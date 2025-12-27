@@ -1,0 +1,74 @@
+{
+  "updatedAt": "2025-12-22T12:57:47.000Z",
+  "createdAt": "2025-12-22T12:25:01.049Z",
+  "id": "Pt59DPfSz29JUKow",
+  "name": "Calendar reminder automation",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "path": "iphone-reminder",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -144,
+        0
+      ],
+      "id": "0b788a0b-da1b-4c59-a014-762734669662",
+      "name": "Webhook",
+      "webhookId": "d3d6d0ad-20b3-46bb-b305-6d87b0ba3f96"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"title\": \"Follow up with client\",\n  \"notes\": \"From Instagram DM\",\n  \"due_date\": \"2025-01-15T18:00:00\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        64,
+        0
+      ],
+      "id": "bfbfa6e5-f012-4d31-8603-e4cce3067c82",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "3dcdf9c0-84f0-4976-88f3-9f8083f613f8",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-12-22T12:25:01.059Z",
+      "createdAt": "2025-12-22T12:25:01.059Z",
+      "role": "workflow:owner",
+      "workflowId": "Pt59DPfSz29JUKow",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
