@@ -1,0 +1,359 @@
+{
+  "updatedAt": "2025-12-29T12:31:43.000Z",
+  "createdAt": "2025-12-22T12:25:01.049Z",
+  "id": "Pt59DPfSz29JUKow",
+  "name": "Whatsapp FLow with Endpoint",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "path": "flow-endpoint",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -384,
+        112
+      ],
+      "id": "6e0acf10-137b-47c9-9a2e-2724ef5b2383",
+      "name": "Webhook",
+      "webhookId": "e0001cca-1abe-4bdc-aa96-f4c16e7ef68e"
+    },
+    {
+      "parameters": {
+        "action": "sign"
+      },
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 1,
+      "position": [
+        448,
+        -208
+      ],
+      "id": "4ce5dc0f-23c0-4672-9158-97169867089b",
+      "name": "Crypto"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        -352
+      ],
+      "id": "ad88a899-ee03-4aa5-8976-5e5c5f9d7a99",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/{{ $('set_variable').item.json.app_version }}/{{ $('set_variable').item.json.phone_number_id }}/whatsapp_business_encryption",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "business_public_key",
+              "value": "=-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsPZBk3M330AWyTAbtSUE\n/Jsdh4/PIuiekLzQ4bG2n825jHaB+Uai3uOI2Qa0jOdCYGKPuXFWK5dfdljW992e\n/AqfbEsocFsTo6AvC9k7twhX/acqWk0o/+yR/w3zP3ubQIWOzzPZy2LQ5lDjCqY/\nCITt2lmHaYEj6g46gk6+eP15nr4wMt/6rECqbGBSFtP6KZXxDvVgQ0FoQPrkt4UB\nHgu2NpVS6qDQ5N0TM4bYYxcQNImWj+WoninyUROgd4C+N6mTNlODBwcyimgJOVon\n24Bjn7MOwWOwpVMDOMy5xhawbulCGyMr/KS0QLOb2RGxRm8CATIzV/C9+qWlqOxm\nqQIDAQAB\n-----END PUBLIC KEY-----"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        96,
+        -352
+      ],
+      "id": "b649b786-ddb5-46dc-931e-ca9d31a1e6d3",
+      "name": "Send Normal Message",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "iR5q4Pc809XWa04V",
+          "name": "whatsapp wa-agent-alister app Lakshit"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8adf164e-e24e-4693-ad9c-540031adbc66",
+              "name": "phone_number_id",
+              "value": "=924412964080974",
+              "type": "string"
+            },
+            {
+              "id": "e90a0536-0be2-43e2-9580-4fd111f19d57",
+              "name": "user_number",
+              "value": "={{ $json.body.entry[0].changes[0].value.contacts[0].wa_id }}",
+              "type": "string"
+            },
+            {
+              "id": "ffe41fb9-29de-4fbc-8855-209c48946961",
+              "name": "bot_number",
+              "value": "={{ $json.body.entry[0].changes[0].value.metadata.display_phone_number }}",
+              "type": "string"
+            },
+            {
+              "id": "678e1e3f-c93a-4339-bd3a-77f3b6a2f832",
+              "name": "WABA_id",
+              "value": "=1513036893303968",
+              "type": "string"
+            },
+            {
+              "id": "1dfdb50b-aae0-4614-9923-d73c50aa9cc9",
+              "name": "app_version",
+              "value": "v24.0",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -80,
+        -352
+      ],
+      "id": "d2bd339b-900e-4d4a-a98c-50c56c7f0ba7",
+      "name": "set_variable"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cb84fa11-ec27-4877-83ea-3a11a195fc92",
+              "leftValue": "={{ $json.query['hub.mode'] }}",
+              "rightValue": "subscribe",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "cc0f2c01-431e-4fc0-9386-3c31b52fec46",
+              "leftValue": "={{ $json.query['hub.verify_token'] }}",
+              "rightValue": "lakshit",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -144,
+        -16
+      ],
+      "id": "d20a0f40-06d5-4e5b-b119-0810be4fa26d",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.query['hub.challenge'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        64,
+        -16
+      ],
+      "id": "3e318b1a-b599-4643-863e-07031df10544",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6de59eb4-a400-4c3a-b553-5ab74987778c",
+              "leftValue": "={{ $json.body.entry[0].changes[0].value.statuses[0].status }}",
+              "rightValue": "read",
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        96,
+        256
+      ],
+      "id": "968e749f-415a-4da3-a45b-57588308caaf",
+      "name": "Filter1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8adf164e-e24e-4693-ad9c-540031adbc66",
+              "name": "phone_number_id",
+              "value": "={{ $json.body.entry[0].changes[0].value.metadata.phone_number_id }}",
+              "type": "string"
+            },
+            {
+              "id": "e90a0536-0be2-43e2-9580-4fd111f19d57",
+              "name": "user_number",
+              "value": "={{ $json.body.entry[0].changes[0].value.contacts[0].wa_id }}",
+              "type": "string"
+            },
+            {
+              "id": "ffe41fb9-29de-4fbc-8855-209c48946961",
+              "name": "bot_number",
+              "value": "={{ $json.body.entry[0].changes[0].value.metadata.display_phone_number }}",
+              "type": "string"
+            },
+            {
+              "id": "678e1e3f-c93a-4339-bd3a-77f3b6a2f832",
+              "name": "WABA_id",
+              "value": "={{ $json.body.entry[0].id }}",
+              "type": "string"
+            },
+            {
+              "id": "1dfdb50b-aae0-4614-9923-d73c50aa9cc9",
+              "name": "app_version",
+              "value": "v24.0",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        288,
+        256
+      ],
+      "id": "13d7982f-25f5-4c4e-bc0a-5d9854211fce",
+      "name": "set_variable1"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Filter1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "set_variable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set_variable": {
+      "main": [
+        [
+          {
+            "node": "Send Normal Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter1": {
+      "main": [
+        [
+          {
+            "node": "set_variable1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "7bdda8d1-aa22-44d1-be25-f21e6b5d61ad",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-12-22T12:25:01.059Z",
+      "createdAt": "2025-12-22T12:25:01.059Z",
+      "role": "workflow:owner",
+      "workflowId": "Pt59DPfSz29JUKow",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
