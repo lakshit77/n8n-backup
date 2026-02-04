@@ -1,0 +1,5273 @@
+{
+  "updatedAt": "2026-01-30T12:50:59.363Z",
+  "createdAt": "2026-01-23T06:13:33.579Z",
+  "id": "D2R5X2sRzfi7bOdA",
+  "name": "n8n-whatsapp",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.query[\"hub.challenge\"] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2848,
+        -1024
+      ],
+      "id": "547d596e-470e-4d21-aede-fb3a5f226036",
+      "name": "Verify Webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "51696ba9-54b9-4f8c-bd0c-4e11fcb50d45",
+              "leftValue": "={{ $json.query['hub.mode'] }}",
+              "rightValue": "subscribe",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "4b041959-0ee0-4db3-8465-d08554bdec80",
+              "leftValue": "={{ $json.query['hub.verify_token'] }}",
+              "rightValue": "hello",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        2624,
+        -1024
+      ],
+      "id": "ec6bd126-7725-4e05-9b33-2530e94868c5",
+      "name": "Check webhook configure parameter"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ade969fb-d749-4b0b-af12-166008c17370",
+              "leftValue": "={{ $('Meta Webhook').item.json.body.entry[0].changes[0].value.statuses[0].status }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3296,
+        -832
+      ],
+      "id": "d776c4ef-813e-46e8-bae6-40489e13c211",
+      "name": "normal message?"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "users",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "phone_number",
+              "keyValue": "={{ $json.bot_phone_number }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        -720
+      ],
+      "id": "100cd0a4-45f5-46a0-a162-43dfc45de30b",
+      "name": "Get Bot User",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "Xa9U6Qo37D2g6E7Z",
+          "name": "Lakshit77 - n8n whatsapp project"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "users",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "phone_number",
+              "fieldValue": "={{ $('Clean Phone number').item.json.bot_phone_number }}"
+            },
+            {
+              "fieldId": "whatsapp_business_account_id",
+              "fieldValue": "={{ $('Add Variable').item.json.whatsapp_business_account_id }}"
+            },
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $('Add Variable').item.json.bot_user_name }}"
+            },
+            {
+              "fieldId": "phone_number_id",
+              "fieldValue": "={{ $('Add Variable').item.json.bot_phone_number_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        416,
+        -640
+      ],
+      "id": "e9f5af40-9266-4442-9c40-4519bf7a0e32",
+      "name": "Create Bot User",
+      "credentials": {
+        "supabaseApi": {
+          "id": "Xa9U6Qo37D2g6E7Z",
+          "name": "Lakshit77 - n8n whatsapp project"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "users",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "phone_number",
+              "keyValue": "={{ $('Data from Webhook').item.json.bot_phone_number }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3968,
+        -832
+      ],
+      "id": "0261b880-cb0a-4bee-a372-b9aa2c3bdc63",
+      "name": "Get Bot User2",
+      "alwaysOutputData": false,
+      "credentials": {
+        "supabaseApi": {
+          "id": "Xa9U6Qo37D2g6E7Z",
+          "name": "Lakshit77 - n8n whatsapp project"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "contacts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "phone_number",
+              "keyValue": "={{ $('Data from Webhook').item.json.contact_phone_numbe }}"
+            },
+            {
+              "keyName": "user_id",
+              "keyValue": "={{ $json.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        4192,
+        -832
+      ],
+      "id": "62d3a92a-cc23-45f0-b316-cfa87794712d",
+      "name": "Get a contact",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "Xa9U6Qo37D2g6E7Z",
+          "name": "Lakshit77 - n8n whatsapp project"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d26679c5-6d46-49cf-b7cc-28b90583438f",
+              "leftValue": "={{ $('Get a contact').item.json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        4416,
+        -832
+      ],
+      "id": "7c67c1dd-60ba-42dc-8dcc-34f02daf19bb",
+      "name": "Does Contact Exist"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b6e234ca-4654-4ad2-a634-79f36fa54def",
+              "name": "contact_db_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4864,
+        -832
+      ],
+      "id": "3573348f-cd9f-461c-b522-7403e6e7c647",
+      "name": "Common Variable "
+    },
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "path": "n8n-whatsapp-saas",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        2400,
+        -928
+      ],
+      "id": "d64bea77-486c-4e67-b45e-943d084047dd",
+      "name": "Meta Webhook",
+      "webhookId": "4cafd96b-0322-44da-988f-8688f0b1e7d8"
+    },
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "httpMethod": [
+          "POST"
+        ],
+        "path": "=message/",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1104,
+        -208
+      ],
+      "id": "d8adce45-cb6c-49d5-abc8-f1b7981fec13",
+      "name": "Message API",
+      "webhookId": "6bed4c3b-0d58-47fe-802f-e263f7ec59a9"
+    },
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "httpMethod": [
+          "GET"
+        ],
+        "path": "=contacts",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1104,
+        256
+      ],
+      "id": "82cdd43c-ff57-479c-a5bd-794eea4bc5fb",
+      "name": "Contacts API",
+      "webhookId": "6bed4c3b-0d58-47fe-802f-e263f7ec59a9"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT count(*) as total\nFROM PUBLIC.contacts\nWHERE user_id = $1",
+        "options": {
+          "queryReplacement": "={{ $json.query.user_id }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -880,
+        256
+      ],
+      "id": "b5a7470c-8fe2-4370-8599-d63933eb8a3e",
+      "name": "Total Contacts",
+      "credentials": {
+        "postgres": {
+          "id": "wI2bluzrLTUPa0Lb",
+          "name": "supabase n8n-whatsapp db"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "contacts",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "phone_number",
+              "fieldValue": "={{ $('Data from Webhook').item.json.contact_phone_numbe }}"
+            },
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $('Data from Webhook').item.json.contact_user_name }}"
+            },
+            {
+              "fieldId": "unread_count",
+              "fieldValue": "1"
+            },
+            {
+              "fieldId": "user_id",
+              "fieldValue": "={{ $('Get Bot User2').item.json.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        4640,
+        -752
+      ],
+      "id": "26c5615a-448d-473f-814d-5741f21d60b1",
+      "name": "Create Contact",
+      "credentials": {
+        "supabaseApi": {
+          "id": "Xa9U6Qo37D2g6E7Z",
+          "name": "Lakshit77 - n8n whatsapp project"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "messages",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "user_id",
+              "fieldValue": "={{ $('Get Bot User2').item.json.id }}"
+            },
+            {
+              "fieldId": "contact_id",
+              "fieldValue": "={{ $json.contact_db_id }}"
+            },
+            {
+              "fieldId": "message_id",
+              "fieldValue": "={{ $('Data from Webhook').item.json.message_id }}"
+            },
+            {
+              "fieldId": "direction",
+              "fieldValue": "inbound"
+            },
+            {
+              "fieldId": "content",
+              "fieldValue": "={{ $('Text Variable1').item.json.message_text }}"
+            },
+            {
+              "fieldId": "timestamp",
+              "fieldValue": "={{ \nDateTime.\n      fromMillis($('Data from Webhook').item.json.message_timestamp * 1000).\n      setZone('Asia/Kolkata').\n      toISO() \n}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        5088,
+        -832
+      ],
+      "id": "7b673e71-3e92-4b94-8d82-45b9420b6310",
+      "name": "Insert Message",
+      "alwaysOutputData": false,
+      "credentials": {
+        "supabaseApi": {
+          "id": "Xa9U6Qo37D2g6E7Z",
+          "name": "Lakshit77 - n8n whatsapp project"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e8517e4a-6828-4658-8875-e43d53da145d",
+              "name": "limit",
+              "value": "={{ $('Contacts API').item.json.query.limit || $json.default_limit}}",
+              "type": "string"
+            },
+            {
+              "id": "4417e657-f89a-4038-9d8f-48a7f4d34307",
+              "name": "offset",
+              "value": "={{ (($('Contacts API').item.json.query.page || 1) - 1) * ($('Contacts API').item.json.query.limit || $json.default_limit) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -256,
+        256
+      ],
+      "id": "9289052d-9a14-42a9-88e7-f05a14ec36d9",
+      "name": "Set Variables"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ffa34e94-b5d7-42f1-aa70-e4b7d170ce17",
+              "name": "default_limit",
+              "value": "={{ $('Get Contact Pagination Limit').all().find(item => item.json.key === 'chat_list_contact_pagination_limit').json.value }}\n",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -464,
+        256
+      ],
+      "id": "4975e0b6-52a4-4bfe-ac5b-9a9a2962cbec",
+      "name": "Default Value"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        320,
+        256
+      ],
+      "id": "a25089c0-8606-432b-ac6c-2e4c02ff41de",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n  id,\n  phone_number,\n  name,\n  unread_count,\n  last_message_at,\n  is_archived,\n  first_message_at,\n  last_message\nFROM contacts\nWHERE user_id = $1\n  AND is_archived = false\nORDER BY last_message_at DESC\nLIMIT $2\nOFFSET $3;",
+        "options": {
+          "queryReplacement": "={{ $('Contacts API').item.json.query.user_id }}, {{ $json.limit }}, {{ $json.offset }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -64,
+        256
+      ],
+      "id": "eada4b12-8dcb-4eb7-8b38-bbcbf45a5033",
+      "name": "Get All Contacts",
+      "credentials": {
+        "postgres": {
+          "id": "wI2bluzrLTUPa0Lb",
+          "name": "supabase n8n-whatsapp db"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e8517e4a-6828-4658-8875-e43d53da145d",
+              "name": "limit",
+              "value": "={{ $('Contact Message API With Param').item.json.query.limit || $json.default_limit}}",
+              "type": "string"
+            },
+            {
+              "id": "4417e657-f89a-4038-9d8f-48a7f4d34307",
+              "name": "offset",
+              "value": "={{ (($('Contact Message API With Param').item.json.query.page || 1) - 1) * ($('Contact Message API With Param').item.json.query.limit || $json.default_limit) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -208,
+        640
+      ],
+      "id": "fe5ade83-8aff-4c7b-9255-9d189fcddcc9",
+      "name": "Set Variables1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ffa34e94-b5d7-42f1-aa70-e4b7d170ce17",
+              "name": "default_limit",
+              "value": "={{ $('Get Chat Thread Info').all().find(item => item.json.key === 'chat_thread_message_limit').json.value }}\n",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -432,
+        640
+      ],
+      "id": "53e84bfa-7551-4884-b251-67b1beaf950e",
+      "name": "Default Value1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        464,
+        640
+      ],
+      "id": "e439ba46-be4a-4cd8-98d1-6f764b6af386",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT *\nFROM messages\nWHERE contact_id = $1\nORDER BY timestamp DESC\nLIMIT $2\nOFFSET $3;",
+        "options": {
+          "queryReplacement": "={{ $('Contact Message API With Param').item.json.params.contact_id }}, {{ $json.limit }}, {{ $json.offset }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        16,
+        640
+      ],
+      "id": "11878e4f-8733-4592-a35e-d3204c80f9bb",
+      "name": "Get All Contacts Messages",
+      "credentials": {
+        "postgres": {
+          "id": "wI2bluzrLTUPa0Lb",
+          "name": "supabase n8n-whatsapp db"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT count(*) as total\nFROM PUBLIC.messages\nWHERE contact_id = $1",
+        "options": {
+          "queryReplacement": "={{ $json.params.contact_id }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -880,
+        640
+      ],
+      "id": "7d469e31-17a8-4b3f-ad30-725753788bbd",
+      "name": "Total Contact Messages",
+      "credentials": {
+        "postgres": {
+          "id": "wI2bluzrLTUPa0Lb",
+          "name": "supabase n8n-whatsapp db"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the total from \"Total Contacts\" node\nconst totalContacts = parseInt($(\"Total Contact Messages\").first().json.total);\n\n// Get ALL contact data from \"Get All Contacts\" node\nconst allContactsData = $(\"Get All Contacts Messages\").all().map(item => item.json);\n\nconst page = parseInt($('Contact Message API With Param').first().json.query.page || 1)\n\nconst limit = parseInt($('Contact Message API With Param').first().json.query.limit || $('Default Value1').first().json.default_limit)\n\n// Calculate pagination\nconst totalPages = Math.ceil(totalContacts / limit);\nconst hasNext = page < totalPages;\nconst hasPrevious = page > 1;\n\n// If you want to return both in your response:\nreturn {\n  json: {\n    status: 1,\n    message: \"success\",\n    next: hasNext,\n    previous: hasPrevious,\n    total: totalContacts,\n    data: allContactsData\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        640
+      ],
+      "id": "3a6292d8-83b9-4aad-b9f0-0e9128742cea",
+      "name": "Json response1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the total from \"Total Contacts\" node\nconst totalContacts = parseInt($(\"Total Contacts\").first().json.total);\n\n// Get ALL contact data from \"Get All Contacts\" node\nconst allContactsData = $(\"Get All Contacts\").all().map(item => item.json);\n\nconst page = parseInt($('Contacts API').first().json.query.page || 1)\n\nconst limit = parseInt($('Contacts API').first().json.query.limit || $('Default Value').first().json.default_limit)\n\n// Calculate pagination\nconst totalPages = Math.ceil(totalContacts / limit);\nconst hasNext = page < totalPages;\nconst hasPrevious = page > 1;\n\n// If you want to return both in your response:\nreturn {\n  json: {\n    status: 1,\n    message: \"success\",\n    next: hasNext,\n    previous: hasPrevious,\n    total: totalContacts,\n    data: allContactsData\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        128,
+        256
+      ],
+      "id": "9b196daf-cf10-4ca8-8fca-4758036f65c6",
+      "name": "Json response"
+    },
+    {
+      "parameters": {
+        "path": ":contact_id",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1104,
+        640
+      ],
+      "id": "7e4618ce-2971-4b29-9db5-d6bf902d2e3c",
+      "name": "Contact Message API With Param",
+      "webhookId": "6bed4c3b-0d58-47fe-802f-e263f7ec59a9"
+    },
+    {
+      "parameters": {
+        "jsCode": "bot_object = $(\"Does Bot Exist\").first().json\n\nbot_id = bot_object.id\nbot_name = bot_object.name\nbot_phone_number = bot_object.phone_number\n\nreturn {\n  json: {\n    status: 1,\n    message: \"success\",\n    data: {\n      \"id\": bot_id,\n      \"name\": bot_name,\n      \"phone_number\": bot_phone_number\n    }\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        -720
+      ],
+      "id": "6d80a0d8-c103-4082-8c8f-aae8ff557831",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        864,
+        -720
+      ],
+      "id": "d0c31fae-6188-4410-9519-542f0a3edf1b",
+      "name": "Respond to Webhook2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/{{ $('Common Variable').item.json.api_version }}/{{ $('Get Bot User1').item.json.phone_number_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $(\"Common Variable\").first().json.contact_phone_number }}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"{{ $json.clean_text }}\"\n  }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        672,
+        -304
+      ],
+      "id": "136833d4-3103-4faf-96ac-ebb317098787",
+      "name": "Send msg",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "iR5q4Pc809XWa04V",
+          "name": "whatsapp wa-agent-alister app Lakshit"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Message API').item.json.body.message_type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "b04d6cf8-95a8-4248-941d-34ca9678148c"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        -304
+      ],
+      "id": "37732434-9ed6-453b-bf8e-7f660df69e30",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "users",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $json.query.user_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -880,
+        -208
+      ],
+      "id": "e9e861a0-21c0-431d-bea9-2be1e02f667a",
+      "name": "Get Bot User1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "Xa9U6Qo37D2g6E7Z",
+          "name": "Lakshit77 - n8n whatsapp project"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "961e76d1-78ff-4369-857f-7abf63be53d6",
+              "leftValue": "={{ $('Get Bot User1').item.json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -656,
+        -208
+      ],
+      "id": "fa5406d2-3e8b-4d00-acae-d8aa783e4ae7",
+      "name": "Does Bot User exist"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"success\": \"0\",\n  \"message\": \"Bot User Not found\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -432,
+        -112
+      ],
+      "id": "ba8560d4-7fb4-4056-a767-5b13297a4fd9",
+      "name": "Throw Error"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "contacts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $('Message API').item.json.body.contact_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -432,
+        -304
+      ],
+      "id": "9e5ca416-a7c6-4e13-b261-44ec621599f0",
+      "name": "Get a contact1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "Xa9U6Qo37D2g6E7Z",
+          "name": "Lakshit77 - n8n whatsapp project"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "639c5881-127a-4b2b-a4f0-15902f46f11e",
+              "name": "api_version",
+              "value": "={{ $('Get API Version').all().find(item => item.json.key === 'api_version').json.value }}",
+              "type": "string"
+            },
+            {
+              "id": "ef88c8a3-e30b-48db-a217-32e162a860a5",
+              "name": "contact_phone_number",
+              "value": "={{ $('Get a contact1').item.json.phone_number }}",
+              "type": "string"
+            },
+            {
+              "id": "0bb56cd7-7b52-4c76-aeb9-ee36dffaf1f2",
+              "name": "user_id",
+              "value": "={{ $('Get Bot User1').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "a8abc1fd-a99a-4ab4-adfc-42b87ae260f1",
+              "name": "contact_id",
+              "value": "={{ $('Get a contact1').first().json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        32,
+        -304
+      ],
+      "id": "f4f4c5e0-11a3-4867-85f1-9bb1b1bd4ae0",
+      "name": "Common Variable"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "05fbe96b-7975-451e-a856-e6efb5750ae3",
+              "name": "clean_text",
+              "value": "={{ $('Message API').item.json.body.content.replace(/\\n/g, '\\\\n').replace(/\"/g, \"'\") }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        -304
+      ],
+      "id": "1d4ce8b1-c069-45fa-8009-2fab4e39c92b",
+      "name": "Text Variable"
+    },
+    {
+      "parameters": {
+        "tableId": "messages",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "user_id",
+              "fieldValue": "={{ $('Common Variable').item.json.user_id }}"
+            },
+            {
+              "fieldId": "contact_id",
+              "fieldValue": "={{ $('Common Variable').item.json.contact_id }}"
+            },
+            {
+              "fieldId": "message_id",
+              "fieldValue": "={{ $('Send msg').item.json.body.messages[0].id }}"
+            },
+            {
+              "fieldId": "direction",
+              "fieldValue": "outbound"
+            },
+            {
+              "fieldId": "message_type",
+              "fieldValue": "text"
+            },
+            {
+              "fieldId": "content",
+              "fieldValue": "={{ $('Text Variable').item.json.clean_text }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "sent"
+            },
+            {
+              "fieldId": "timestamp",
+              "fieldValue": "={{\n  DateTime\n    .now()\n    .setZone('Asia/Kolkata')\n    .toISO()\n}}\n"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        -304
+      ],
+      "id": "0122a96e-b8b0-4a33-8622-4dde3277519a",
+      "name": "Insert Message entry",
+      "credentials": {
+        "supabaseApi": {
+          "id": "Xa9U6Qo37D2g6E7Z",
+          "name": "Lakshit77 - n8n whatsapp project"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "contacts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Common Variable').item.json.contact_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "last_message_at",
+              "fieldValue": "={{ new Date().toISOString() }}"
+            },
+            {
+              "fieldId": "last_message",
+              "fieldValue": "={{ $('Text Variable').item.json.clean_text }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1344,
+        -304
+      ],
+      "id": "825b2aa4-5f29-4cc4-b231-e60dad0cc516",
+      "name": "Update a Contact",
+      "credentials": {
+        "supabaseApi": {
+          "id": "Xa9U6Qo37D2g6E7Z",
+          "name": "Lakshit77 - n8n whatsapp project"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1792,
+        -304
+      ],
+      "id": "21f78a86-7a09-4457-820e-0463c29ca42e",
+      "name": "Respond to Webhook3"
+    },
+    {
+      "parameters": {
+        "jsCode": "\n\n// Get ALL contact data from \"Get All Contacts\" node\nconst new_msg_entry = $(\"Insert Message entry\").first().json;\n\n// If you want to return both in your response:\nreturn {\n  json: {\n    status: 1,\n    message: \"success\",\n    data: new_msg_entry\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        -304
+      ],
+      "id": "4af11207-018d-47f1-afdc-6c50467fac56",
+      "name": "Json response2"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "messages",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "message_id",
+              "keyValue": "={{ $('Meta Webhook').item.json.body.entry[0].changes[0].value.statuses[0].id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3520,
+        -640
+      ],
+      "id": "30700c40-3438-448a-bf63-e933ba34267a",
+      "name": "Get a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "Xa9U6Qo37D2g6E7Z",
+          "name": "Lakshit77 - n8n whatsapp project"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Status priority\nconst PRIORITY = {\n  'failed': 0,\n  'sent': 1,\n  'delivered': 2,\n  'read': 3\n};\n\n// Data from webhook\nconst newStatus = $('Meta Webhook').first().json.body.entry[0].changes[0].value.statuses[0].status;\nconst messageId = $('Meta Webhook').first().json.body.entry[0].changes[0].value.statuses[0].id;\n\n// Data from database GET\nconst currentStatus = $input.first().json.status; // from Supabase query\n\n// Get priorities\nconst currentPriority = PRIORITY[currentStatus] || 0;\nconst newPriority = PRIORITY[newStatus] || 0;\n\n// Should we update?\nif (newPriority > currentPriority) {\n  // YES - new status is higher priority\n  return {\n    json: {\n      should_update: true,\n      message_id: messageId,\n      new_status: newStatus\n    }\n  };\n} else {\n  // NO - current status is higher or equal\n  return {\n    json: {\n      should_update: false,\n      message_id: messageId\n    }\n  };\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3744,
+        -640
+      ],
+      "id": "d6b7002e-9b17-4cce-8e59-c80457404709",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "messages",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "message_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.message_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "={{ $json.new_status }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        4192,
+        -640
+      ],
+      "id": "1423a3fe-d5ee-4bea-95c5-f4a640b76008",
+      "name": "Update a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "Xa9U6Qo37D2g6E7Z",
+          "name": "Lakshit77 - n8n whatsapp project"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE contacts\nSET \n  unread_count = unread_count + 1,\n  last_message = $1,\n  last_message_at = $2\nWHERE id = $3",
+        "options": {
+          "queryReplacement": "={{ [$('Text Variable1').item.json.message_text, new Date().toISOString(), $('Common Variable ').item.json.contact_db_id] }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        5312,
+        -832
+      ],
+      "id": "ce74a887-1ee6-4145-b2db-dc40b721ef2e",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "wI2bluzrLTUPa0Lb",
+          "name": "supabase n8n-whatsapp db"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "httpMethod": [
+          "PATCH"
+        ],
+        "path": "=contacts/:contact_id",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1088,
+        1088
+      ],
+      "id": "4701fcd6-da80-4809-a1da-34c285aac78a",
+      "name": "Update Contacts API",
+      "webhookId": "6bed4c3b-0d58-47fe-802f-e263f7ec59a9"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "contacts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $json.params.contact_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "unread_count",
+              "fieldValue": "={{ $json.body.unread_count }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -864,
+        1088
+      ],
+      "id": "0ec0a38f-976a-4c98-b41f-801ec183ddcf",
+      "name": "Update a row1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "Xa9U6Qo37D2g6E7Z",
+          "name": "Lakshit77 - n8n whatsapp project"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": 1,\n  \"message\": \"success\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -640,
+        1088
+      ],
+      "id": "b413d25d-2333-43ea-8b3b-2cc0cfc816e7",
+      "name": "Respond to Webhook4"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "message_id",
+              "value": "={{ $json.body.entry[0].changes[0].value.messages?.[0]?.id || $json.body.entry[0].changes[0].value.statuses?.[0]?.id }}"
+            },
+            {
+              "key": "error_code",
+              "value": "={{ $json.body.entry[0].changes[0].value.messages[0].errors[0].code }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        2624,
+        -832
+      ],
+      "id": "55bb7670-a58c-4917-858a-f3d2c136c180",
+      "name": "Execution Data"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "message_id",
+              "value": "={{ $json.body.messages[0].id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        896,
+        -304
+      ],
+      "id": "970d7be7-f467-4d28-b3eb-ae9a6f9e6095",
+      "name": "Execution Data1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5705316f-3f34-467a-a2a0-aeb300810a5e",
+              "leftValue": "={{ $json.body.entry[0].changes[0].value.messages[0].errors[0].code }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        2848,
+        -832
+      ],
+      "id": "60dbff16-08f3-46a8-a749-ec4dd3b0c3e9",
+      "name": "Not Error Msg"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Meta Webhook').item.json.body.entry[0].changes[0].value.messages[0].type }}",
+                    "rightValue": "interactive",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "38c2ee1e-5380-4c4c-906a-765cd35fff09"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Interactive"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "73114ba1-f1c6-4eb8-8f92-f9abf6d6cb29",
+                    "leftValue": "={{ $('Meta Webhook').item.json.body.entry[0].changes[0].value.messages[0].type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        3520,
+        -928
+      ],
+      "id": "e9b18298-9264-4dcb-9f3c-2f8f5e9c2bdc",
+      "name": "Message Type Routing"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "33e2f2a6-2c09-4b55-abe8-b4fee5dc400b",
+              "name": "message_text",
+              "value": "={{ $('Meta Webhook').item.json.body.entry[0].changes[0].value.messages[0].text.body }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3744,
+        -832
+      ],
+      "id": "fbed05ce-36e4-4ce9-a9f1-2527969d81ec",
+      "name": "Text Variable1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3744,
+        -1024
+      ],
+      "id": "cf6307cf-5b28-4b01-8a5a-61754869719f",
+      "name": "Coming Soon"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a67357b0-2fb8-44b8-9f8e-15ae40f71cfe",
+              "leftValue": "={{ $json.should_update }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        3968,
+        -640
+      ],
+      "id": "7907d45f-8a9d-4cea-b486-8ff3618ec137",
+      "name": "Should Update"
+    },
+    {
+      "parameters": {
+        "path": "status",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1088,
+        -1056
+      ],
+      "id": "a328c63b-1b03-4613-af2f-48adbd76e6dd",
+      "name": "Status API",
+      "webhookId": "85c64e3b-59fa-43c0-901c-f79de5e8727f"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "99da2322-843a-491c-bc98-089e46cacf68",
+              "leftValue": "={{ $('Get Bot User').item.json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        192,
+        -720
+      ],
+      "id": "45a2d1ef-41d0-4d67-9bb9-a65b8fd82170",
+      "name": "Does Bot Exist"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c5b8b5d9-9a80-4eee-b0cc-91674c244ed6",
+              "name": "whatsapp_business_account_id",
+              "value": "={{ $('Get WABA Data').all().find(item => item.json.key === 'whatsapp_business_account_id').json.value }}\n",
+              "type": "string"
+            },
+            {
+              "id": "cd7926ae-84fa-486a-94e6-b07210682b3b",
+              "name": "bot_phone_number_id",
+              "value": "={{ $('Get WABA Data').all().find(item => item.json.key === 'bot_phone_number_id').json.value }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -704,
+        -720
+      ],
+      "id": "fc04fbbd-9360-4683-93ea-48b4636a3e27",
+      "name": "Add Variable"
+    },
+    {
+      "parameters": {
+        "content": "# URL - /status\n## method - GET\n",
+        "height": 256,
+        "width": 576
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1152,
+        -1168
+      ],
+      "id": "6e410515-052d-4c66-bd5b-ef05a21dabe2",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"1\",\n  \"message\": \"success\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -864,
+        -1056
+      ],
+      "id": "0a092815-971a-4405-b863-54a4d016c949",
+      "name": "Respond to Status API"
+    },
+    {
+      "parameters": {
+        "content": "# URL - /user\n## Method - GET\n",
+        "height": 368,
+        "width": 2160
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1152,
+        -848
+      ],
+      "id": "12ec4f8a-0e59-46b6-90d6-6dfde10118ed",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "path": "user",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1088,
+        -720
+      ],
+      "id": "0377bbf1-3540-4669-ab25-7867c8ba0a29",
+      "name": "Whatsapp bot user API",
+      "webhookId": "55544baf-2e3d-4dcf-916e-b35a32965b97"
+    },
+    {
+      "parameters": {
+        "content": "## Meta Connection Webhook",
+        "height": 624,
+        "width": 3232
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2336,
+        -1088
+      ],
+      "id": "494b969e-e214-4397-9cc2-c951e1136864",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "# URL - /message\n## Method - POST",
+        "height": 480,
+        "width": 3120
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1152,
+        -416
+      ],
+      "id": "38806f5d-6d07-4a0d-bed5-87c15f11a9db",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 3376,
+        "width": 150,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2000,
+        -2064
+      ],
+      "id": "53259f7e-52e6-433d-8e99-b59793bc427e",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "# Meta Webhook Handling",
+        "height": 80,
+        "width": 432,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3728,
+        -1440
+      ],
+      "id": "defb05f8-5f4f-4e3c-bf72-29cb3c1ffd78",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "# API Handling",
+        "height": 80,
+        "width": 256,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        144,
+        -1408
+      ],
+      "id": "c181e4bb-f823-473d-8908-5a9e1d6ed825",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "# URL - /contacts\n## Method - GET",
+        "height": 320,
+        "width": 1760
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1152,
+        112
+      ],
+      "id": "91ddf099-575f-40e6-854f-5488b7ebae89",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "# URL - <webhook_id>/messages/<contact_id>\n## Method - GET",
+        "height": 352,
+        "width": 1840
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1152,
+        512
+      ],
+      "id": "6a3bd058-232a-4b51-8eec-19eafe60a773",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "# URL - <webhook_id>/contacts/<contact_id>\n## Method - Patch",
+        "height": 320,
+        "width": 864
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1152,
+        944
+      ],
+      "id": "1d5fac0a-1918-43a9-bb4f-fce945d09149",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fca2f617-53dd-4d24-8dac-4eb1bae17d63",
+              "name": "bot_phone_number",
+              "value": "={{ $json.body.entry[0].changes[0].value.metadata.display_phone_number }}",
+              "type": "string"
+            },
+            {
+              "id": "eeb18da1-cbb5-4e04-939d-5b173917bf70",
+              "name": "phone_number_id",
+              "value": "={{ $json.body.entry[0].changes[0].value.metadata.phone_number_id }}",
+              "type": "string"
+            },
+            {
+              "id": "d71274d8-03df-4d4c-aec9-cb50a57f49dc",
+              "name": "whatsapp_business_account_id",
+              "value": "={{ $json.body.entry[0].id }}",
+              "type": "string"
+            },
+            {
+              "id": "aec224cd-bfdf-468e-b864-a5d25bfce6b1",
+              "name": "contact_user_name",
+              "value": "={{ $json.body.entry[0].changes[0].value.contacts[0].profile.name }}",
+              "type": "string"
+            },
+            {
+              "id": "505c2cc7-0a24-4e81-b6a4-fc7f1471ed2b",
+              "name": "contact_phone_numbe",
+              "value": "={{ $json.body.entry[0].changes[0].value.contacts[0].wa_id }}",
+              "type": "string"
+            },
+            {
+              "id": "7b8dd85a-0035-4e70-8b52-830b49c512e6",
+              "name": "message_id",
+              "value": "={{ $json.body.entry[0].changes[0].value.messages[0].id }}",
+              "type": "string"
+            },
+            {
+              "id": "443d5776-1620-46ad-8bf2-580a563edf86",
+              "name": "message_timestamp",
+              "value": "={{ $json.body.entry[0].changes[0].value.messages[0].timestamp }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3072,
+        -832
+      ],
+      "id": "79f1a83a-8cb6-4978-8c89-328c76587719",
+      "name": "Data from Webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c1108fb1-81c8-4609-95c6-f18752bdea72",
+              "name": "bot_phone_number",
+              "value": "={{ $json.display_phone_number.replace('+','').replaceAll(\" \", '') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -256,
+        -720
+      ],
+      "id": "85343977-347b-4517-a30f-7803729cfc74",
+      "name": "Clean Phone number"
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v24.0/{{ $json.bot_phone_number_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -480,
+        -720
+      ],
+      "id": "2efc1a4f-ea94-4f71-bfa3-906c66c53ecd",
+      "name": "Get Phone number ID Data",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "iR5q4Pc809XWa04V",
+          "name": "whatsapp wa-agent-alister app Lakshit"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "Fa1axIex0eyMeBd6",
+          "mode": "list",
+          "cachedResultName": "n8n Whatsapp Variable",
+          "cachedResultUrl": "/projects/iOyc3VpWKvgHH9fv/datatables/Fa1axIex0eyMeBd6"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "key",
+              "keyValue": "whatsapp_business_account_id"
+            },
+            {
+              "keyName": "key",
+              "keyValue": "bot_phone_number_id"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -896,
+        -720
+      ],
+      "id": "18fe7329-fd40-4cbd-a040-04be38a1dbe1",
+      "name": "Get WABA Data"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "Fa1axIex0eyMeBd6",
+          "mode": "list",
+          "cachedResultName": "n8n Whatsapp Variable",
+          "cachedResultUrl": "/projects/iOyc3VpWKvgHH9fv/datatables/Fa1axIex0eyMeBd6"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "key",
+              "keyValue": "api_version"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -208,
+        -304
+      ],
+      "id": "64deab2d-29af-4442-b413-150679345527",
+      "name": "Get API Version"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "Fa1axIex0eyMeBd6",
+          "mode": "list",
+          "cachedResultName": "n8n Whatsapp Variable",
+          "cachedResultUrl": "/projects/iOyc3VpWKvgHH9fv/datatables/Fa1axIex0eyMeBd6"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "key",
+              "keyValue": "chat_list_contact_pagination_limit"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -672,
+        256
+      ],
+      "id": "8ea166af-a6f2-4a8c-8a41-c508beb03173",
+      "name": "Get Contact Pagination Limit"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "Fa1axIex0eyMeBd6",
+          "mode": "list",
+          "cachedResultName": "n8n Whatsapp Variable",
+          "cachedResultUrl": "/projects/iOyc3VpWKvgHH9fv/datatables/Fa1axIex0eyMeBd6"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "key",
+              "keyValue": "chat_thread_message_limit"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -672,
+        640
+      ],
+      "id": "8d7eeda6-d5cf-4e36-9a06-91627a73f696",
+      "name": "Get Chat Thread Info"
+    }
+  ],
+  "connections": {
+    "Check webhook configure parameter": {
+      "main": [
+        [
+          {
+            "node": "Verify Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "normal message?": {
+      "main": [
+        [
+          {
+            "node": "Message Type Routing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Bot User": {
+      "main": [
+        [
+          {
+            "node": "Does Bot Exist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Bot User2": {
+      "main": [
+        [
+          {
+            "node": "Get a contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a contact": {
+      "main": [
+        [
+          {
+            "node": "Does Contact Exist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Does Contact Exist": {
+      "main": [
+        [
+          {
+            "node": "Common Variable ",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Common Variable ": {
+      "main": [
+        [
+          {
+            "node": "Insert Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meta Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check webhook configure parameter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message API": {
+      "main": [
+        [
+          {
+            "node": "Get Bot User1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contacts API": {
+      "main": [
+        [
+          {
+            "node": "Total Contacts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Total Contacts": {
+      "main": [
+        [
+          {
+            "node": "Get Contact Pagination Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Contact": {
+      "main": [
+        [
+          {
+            "node": "Common Variable ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Variables": {
+      "main": [
+        [
+          {
+            "node": "Get All Contacts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Value": {
+      "main": [
+        [
+          {
+            "node": "Set Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Contacts": {
+      "main": [
+        [
+          {
+            "node": "Json response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Variables1": {
+      "main": [
+        [
+          {
+            "node": "Get All Contacts Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Value1": {
+      "main": [
+        [
+          {
+            "node": "Set Variables1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Contacts Messages": {
+      "main": [
+        [
+          {
+            "node": "Json response1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Total Contact Messages": {
+      "main": [
+        [
+          {
+            "node": "Get Chat Thread Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Json response1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Json response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contact Message API With Param": {
+      "main": [
+        [
+          {
+            "node": "Total Contact Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Text Variable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Bot User1": {
+      "main": [
+        [
+          {
+            "node": "Does Bot User exist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Does Bot User exist": {
+      "main": [
+        [
+          {
+            "node": "Get a contact1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Throw Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Throw Error": {
+      "main": [
+        []
+      ]
+    },
+    "Get a contact1": {
+      "main": [
+        [
+          {
+            "node": "Get API Version",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Common Variable": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Variable": {
+      "main": [
+        [
+          {
+            "node": "Send msg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send msg": {
+      "main": [
+        [
+          {
+            "node": "Execution Data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Message entry": {
+      "main": [
+        [
+          {
+            "node": "Update a Contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Json response2": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a Contact": {
+      "main": [
+        [
+          {
+            "node": "Json response2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Should Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Message": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Contacts API": {
+      "main": [
+        [
+          {
+            "node": "Update a row1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a row1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execution Data": {
+      "main": [
+        [
+          {
+            "node": "Not Error Msg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execution Data1": {
+      "main": [
+        [
+          {
+            "node": "Insert Message entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Not Error Msg": {
+      "main": [
+        [
+          {
+            "node": "Data from Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message Type Routing": {
+      "main": [
+        [
+          {
+            "node": "Coming Soon",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Text Variable1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Variable1": {
+      "main": [
+        [
+          {
+            "node": "Get Bot User2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should Update": {
+      "main": [
+        [
+          {
+            "node": "Update a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Status API": {
+      "main": [
+        [
+          {
+            "node": "Respond to Status API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Does Bot Exist": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Bot User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Bot User": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Variable": {
+      "main": [
+        [
+          {
+            "node": "Get Phone number ID Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Whatsapp bot user API": {
+      "main": [
+        [
+          {
+            "node": "Get WABA Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data from Webhook": {
+      "main": [
+        [
+          {
+            "node": "normal message?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean Phone number": {
+      "main": [
+        [
+          {
+            "node": "Get Bot User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Phone number ID Data": {
+      "main": [
+        [
+          {
+            "node": "Clean Phone number",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get WABA Data": {
+      "main": [
+        [
+          {
+            "node": "Add Variable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get API Version": {
+      "main": [
+        [
+          {
+            "node": "Common Variable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Contact Pagination Limit": {
+      "main": [
+        [
+          {
+            "node": "Default Value",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Chat Thread Info": {
+      "main": [
+        [
+          {
+            "node": "Default Value1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timezone": "Asia/Kolkata",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "357f4c9a-785e-49bd-9d41-7309b6ff1605",
+  "activeVersionId": "19a33779-66b3-4eb5-b12e-3479b7e8259d",
+  "triggerCount": 7,
+  "shared": [
+    {
+      "updatedAt": "2026-01-23T06:13:33.593Z",
+      "createdAt": "2026-01-23T06:13:33.593Z",
+      "role": "workflow:owner",
+      "workflowId": "D2R5X2sRzfi7bOdA",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-01-29T06:04:37.000Z",
+    "createdAt": "2026-01-29T06:04:25.378Z",
+    "versionId": "19a33779-66b3-4eb5-b12e-3479b7e8259d",
+    "workflowId": "D2R5X2sRzfi7bOdA",
+    "nodes": [
+      {
+        "parameters": {
+          "respondWith": "text",
+          "responseBody": "={{ $json.query[\"hub.challenge\"] }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.4,
+        "position": [
+          2848,
+          -1024
+        ],
+        "id": "547d596e-470e-4d21-aede-fb3a5f226036",
+        "name": "Verify Webhook"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "51696ba9-54b9-4f8c-bd0c-4e11fcb50d45",
+                "leftValue": "={{ $json.query['hub.mode'] }}",
+                "rightValue": "subscribe",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals",
+                  "name": "filter.operator.equals"
+                }
+              },
+              {
+                "id": "4b041959-0ee0-4db3-8465-d08554bdec80",
+                "leftValue": "={{ $json.query['hub.verify_token'] }}",
+                "rightValue": "hello",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals",
+                  "name": "filter.operator.equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.filter",
+        "typeVersion": 2.2,
+        "position": [
+          2624,
+          -1024
+        ],
+        "id": "ec6bd126-7725-4e05-9b33-2530e94868c5",
+        "name": "Check webhook configure parameter"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "ade969fb-d749-4b0b-af12-166008c17370",
+                "leftValue": "={{ $('Meta Webhook').item.json.body.entry[0].changes[0].value.statuses[0].status }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "string",
+                  "operation": "notExists",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          3296,
+          -832
+        ],
+        "id": "d776c4ef-813e-46e8-bae6-40489e13c211",
+        "name": "normal message?"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "tableId": "users",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "phone_number",
+                "keyValue": "={{ $json.bot_phone_number }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          -32,
+          -720
+        ],
+        "id": "100cd0a4-45f5-46a0-a162-43dfc45de30b",
+        "name": "Get Bot User",
+        "alwaysOutputData": true,
+        "credentials": {
+          "supabaseApi": {
+            "id": "Xa9U6Qo37D2g6E7Z",
+            "name": "Lakshit77 - n8n whatsapp project"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "tableId": "users",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "phone_number",
+                "fieldValue": "={{ $('Clean Phone number').item.json.bot_phone_number }}"
+              },
+              {
+                "fieldId": "whatsapp_business_account_id",
+                "fieldValue": "={{ $('Add Variable').item.json.whatsapp_business_account_id }}"
+              },
+              {
+                "fieldId": "name",
+                "fieldValue": "={{ $('Add Variable').item.json.bot_user_name }}"
+              },
+              {
+                "fieldId": "phone_number_id",
+                "fieldValue": "={{ $('Add Variable').item.json.bot_phone_number_id }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          416,
+          -640
+        ],
+        "id": "e9f5af40-9266-4442-9c40-4519bf7a0e32",
+        "name": "Create Bot User",
+        "credentials": {
+          "supabaseApi": {
+            "id": "Xa9U6Qo37D2g6E7Z",
+            "name": "Lakshit77 - n8n whatsapp project"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "tableId": "users",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "phone_number",
+                "keyValue": "={{ $('Data from Webhook').item.json.bot_phone_number }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          3968,
+          -832
+        ],
+        "id": "0261b880-cb0a-4bee-a372-b9aa2c3bdc63",
+        "name": "Get Bot User2",
+        "alwaysOutputData": false,
+        "credentials": {
+          "supabaseApi": {
+            "id": "Xa9U6Qo37D2g6E7Z",
+            "name": "Lakshit77 - n8n whatsapp project"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "tableId": "contacts",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "phone_number",
+                "keyValue": "={{ $('Data from Webhook').item.json.contact_phone_numbe }}"
+              },
+              {
+                "keyName": "user_id",
+                "keyValue": "={{ $json.id }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          4192,
+          -832
+        ],
+        "id": "62d3a92a-cc23-45f0-b316-cfa87794712d",
+        "name": "Get a contact",
+        "alwaysOutputData": true,
+        "credentials": {
+          "supabaseApi": {
+            "id": "Xa9U6Qo37D2g6E7Z",
+            "name": "Lakshit77 - n8n whatsapp project"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "d26679c5-6d46-49cf-b7cc-28b90583438f",
+                "leftValue": "={{ $('Get a contact').item.json.id }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "string",
+                  "operation": "exists",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          4416,
+          -832
+        ],
+        "id": "7c67c1dd-60ba-42dc-8dcc-34f02daf19bb",
+        "name": "Does Contact Exist"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "b6e234ca-4654-4ad2-a634-79f36fa54def",
+                "name": "contact_db_id",
+                "value": "={{ $json.id }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          4864,
+          -832
+        ],
+        "id": "3573348f-cd9f-461c-b522-7403e6e7c647",
+        "name": "Common Variable "
+      },
+      {
+        "parameters": {
+          "multipleMethods": true,
+          "path": "n8n-whatsapp-saas",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          2400,
+          -928
+        ],
+        "id": "d64bea77-486c-4e67-b45e-943d084047dd",
+        "name": "Meta Webhook",
+        "webhookId": "4cafd96b-0322-44da-988f-8688f0b1e7d8"
+      },
+      {
+        "parameters": {
+          "multipleMethods": true,
+          "httpMethod": [
+            "POST"
+          ],
+          "path": "=message/",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          -1104,
+          -208
+        ],
+        "id": "d8adce45-cb6c-49d5-abc8-f1b7981fec13",
+        "name": "Message API",
+        "webhookId": "6bed4c3b-0d58-47fe-802f-e263f7ec59a9"
+      },
+      {
+        "parameters": {
+          "multipleMethods": true,
+          "httpMethod": [
+            "GET"
+          ],
+          "path": "=contacts",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          -1104,
+          256
+        ],
+        "id": "82cdd43c-ff57-479c-a5bd-794eea4bc5fb",
+        "name": "Contacts API",
+        "webhookId": "6bed4c3b-0d58-47fe-802f-e263f7ec59a9"
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "SELECT count(*) as total\nFROM PUBLIC.contacts\nWHERE user_id = $1",
+          "options": {
+            "queryReplacement": "={{ $json.query.user_id }}"
+          }
+        },
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          -880,
+          256
+        ],
+        "id": "b5a7470c-8fe2-4370-8599-d63933eb8a3e",
+        "name": "Total Contacts",
+        "credentials": {
+          "postgres": {
+            "id": "wI2bluzrLTUPa0Lb",
+            "name": "supabase n8n-whatsapp db"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "tableId": "contacts",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "phone_number",
+                "fieldValue": "={{ $('Data from Webhook').item.json.contact_phone_numbe }}"
+              },
+              {
+                "fieldId": "name",
+                "fieldValue": "={{ $('Data from Webhook').item.json.contact_user_name }}"
+              },
+              {
+                "fieldId": "unread_count",
+                "fieldValue": "1"
+              },
+              {
+                "fieldId": "user_id",
+                "fieldValue": "={{ $('Get Bot User2').item.json.id }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          4640,
+          -752
+        ],
+        "id": "26c5615a-448d-473f-814d-5741f21d60b1",
+        "name": "Create Contact",
+        "credentials": {
+          "supabaseApi": {
+            "id": "Xa9U6Qo37D2g6E7Z",
+            "name": "Lakshit77 - n8n whatsapp project"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "tableId": "messages",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "user_id",
+                "fieldValue": "={{ $('Get Bot User2').item.json.id }}"
+              },
+              {
+                "fieldId": "contact_id",
+                "fieldValue": "={{ $json.contact_db_id }}"
+              },
+              {
+                "fieldId": "message_id",
+                "fieldValue": "={{ $('Data from Webhook').item.json.message_id }}"
+              },
+              {
+                "fieldId": "direction",
+                "fieldValue": "inbound"
+              },
+              {
+                "fieldId": "content",
+                "fieldValue": "={{ $('Text Variable1').item.json.message_text }}"
+              },
+              {
+                "fieldId": "timestamp",
+                "fieldValue": "={{ \nDateTime.\n      fromMillis($('Data from Webhook').item.json.message_timestamp * 1000).\n      setZone('Asia/Kolkata').\n      toISO() \n}}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          5088,
+          -832
+        ],
+        "id": "7b673e71-3e92-4b94-8d82-45b9420b6310",
+        "name": "Insert Message",
+        "alwaysOutputData": false,
+        "credentials": {
+          "supabaseApi": {
+            "id": "Xa9U6Qo37D2g6E7Z",
+            "name": "Lakshit77 - n8n whatsapp project"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "e8517e4a-6828-4658-8875-e43d53da145d",
+                "name": "limit",
+                "value": "={{ $('Contacts API').item.json.query.limit || $json.default_limit}}",
+                "type": "string"
+              },
+              {
+                "id": "4417e657-f89a-4038-9d8f-48a7f4d34307",
+                "name": "offset",
+                "value": "={{ (($('Contacts API').item.json.query.page || 1) - 1) * ($('Contacts API').item.json.query.limit || $json.default_limit) }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          -256,
+          256
+        ],
+        "id": "9289052d-9a14-42a9-88e7-f05a14ec36d9",
+        "name": "Set Variables"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "ffa34e94-b5d7-42f1-aa70-e4b7d170ce17",
+                "name": "default_limit",
+                "value": "={{ $('Get Contact Pagination Limit').all().find(item => item.json.key === 'chat_list_contact_pagination_limit').json.value }}\n",
+                "type": "number"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          -464,
+          256
+        ],
+        "id": "4975e0b6-52a4-4bfe-ac5b-9a9a2962cbec",
+        "name": "Default Value"
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.5,
+        "position": [
+          320,
+          256
+        ],
+        "id": "a25089c0-8606-432b-ac6c-2e4c02ff41de",
+        "name": "Respond to Webhook"
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "SELECT \n  id,\n  phone_number,\n  name,\n  unread_count,\n  last_message_at,\n  is_archived,\n  first_message_at,\n  last_message\nFROM contacts\nWHERE user_id = $1\n  AND is_archived = false\nORDER BY last_message_at DESC\nLIMIT $2\nOFFSET $3;",
+          "options": {
+            "queryReplacement": "={{ $('Contacts API').item.json.query.user_id }}, {{ $json.limit }}, {{ $json.offset }}"
+          }
+        },
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          -64,
+          256
+        ],
+        "id": "eada4b12-8dcb-4eb7-8b38-bbcbf45a5033",
+        "name": "Get All Contacts",
+        "credentials": {
+          "postgres": {
+            "id": "wI2bluzrLTUPa0Lb",
+            "name": "supabase n8n-whatsapp db"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "e8517e4a-6828-4658-8875-e43d53da145d",
+                "name": "limit",
+                "value": "={{ $('Contact Message API With Param').item.json.query.limit || $json.default_limit}}",
+                "type": "string"
+              },
+              {
+                "id": "4417e657-f89a-4038-9d8f-48a7f4d34307",
+                "name": "offset",
+                "value": "={{ (($('Contact Message API With Param').item.json.query.page || 1) - 1) * ($('Contact Message API With Param').item.json.query.limit || $json.default_limit) }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          -208,
+          640
+        ],
+        "id": "fe5ade83-8aff-4c7b-9255-9d189fcddcc9",
+        "name": "Set Variables1"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "ffa34e94-b5d7-42f1-aa70-e4b7d170ce17",
+                "name": "default_limit",
+                "value": "={{ $('Get Chat Thread Info').all().find(item => item.json.key === 'chat_thread_message_limit').json.value }}\n",
+                "type": "number"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          -432,
+          640
+        ],
+        "id": "53e84bfa-7551-4884-b251-67b1beaf950e",
+        "name": "Default Value1"
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.5,
+        "position": [
+          464,
+          640
+        ],
+        "id": "e439ba46-be4a-4cd8-98d1-6f764b6af386",
+        "name": "Respond to Webhook1"
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "SELECT *\nFROM messages\nWHERE contact_id = $1\nORDER BY timestamp DESC\nLIMIT $2\nOFFSET $3;",
+          "options": {
+            "queryReplacement": "={{ $('Contact Message API With Param').item.json.params.contact_id }}, {{ $json.limit }}, {{ $json.offset }}"
+          }
+        },
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          16,
+          640
+        ],
+        "id": "11878e4f-8733-4592-a35e-d3204c80f9bb",
+        "name": "Get All Contacts Messages",
+        "credentials": {
+          "postgres": {
+            "id": "wI2bluzrLTUPa0Lb",
+            "name": "supabase n8n-whatsapp db"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "SELECT count(*) as total\nFROM PUBLIC.messages\nWHERE contact_id = $1",
+          "options": {
+            "queryReplacement": "={{ $json.params.contact_id }}"
+          }
+        },
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          -880,
+          640
+        ],
+        "id": "7d469e31-17a8-4b3f-ad30-725753788bbd",
+        "name": "Total Contact Messages",
+        "credentials": {
+          "postgres": {
+            "id": "wI2bluzrLTUPa0Lb",
+            "name": "supabase n8n-whatsapp db"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Get the total from \"Total Contacts\" node\nconst totalContacts = parseInt($(\"Total Contact Messages\").first().json.total);\n\n// Get ALL contact data from \"Get All Contacts\" node\nconst allContactsData = $(\"Get All Contacts Messages\").all().map(item => item.json);\n\nconst page = parseInt($('Contact Message API With Param').first().json.query.page || 1)\n\nconst limit = parseInt($('Contact Message API With Param').first().json.query.limit || $('Default Value1').first().json.default_limit)\n\n// Calculate pagination\nconst totalPages = Math.ceil(totalContacts / limit);\nconst hasNext = page < totalPages;\nconst hasPrevious = page > 1;\n\n// If you want to return both in your response:\nreturn {\n  json: {\n    status: 1,\n    message: \"success\",\n    next: hasNext,\n    previous: hasPrevious,\n    total: totalContacts,\n    data: allContactsData\n  }\n};"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          240,
+          640
+        ],
+        "id": "3a6292d8-83b9-4aad-b9f0-0e9128742cea",
+        "name": "Json response1"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Get the total from \"Total Contacts\" node\nconst totalContacts = parseInt($(\"Total Contacts\").first().json.total);\n\n// Get ALL contact data from \"Get All Contacts\" node\nconst allContactsData = $(\"Get All Contacts\").all().map(item => item.json);\n\nconst page = parseInt($('Contacts API').first().json.query.page || 1)\n\nconst limit = parseInt($('Contacts API').first().json.query.limit || $('Default Value').first().json.default_limit)\n\n// Calculate pagination\nconst totalPages = Math.ceil(totalContacts / limit);\nconst hasNext = page < totalPages;\nconst hasPrevious = page > 1;\n\n// If you want to return both in your response:\nreturn {\n  json: {\n    status: 1,\n    message: \"success\",\n    next: hasNext,\n    previous: hasPrevious,\n    total: totalContacts,\n    data: allContactsData\n  }\n};"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          128,
+          256
+        ],
+        "id": "9b196daf-cf10-4ca8-8fca-4758036f65c6",
+        "name": "Json response"
+      },
+      {
+        "parameters": {
+          "path": ":contact_id",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          -1104,
+          640
+        ],
+        "id": "7e4618ce-2971-4b29-9db5-d6bf902d2e3c",
+        "name": "Contact Message API With Param",
+        "webhookId": "6bed4c3b-0d58-47fe-802f-e263f7ec59a9"
+      },
+      {
+        "parameters": {
+          "jsCode": "bot_object = $(\"Does Bot Exist\").first().json\n\nbot_id = bot_object.id\nbot_name = bot_object.name\nbot_phone_number = bot_object.phone_number\n\nreturn {\n  json: {\n    status: 1,\n    message: \"success\",\n    data: {\n      \"id\": bot_id,\n      \"name\": bot_name,\n      \"phone_number\": bot_phone_number\n    }\n  }\n};"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          640,
+          -720
+        ],
+        "id": "6d80a0d8-c103-4082-8c8f-aae8ff557831",
+        "name": "Code in JavaScript"
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.5,
+        "position": [
+          864,
+          -720
+        ],
+        "id": "d0c31fae-6188-4410-9519-542f0a3edf1b",
+        "name": "Respond to Webhook2"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "=https://graph.facebook.com/{{ $('Common Variable').item.json.api_version }}/{{ $('Get Bot User1').item.json.phone_number_id }}/messages",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $(\"Common Variable\").first().json.contact_phone_number }}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"{{ $json.clean_text }}\"\n  }\n}",
+          "options": {
+            "response": {
+              "response": {
+                "fullResponse": true
+              }
+            }
+          }
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          672,
+          -304
+        ],
+        "id": "136833d4-3103-4faf-96ac-ebb317098787",
+        "name": "Send msg",
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "iR5q4Pc809XWa04V",
+            "name": "whatsapp wa-agent-alister app Lakshit"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $('Message API').item.json.body.message_type }}",
+                      "rightValue": "text",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "id": "b04d6cf8-95a8-4248-941d-34ca9678148c"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "Text"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.4,
+        "position": [
+          240,
+          -304
+        ],
+        "id": "37732434-9ed6-453b-bf8e-7f660df69e30",
+        "name": "Switch"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "tableId": "users",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "id",
+                "keyValue": "={{ $json.query.user_id }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          -880,
+          -208
+        ],
+        "id": "e9e861a0-21c0-431d-bea9-2be1e02f667a",
+        "name": "Get Bot User1",
+        "alwaysOutputData": true,
+        "credentials": {
+          "supabaseApi": {
+            "id": "Xa9U6Qo37D2g6E7Z",
+            "name": "Lakshit77 - n8n whatsapp project"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "961e76d1-78ff-4369-857f-7abf63be53d6",
+                "leftValue": "={{ $('Get Bot User1').item.json.id }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "string",
+                  "operation": "exists",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          -656,
+          -208
+        ],
+        "id": "fa5406d2-3e8b-4d00-acae-d8aa783e4ae7",
+        "name": "Does Bot User exist"
+      },
+      {
+        "parameters": {
+          "respondWith": "json",
+          "responseBody": "{\n  \"success\": \"0\",\n  \"message\": \"Bot User Not found\"\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.5,
+        "position": [
+          -432,
+          -112
+        ],
+        "id": "ba8560d4-7fb4-4056-a767-5b13297a4fd9",
+        "name": "Throw Error"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "tableId": "contacts",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "id",
+                "keyValue": "={{ $('Message API').item.json.body.contact_id }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          -432,
+          -304
+        ],
+        "id": "9e5ca416-a7c6-4e13-b261-44ec621599f0",
+        "name": "Get a contact1",
+        "alwaysOutputData": true,
+        "credentials": {
+          "supabaseApi": {
+            "id": "Xa9U6Qo37D2g6E7Z",
+            "name": "Lakshit77 - n8n whatsapp project"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "639c5881-127a-4b2b-a4f0-15902f46f11e",
+                "name": "api_version",
+                "value": "={{ $('Get API Version').all().find(item => item.json.key === 'api_version').json.value }}",
+                "type": "string"
+              },
+              {
+                "id": "ef88c8a3-e30b-48db-a217-32e162a860a5",
+                "name": "contact_phone_number",
+                "value": "={{ $('Get a contact1').item.json.phone_number }}",
+                "type": "string"
+              },
+              {
+                "id": "0bb56cd7-7b52-4c76-aeb9-ee36dffaf1f2",
+                "name": "user_id",
+                "value": "={{ $('Get Bot User1').item.json.id }}",
+                "type": "string"
+              },
+              {
+                "id": "a8abc1fd-a99a-4ab4-adfc-42b87ae260f1",
+                "name": "contact_id",
+                "value": "={{ $('Get a contact1').first().json.id }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          32,
+          -304
+        ],
+        "id": "f4f4c5e0-11a3-4867-85f1-9bb1b1bd4ae0",
+        "name": "Common Variable"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "05fbe96b-7975-451e-a856-e6efb5750ae3",
+                "name": "clean_text",
+                "value": "={{ $('Message API').item.json.body.content.replace(/\\n/g, '\\\\n').replace(/\"/g, \"'\") }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          448,
+          -304
+        ],
+        "id": "1d4ce8b1-c069-45fa-8009-2fab4e39c92b",
+        "name": "Text Variable"
+      },
+      {
+        "parameters": {
+          "tableId": "messages",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "user_id",
+                "fieldValue": "={{ $('Common Variable').item.json.user_id }}"
+              },
+              {
+                "fieldId": "contact_id",
+                "fieldValue": "={{ $('Common Variable').item.json.contact_id }}"
+              },
+              {
+                "fieldId": "message_id",
+                "fieldValue": "={{ $('Send msg').item.json.body.messages[0].id }}"
+              },
+              {
+                "fieldId": "direction",
+                "fieldValue": "outbound"
+              },
+              {
+                "fieldId": "message_type",
+                "fieldValue": "text"
+              },
+              {
+                "fieldId": "content",
+                "fieldValue": "={{ $('Text Variable').item.json.clean_text }}"
+              },
+              {
+                "fieldId": "status",
+                "fieldValue": "sent"
+              },
+              {
+                "fieldId": "timestamp",
+                "fieldValue": "={{\n  DateTime\n    .now()\n    .setZone('Asia/Kolkata')\n    .toISO()\n}}\n"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          1120,
+          -304
+        ],
+        "id": "0122a96e-b8b0-4a33-8622-4dde3277519a",
+        "name": "Insert Message entry",
+        "credentials": {
+          "supabaseApi": {
+            "id": "Xa9U6Qo37D2g6E7Z",
+            "name": "Lakshit77 - n8n whatsapp project"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "tableId": "contacts",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "id",
+                "condition": "eq",
+                "keyValue": "={{ $('Common Variable').item.json.contact_id }}"
+              }
+            ]
+          },
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "last_message_at",
+                "fieldValue": "={{ new Date().toISOString() }}"
+              },
+              {
+                "fieldId": "last_message",
+                "fieldValue": "={{ $('Text Variable').item.json.clean_text }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          1344,
+          -304
+        ],
+        "id": "825b2aa4-5f29-4cc4-b231-e60dad0cc516",
+        "name": "Update a Contact",
+        "credentials": {
+          "supabaseApi": {
+            "id": "Xa9U6Qo37D2g6E7Z",
+            "name": "Lakshit77 - n8n whatsapp project"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.5,
+        "position": [
+          1792,
+          -304
+        ],
+        "id": "21f78a86-7a09-4457-820e-0463c29ca42e",
+        "name": "Respond to Webhook3"
+      },
+      {
+        "parameters": {
+          "jsCode": "\n\n// Get ALL contact data from \"Get All Contacts\" node\nconst new_msg_entry = $(\"Insert Message entry\").first().json;\n\n// If you want to return both in your response:\nreturn {\n  json: {\n    status: 1,\n    message: \"success\",\n    data: new_msg_entry\n  }\n};"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1568,
+          -304
+        ],
+        "id": "4af11207-018d-47f1-afdc-6c50467fac56",
+        "name": "Json response2"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "tableId": "messages",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "message_id",
+                "keyValue": "={{ $('Meta Webhook').item.json.body.entry[0].changes[0].value.statuses[0].id }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          3520,
+          -640
+        ],
+        "id": "30700c40-3438-448a-bf63-e933ba34267a",
+        "name": "Get a row",
+        "credentials": {
+          "supabaseApi": {
+            "id": "Xa9U6Qo37D2g6E7Z",
+            "name": "Lakshit77 - n8n whatsapp project"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Status priority\nconst PRIORITY = {\n  'failed': 0,\n  'sent': 1,\n  'delivered': 2,\n  'read': 3\n};\n\n// Data from webhook\nconst newStatus = $('Meta Webhook').first().json.body.entry[0].changes[0].value.statuses[0].status;\nconst messageId = $('Meta Webhook').first().json.body.entry[0].changes[0].value.statuses[0].id;\n\n// Data from database GET\nconst currentStatus = $input.first().json.status; // from Supabase query\n\n// Get priorities\nconst currentPriority = PRIORITY[currentStatus] || 0;\nconst newPriority = PRIORITY[newStatus] || 0;\n\n// Should we update?\nif (newPriority > currentPriority) {\n  // YES - new status is higher priority\n  return {\n    json: {\n      should_update: true,\n      message_id: messageId,\n      new_status: newStatus\n    }\n  };\n} else {\n  // NO - current status is higher or equal\n  return {\n    json: {\n      should_update: false,\n      message_id: messageId\n    }\n  };\n}"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3744,
+          -640
+        ],
+        "id": "d6b7002e-9b17-4cce-8e59-c80457404709",
+        "name": "Code in JavaScript1"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "tableId": "messages",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "message_id",
+                "condition": "eq",
+                "keyValue": "={{ $json.message_id }}"
+              }
+            ]
+          },
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "status",
+                "fieldValue": "={{ $json.new_status }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          4192,
+          -640
+        ],
+        "id": "1423a3fe-d5ee-4bea-95c5-f4a640b76008",
+        "name": "Update a row",
+        "credentials": {
+          "supabaseApi": {
+            "id": "Xa9U6Qo37D2g6E7Z",
+            "name": "Lakshit77 - n8n whatsapp project"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "UPDATE contacts\nSET \n  unread_count = unread_count + 1,\n  last_message = $1,\n  last_message_at = $2\nWHERE id = $3",
+          "options": {
+            "queryReplacement": "={{ [$('Text Variable1').item.json.message_text, new Date().toISOString(), $('Common Variable ').item.json.contact_db_id] }}"
+          }
+        },
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          5312,
+          -832
+        ],
+        "id": "ce74a887-1ee6-4145-b2db-dc40b721ef2e",
+        "name": "Execute a SQL query",
+        "credentials": {
+          "postgres": {
+            "id": "wI2bluzrLTUPa0Lb",
+            "name": "supabase n8n-whatsapp db"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "multipleMethods": true,
+          "httpMethod": [
+            "PATCH"
+          ],
+          "path": "=contacts/:contact_id",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          -1088,
+          1088
+        ],
+        "id": "4701fcd6-da80-4809-a1da-34c285aac78a",
+        "name": "Update Contacts API",
+        "webhookId": "6bed4c3b-0d58-47fe-802f-e263f7ec59a9"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "tableId": "contacts",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "id",
+                "condition": "eq",
+                "keyValue": "={{ $json.params.contact_id }}"
+              }
+            ]
+          },
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "unread_count",
+                "fieldValue": "={{ $json.body.unread_count }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          -864,
+          1088
+        ],
+        "id": "0ec0a38f-976a-4c98-b41f-801ec183ddcf",
+        "name": "Update a row1",
+        "credentials": {
+          "supabaseApi": {
+            "id": "Xa9U6Qo37D2g6E7Z",
+            "name": "Lakshit77 - n8n whatsapp project"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "respondWith": "json",
+          "responseBody": "{\n  \"status\": 1,\n  \"message\": \"success\"\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.5,
+        "position": [
+          -640,
+          1088
+        ],
+        "id": "b413d25d-2333-43ea-8b3b-2cc0cfc816e7",
+        "name": "Respond to Webhook4"
+      },
+      {
+        "parameters": {
+          "dataToSave": {
+            "values": [
+              {
+                "key": "message_id",
+                "value": "={{ $json.body.entry[0].changes[0].value.messages?.[0]?.id || $json.body.entry[0].changes[0].value.statuses?.[0]?.id }}"
+              },
+              {
+                "key": "error_code",
+                "value": "={{ $json.body.entry[0].changes[0].value.messages[0].errors[0].code }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.executionData",
+        "typeVersion": 1.1,
+        "position": [
+          2624,
+          -832
+        ],
+        "id": "55bb7670-a58c-4917-858a-f3d2c136c180",
+        "name": "Execution Data"
+      },
+      {
+        "parameters": {
+          "dataToSave": {
+            "values": [
+              {
+                "key": "message_id",
+                "value": "={{ $json.body.messages[0].id }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.executionData",
+        "typeVersion": 1.1,
+        "position": [
+          896,
+          -304
+        ],
+        "id": "970d7be7-f467-4d28-b3eb-ae9a6f9e6095",
+        "name": "Execution Data1"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "5705316f-3f34-467a-a2a0-aeb300810a5e",
+                "leftValue": "={{ $json.body.entry[0].changes[0].value.messages[0].errors[0].code }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "number",
+                  "operation": "notExists",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.filter",
+        "typeVersion": 2.3,
+        "position": [
+          2848,
+          -832
+        ],
+        "id": "60dbff16-08f3-46a8-a749-ec4dd3b0c3e9",
+        "name": "Not Error Msg"
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $('Meta Webhook').item.json.body.entry[0].changes[0].value.messages[0].type }}",
+                      "rightValue": "interactive",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "id": "38c2ee1e-5380-4c4c-906a-765cd35fff09"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "Interactive"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "73114ba1-f1c6-4eb8-8f92-f9abf6d6cb29",
+                      "leftValue": "={{ $('Meta Webhook').item.json.body.entry[0].changes[0].value.messages[0].type }}",
+                      "rightValue": "text",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "Text"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.3,
+        "position": [
+          3520,
+          -928
+        ],
+        "id": "e9b18298-9264-4dcb-9f3c-2f8f5e9c2bdc",
+        "name": "Message Type Routing"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "33e2f2a6-2c09-4b55-abe8-b4fee5dc400b",
+                "name": "message_text",
+                "value": "={{ $('Meta Webhook').item.json.body.entry[0].changes[0].value.messages[0].text.body }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          3744,
+          -832
+        ],
+        "id": "fbed05ce-36e4-4ce9-a9f1-2527969d81ec",
+        "name": "Text Variable1"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.noOp",
+        "typeVersion": 1,
+        "position": [
+          3744,
+          -1024
+        ],
+        "id": "cf6307cf-5b28-4b01-8a5a-61754869719f",
+        "name": "Coming Soon"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "a67357b0-2fb8-44b8-9f8e-15ae40f71cfe",
+                "leftValue": "={{ $json.should_update }}",
+                "rightValue": false,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.filter",
+        "typeVersion": 2.3,
+        "position": [
+          3968,
+          -640
+        ],
+        "id": "7907d45f-8a9d-4cea-b486-8ff3618ec137",
+        "name": "Should Update"
+      },
+      {
+        "parameters": {
+          "path": "status",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          -1088,
+          -1056
+        ],
+        "id": "a328c63b-1b03-4613-af2f-48adbd76e6dd",
+        "name": "Status API",
+        "webhookId": "85c64e3b-59fa-43c0-901c-f79de5e8727f"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "99da2322-843a-491c-bc98-089e46cacf68",
+                "leftValue": "={{ $('Get Bot User').item.json.id }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "string",
+                  "operation": "exists",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          192,
+          -720
+        ],
+        "id": "45a2d1ef-41d0-4d67-9bb9-a65b8fd82170",
+        "name": "Does Bot Exist"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "c5b8b5d9-9a80-4eee-b0cc-91674c244ed6",
+                "name": "whatsapp_business_account_id",
+                "value": "={{ $('Get WABA Data').all().find(item => item.json.key === 'whatsapp_business_account_id').json.value }}\n",
+                "type": "string"
+              },
+              {
+                "id": "cd7926ae-84fa-486a-94e6-b07210682b3b",
+                "name": "bot_phone_number_id",
+                "value": "={{ $('Get WABA Data').all().find(item => item.json.key === 'bot_phone_number_id').json.value }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          -704,
+          -720
+        ],
+        "id": "fc04fbbd-9360-4683-93ea-48b4636a3e27",
+        "name": "Add Variable"
+      },
+      {
+        "parameters": {
+          "content": "# URL - /status\n## method - GET\n",
+          "height": 256,
+          "width": 576
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -1152,
+          -1168
+        ],
+        "id": "6e410515-052d-4c66-bd5b-ef05a21dabe2",
+        "name": "Sticky Note"
+      },
+      {
+        "parameters": {
+          "respondWith": "json",
+          "responseBody": "{\n  \"status\": \"1\",\n  \"message\": \"success\"\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.5,
+        "position": [
+          -864,
+          -1056
+        ],
+        "id": "0a092815-971a-4405-b863-54a4d016c949",
+        "name": "Respond to Status API"
+      },
+      {
+        "parameters": {
+          "content": "# URL - /user\n## Method - GET\n",
+          "height": 368,
+          "width": 2160
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -1152,
+          -848
+        ],
+        "id": "12ec4f8a-0e59-46b6-90d6-6dfde10118ed",
+        "name": "Sticky Note1"
+      },
+      {
+        "parameters": {
+          "path": "user",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          -1088,
+          -720
+        ],
+        "id": "0377bbf1-3540-4669-ab25-7867c8ba0a29",
+        "name": "Whatsapp bot user API",
+        "webhookId": "55544baf-2e3d-4dcf-916e-b35a32965b97"
+      },
+      {
+        "parameters": {
+          "content": "## Meta Connection Webhook",
+          "height": 624,
+          "width": 3232
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          2336,
+          -1088
+        ],
+        "id": "494b969e-e214-4397-9cc2-c951e1136864",
+        "name": "Sticky Note2"
+      },
+      {
+        "parameters": {
+          "content": "# URL - /message\n## Method - POST",
+          "height": 480,
+          "width": 3120
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -1152,
+          -416
+        ],
+        "id": "38806f5d-6d07-4a0d-bed5-87c15f11a9db",
+        "name": "Sticky Note3"
+      },
+      {
+        "parameters": {
+          "content": "",
+          "height": 3376,
+          "width": 150,
+          "color": 3
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          2000,
+          -2064
+        ],
+        "id": "53259f7e-52e6-433d-8e99-b59793bc427e",
+        "name": "Sticky Note4"
+      },
+      {
+        "parameters": {
+          "content": "# Meta Webhook Handling",
+          "height": 80,
+          "width": 432,
+          "color": 6
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          3728,
+          -1440
+        ],
+        "id": "defb05f8-5f4f-4e3c-bf72-29cb3c1ffd78",
+        "name": "Sticky Note5"
+      },
+      {
+        "parameters": {
+          "content": "# API Handling",
+          "height": 80,
+          "width": 256,
+          "color": 6
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          144,
+          -1408
+        ],
+        "id": "c181e4bb-f823-473d-8908-5a9e1d6ed825",
+        "name": "Sticky Note6"
+      },
+      {
+        "parameters": {
+          "content": "# URL - /contacts\n## Method - GET",
+          "height": 320,
+          "width": 1664
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -1152,
+          112
+        ],
+        "id": "91ddf099-575f-40e6-854f-5488b7ebae89",
+        "name": "Sticky Note7"
+      },
+      {
+        "parameters": {
+          "content": "# URL - <webhook_id>/messages/<contact_id>\n## Method - GET",
+          "height": 352,
+          "width": 1840
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -1152,
+          512
+        ],
+        "id": "6a3bd058-232a-4b51-8eec-19eafe60a773",
+        "name": "Sticky Note8"
+      },
+      {
+        "parameters": {
+          "content": "# URL - <webhook_id>/contacts/<contact_id>\n## Method - Patch",
+          "height": 320,
+          "width": 864
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -1152,
+          944
+        ],
+        "id": "1d5fac0a-1918-43a9-bb4f-fce945d09149",
+        "name": "Sticky Note9"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "fca2f617-53dd-4d24-8dac-4eb1bae17d63",
+                "name": "bot_phone_number",
+                "value": "={{ $json.body.entry[0].changes[0].value.metadata.display_phone_number }}",
+                "type": "string"
+              },
+              {
+                "id": "eeb18da1-cbb5-4e04-939d-5b173917bf70",
+                "name": "phone_number_id",
+                "value": "={{ $json.body.entry[0].changes[0].value.metadata.phone_number_id }}",
+                "type": "string"
+              },
+              {
+                "id": "d71274d8-03df-4d4c-aec9-cb50a57f49dc",
+                "name": "whatsapp_business_account_id",
+                "value": "={{ $json.body.entry[0].id }}",
+                "type": "string"
+              },
+              {
+                "id": "aec224cd-bfdf-468e-b864-a5d25bfce6b1",
+                "name": "contact_user_name",
+                "value": "={{ $json.body.entry[0].changes[0].value.contacts[0].profile.name }}",
+                "type": "string"
+              },
+              {
+                "id": "505c2cc7-0a24-4e81-b6a4-fc7f1471ed2b",
+                "name": "contact_phone_numbe",
+                "value": "={{ $json.body.entry[0].changes[0].value.contacts[0].wa_id }}",
+                "type": "string"
+              },
+              {
+                "id": "7b8dd85a-0035-4e70-8b52-830b49c512e6",
+                "name": "message_id",
+                "value": "={{ $json.body.entry[0].changes[0].value.messages[0].id }}",
+                "type": "string"
+              },
+              {
+                "id": "443d5776-1620-46ad-8bf2-580a563edf86",
+                "name": "message_timestamp",
+                "value": "={{ $json.body.entry[0].changes[0].value.messages[0].timestamp }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          3072,
+          -832
+        ],
+        "id": "79f1a83a-8cb6-4978-8c89-328c76587719",
+        "name": "Data from Webhook"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "c1108fb1-81c8-4609-95c6-f18752bdea72",
+                "name": "bot_phone_number",
+                "value": "={{ $json.display_phone_number.replace('+','').replaceAll(\" \", '') }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          -256,
+          -720
+        ],
+        "id": "85343977-347b-4517-a30f-7803729cfc74",
+        "name": "Clean Phone number"
+      },
+      {
+        "parameters": {
+          "url": "=https://graph.facebook.com/v24.0/{{ $json.bot_phone_number_id }}",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          -480,
+          -720
+        ],
+        "id": "2efc1a4f-ea94-4f71-bfa3-906c66c53ecd",
+        "name": "Get Phone number ID Data",
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "iR5q4Pc809XWa04V",
+            "name": "whatsapp wa-agent-alister app Lakshit"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "dataTableId": {
+            "__rl": true,
+            "value": "Fa1axIex0eyMeBd6",
+            "mode": "list",
+            "cachedResultName": "n8n Whatsapp Variable",
+            "cachedResultUrl": "/projects/iOyc3VpWKvgHH9fv/datatables/Fa1axIex0eyMeBd6"
+          },
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "key",
+                "keyValue": "whatsapp_business_account_id"
+              },
+              {
+                "keyName": "key",
+                "keyValue": "bot_phone_number_id"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          -896,
+          -720
+        ],
+        "id": "18fe7329-fd40-4cbd-a040-04be38a1dbe1",
+        "name": "Get WABA Data"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "dataTableId": {
+            "__rl": true,
+            "value": "Fa1axIex0eyMeBd6",
+            "mode": "list",
+            "cachedResultName": "n8n Whatsapp Variable",
+            "cachedResultUrl": "/projects/iOyc3VpWKvgHH9fv/datatables/Fa1axIex0eyMeBd6"
+          },
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "key",
+                "keyValue": "api_version"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          -208,
+          -304
+        ],
+        "id": "64deab2d-29af-4442-b413-150679345527",
+        "name": "Get API Version"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "dataTableId": {
+            "__rl": true,
+            "value": "Fa1axIex0eyMeBd6",
+            "mode": "list",
+            "cachedResultName": "n8n Whatsapp Variable",
+            "cachedResultUrl": "/projects/iOyc3VpWKvgHH9fv/datatables/Fa1axIex0eyMeBd6"
+          },
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "key",
+                "keyValue": "chat_list_contact_pagination_limit"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          -672,
+          256
+        ],
+        "id": "8ea166af-a6f2-4a8c-8a41-c508beb03173",
+        "name": "Get Contact Pagination Limit"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "dataTableId": {
+            "__rl": true,
+            "value": "Fa1axIex0eyMeBd6",
+            "mode": "list",
+            "cachedResultName": "n8n Whatsapp Variable",
+            "cachedResultUrl": "/projects/iOyc3VpWKvgHH9fv/datatables/Fa1axIex0eyMeBd6"
+          },
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "key",
+                "keyValue": "chat_thread_message_limit"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          -672,
+          640
+        ],
+        "id": "8d7eeda6-d5cf-4e36-9a06-91627a73f696",
+        "name": "Get Chat Thread Info"
+      }
+    ],
+    "connections": {
+      "Check webhook configure parameter": {
+        "main": [
+          [
+            {
+              "node": "Verify Webhook",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "normal message?": {
+        "main": [
+          [
+            {
+              "node": "Message Type Routing",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Get a row",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Bot User": {
+        "main": [
+          [
+            {
+              "node": "Does Bot Exist",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Bot User2": {
+        "main": [
+          [
+            {
+              "node": "Get a contact",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get a contact": {
+        "main": [
+          [
+            {
+              "node": "Does Contact Exist",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Does Contact Exist": {
+        "main": [
+          [
+            {
+              "node": "Common Variable ",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Create Contact",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Common Variable ": {
+        "main": [
+          [
+            {
+              "node": "Insert Message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Meta Webhook": {
+        "main": [
+          [
+            {
+              "node": "Check webhook configure parameter",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Execution Data",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Message API": {
+        "main": [
+          [
+            {
+              "node": "Get Bot User1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Contacts API": {
+        "main": [
+          [
+            {
+              "node": "Total Contacts",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Total Contacts": {
+        "main": [
+          [
+            {
+              "node": "Get Contact Pagination Limit",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create Contact": {
+        "main": [
+          [
+            {
+              "node": "Common Variable ",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Set Variables": {
+        "main": [
+          [
+            {
+              "node": "Get All Contacts",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Default Value": {
+        "main": [
+          [
+            {
+              "node": "Set Variables",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get All Contacts": {
+        "main": [
+          [
+            {
+              "node": "Json response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Set Variables1": {
+        "main": [
+          [
+            {
+              "node": "Get All Contacts Messages",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Default Value1": {
+        "main": [
+          [
+            {
+              "node": "Set Variables1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get All Contacts Messages": {
+        "main": [
+          [
+            {
+              "node": "Json response1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Total Contact Messages": {
+        "main": [
+          [
+            {
+              "node": "Get Chat Thread Info",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Json response1": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Json response": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Contact Message API With Param": {
+        "main": [
+          [
+            {
+              "node": "Total Contact Messages",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Switch": {
+        "main": [
+          [
+            {
+              "node": "Text Variable",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Bot User1": {
+        "main": [
+          [
+            {
+              "node": "Does Bot User exist",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Does Bot User exist": {
+        "main": [
+          [
+            {
+              "node": "Get a contact1",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Throw Error",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Throw Error": {
+        "main": [
+          []
+        ]
+      },
+      "Get a contact1": {
+        "main": [
+          [
+            {
+              "node": "Get API Version",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Common Variable": {
+        "main": [
+          [
+            {
+              "node": "Switch",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Text Variable": {
+        "main": [
+          [
+            {
+              "node": "Send msg",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send msg": {
+        "main": [
+          [
+            {
+              "node": "Execution Data1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Insert Message entry": {
+        "main": [
+          [
+            {
+              "node": "Update a Contact",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Json response2": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update a Contact": {
+        "main": [
+          [
+            {
+              "node": "Json response2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get a row": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript1": {
+        "main": [
+          [
+            {
+              "node": "Should Update",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Insert Message": {
+        "main": [
+          [
+            {
+              "node": "Execute a SQL query",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update Contacts API": {
+        "main": [
+          [
+            {
+              "node": "Update a row1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update a row1": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook4",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Execution Data": {
+        "main": [
+          [
+            {
+              "node": "Not Error Msg",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Execution Data1": {
+        "main": [
+          [
+            {
+              "node": "Insert Message entry",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Not Error Msg": {
+        "main": [
+          [
+            {
+              "node": "Data from Webhook",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Message Type Routing": {
+        "main": [
+          [
+            {
+              "node": "Coming Soon",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Text Variable1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Text Variable1": {
+        "main": [
+          [
+            {
+              "node": "Get Bot User2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Should Update": {
+        "main": [
+          [
+            {
+              "node": "Update a row",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Status API": {
+        "main": [
+          [
+            {
+              "node": "Respond to Status API",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Does Bot Exist": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Create Bot User",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create Bot User": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Add Variable": {
+        "main": [
+          [
+            {
+              "node": "Get Phone number ID Data",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Whatsapp bot user API": {
+        "main": [
+          [
+            {
+              "node": "Get WABA Data",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Data from Webhook": {
+        "main": [
+          [
+            {
+              "node": "normal message?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Clean Phone number": {
+        "main": [
+          [
+            {
+              "node": "Get Bot User",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Phone number ID Data": {
+        "main": [
+          [
+            {
+              "node": "Clean Phone number",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get WABA Data": {
+        "main": [
+          [
+            {
+              "node": "Add Variable",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get API Version": {
+        "main": [
+          [
+            {
+              "node": "Common Variable",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Contact Pagination Limit": {
+        "main": [
+          [
+            {
+              "node": "Default Value",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Chat Thread Info": {
+        "main": [
+          [
+            {
+              "node": "Default Value1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Lakshit Ukani",
+    "name": "Version v1",
+    "description": "",
+    "autosaved": false
+  },
+  "tags": []
+}
