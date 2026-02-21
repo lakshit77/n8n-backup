@@ -1,0 +1,2385 @@
+{
+  "updatedAt": "2025-12-08T12:45:57.000Z",
+  "createdAt": "2025-11-27T18:34:45.484Z",
+  "id": "rZMKj0UvVFexuQHc",
+  "name": "Platform Updates Monitor (OpenAI, Anthropic, n8n)",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://openai.com/blog/rss.xml",
+        "options": {}
+      },
+      "id": "dc20a9e0-816e-4971-9a2b-742f631a0bf1",
+      "name": "OpenAI Blog RSS",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        1024,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://blog.n8n.io/rss/",
+        "options": {}
+      },
+      "id": "ae9e2393-4668-4091-8fd4-46fbe5e9be68",
+      "name": "n8n Blog RSS",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        1024,
+        672
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process OpenAI RSS feed items\nconst items = $input.all();\nconst processedItems = [];\n\nfor (const item of items) {\n  processedItems.push({\n    source: 'OpenAI',\n    title: item.json.title,\n    link: item.json.link,\n    pubDate: item.json.pubDate || item.json.isoDate,\n    description: item.json.contentSnippet || item.json.content?.substring(0, 200) || '',\n    uniqueId: `openai-${item.json.link}`\n  });\n}\n\nreturn processedItems.map(item => ({ json: item }));"
+      },
+      "id": "9e195286-c2c8-4ef3-a069-6d2f852d7a9b",
+      "name": "Process OpenAI Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process n8n RSS feed items\nconst items = $input.all();\nconst processedItems = [];\n\nfor (const item of items) {\n  processedItems.push({\n    source: 'n8n Blog',\n    title: item.json.title,\n    link: item.json.link,\n    pubDate: item.json.pubDate || item.json.isoDate,\n    description: item.json.contentSnippet || item.json.content?.substring(0, 200) || '',\n    uniqueId: `n8n-${item.json.link}`\n  });\n}\n\nreturn processedItems.map(item => ({ json: item }));"
+      },
+      "id": "c90b6deb-9a5a-4953-8f4a-e5e20b4365a4",
+      "name": "Process n8n Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        672
+      ]
+    },
+    {
+      "parameters": {
+        "numberInputs": 5
+      },
+      "id": "babc2304-3532-41c3-b31d-260e4641aa9f",
+      "name": "Merge All Sources",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1552,
+        624
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter out already seen updates using Static Data\nconst items = $input.all();\nconst staticData = $getWorkflowStaticData('global');\n\nconsole.log(`static data is ${staticData.seenItems}`)\n\n// Initialize seen items array if it doesn't exist\nif (!staticData.seenItems) {\n  staticData.seenItems = [];\n}\n\nconst newItems = [];\n\nfor (const item of items) {\n  const uniqueId = item.json.uniqueId;\n  \n  // Check if we've seen this item before\n  if (!staticData.seenItems.includes(uniqueId)) {\n    newItems.push(item.json);\n    staticData.seenItems.push(uniqueId);\n  }\n}\n\n// Keep only the last n items to prevent unlimited growth\nconst n_items = 300000\nif (staticData.seenItems.length > n_items) {\n  staticData.seenItems = staticData.seenItems.slice(-n_items);\n}\n\nconsole.log(`Total items checked: ${items.length}`);\nconsole.log(`New items found: ${newItems.length}`);\nconsole.log(`Total tracked items: ${staticData.seenItems.length}`);\n\n// Return new items or empty array if none\nif (newItems.length === 0) {\n  return [];\n}\n\nreturn newItems.map(item => ({ json: item }));"
+      },
+      "id": "3de6dc2b-60e5-4421-9899-e6a4a57c22a2",
+      "name": "Filter New Items (Static Data)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1744,
+        672
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "has-new-items",
+              "leftValue": "={{ $json.source }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "74f3cccf-6fe7-40c5-9b34-21e7c17687aa",
+      "name": "Has New Items?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1952,
+        672
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format Slack message with all new updates\nconst items = $input.all();\n\nif (items.length === 0) {\n  return [];\n}\n\n// Group items by source\nconst groupedBySource = {};\nfor (const item of items) {\n  const source = item.json.source;\n  if (!groupedBySource[source]) {\n    groupedBySource[source] = [];\n  }\n  groupedBySource[source].push(item.json);\n}\n\n// Create Slack blocks\nconst blocks = [\n  {\n    type: \"header\",\n    text: {\n      type: \"plain_text\",\n      text: \"🚨 New Platform Updates Detected!\",\n      emoji: true\n    }\n  },\n  {\n    type: \"context\",\n    elements: [\n      {\n        type: \"mrkdwn\",\n        text: `Found ${items.length} new update${items.length > 1 ? 's' : ''} • ${new Date().toLocaleString()}`\n      }\n    ]\n  },\n  {\n    type: \"divider\"\n  }\n];\n\n// Add sections for each source\nfor (const [source, updates] of Object.entries(groupedBySource)) {\n  // Source header\n  blocks.push({\n    type: \"section\",\n    text: {\n      type: \"mrkdwn\",\n      text: `*${source}* (${updates.length} update${updates.length > 1 ? 's' : ''})`\n    }\n  });\n  \n  // Add each update\n  for (const update of updates) {\n    const dateStr = update.pubDate ? new Date(update.pubDate).toLocaleDateString('en-US', { \n      month: 'short', \n      day: 'numeric', \n      year: 'numeric' \n    }) : 'Recent';\n    \n    let text = `• *<${update.link}|${update.title}>*\\n   _${dateStr}_`;\n    \n    if (update.description) {\n      const shortDesc = update.description.length > 150 \n        ? update.description.substring(0, 150) + '...' \n        : update.description;\n      text += `\\n   ${shortDesc.replace(/\\n/g, ' ')}`;\n    }\n    \n    blocks.push({\n      type: \"section\",\n      text: {\n        type: \"mrkdwn\",\n        text: text\n      }\n    });\n  }\n  \n  blocks.push({\n    type: \"divider\"\n  });\n}\n\n// Create the final message\nconst slackMessage = {\n  text: `🚨 ${items.length} New Platform Update${items.length > 1 ? 's' : ''} Detected!`,\n  blocks: blocks\n};\n\nreturn [{ json: slackMessage }];"
+      },
+      "id": "78b58ce3-bfb3-4da1-8f40-f8e36bc0decc",
+      "name": "Format Slack Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2496,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C09ADULQJG1",
+          "mode": "list",
+          "cachedResultName": "all-notification"
+        },
+        "messageType": "block",
+        "blocksUi": "={\n \"blocks\": {{ JSON.stringify($json.blocks) }}\n}",
+        "text": "={{ $json.text }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "id": "1c63e03e-cef0-434f-851d-7ea010351296",
+      "name": "Send to Slack",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [
+        2752,
+        560
+      ],
+      "webhookId": "144c71c1-d924-43e1-a014-a9f2bfc15e22",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "ZC8Jm1dyTNehWjKR",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ { \"status\": \"No new updates found\", \"checked_at\": $now.toISO() } }}",
+        "options": {}
+      },
+      "id": "7ba4693b-2072-42dc-9e75-1ba27b51dc50",
+      "name": "No Updates",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2272,
+        832
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://github.com/n8n-io/n8n/releases.atom",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        1024,
+        848
+      ],
+      "id": "cba0043b-d2ba-40bd-b03b-13c275ace1e6",
+      "name": "n8n Release Notes"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process n8n RSS feed items\nconst items = $input.all();\nconst processedItems = [];\n\nfor (const item of items) {\n  processedItems.push({\n    source: 'n8n Release Notes',\n    title: item.json.title,\n    link: item.json.link,\n    pubDate: item.json.pubDate || item.json.isoDate,\n    description: item.json.contentSnippet || item.json.content?.substring(0, 200) || '',\n    uniqueId: `n8n-${item.json.id}`\n  });\n}\n\nreturn processedItems.map(item => ({ json: item }));"
+      },
+      "id": "e3e951f0-ed48-4600-8c35-db64a16864b6",
+      "name": "Process n8n Release Notes",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        864
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process n8n RSS feed items\nconst items = $input.all();\nconst processedItems = [];\n\nfor (const item of items) {\n  processedItems.push({\n    source: 'Gemini Update',\n    title: item.json.title,\n    link: item.json.link,\n    pubDate: item.json.pubDate || item.json.isoDate,\n    description: item.json.contentSnippet || item.json.content?.substring(0, 200) || '',\n    uniqueId: `gemini-${item.json.guid}`\n  });\n}\n\nreturn processedItems.map(item => ({ json: item }));"
+      },
+      "id": "e2fb82b7-62de-40a7-a1b6-ca0cacdfe2c5",
+      "name": "Process Gemini Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        1072
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process OpenAI RSS feed items\nconst items = $input.all();\nconst processedItems = [];\n\nfor (const item of items) {\n  processedItems.push({\n    source: 'Anthropic',\n    title: item.json.title,\n    link: item.json.link,\n    pubDate: item.json.pubDate || item.json.isoDate,\n    description: item.json.contentSnippet || item.json.content?.substring(0, 200) || '',\n    uniqueId: `anthropic-${item.json.guid}`\n  });\n}\n\nreturn processedItems.map(item => ({ json: item }));"
+      },
+      "id": "9479345d-16b6-4b84-85dd-52c6bd0e2ca5",
+      "name": "Process Anthropic Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_anthropic_news.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        1024,
+        480
+      ],
+      "id": "67998bc6-7f3e-4890-b36b-9d43000c7a22",
+      "name": "Anthropic RSS Read"
+    },
+    {
+      "parameters": {
+        "url": "https://blog.google/products/gemini/rss/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        1024,
+        1072
+      ],
+      "id": "194d934d-1791-450d-b52d-78a085517fe3",
+      "name": "Gemini RSS Read"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "id": "b0f98196-bf1b-404c-865b-93def031f504",
+      "name": "Everyday at 7am",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        688,
+        672
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 40,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2272,
+        544
+      ],
+      "id": "d0faa060-69bd-479f-9938-b85543688534",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2496,
+        384
+      ],
+      "id": "d4dd0f7c-67cb-46f2-8354-445a871b5475",
+      "name": "No Operation, do nothing"
+    }
+  ],
+  "connections": {
+    "OpenAI Blog RSS": {
+      "main": [
+        [
+          {
+            "node": "Process OpenAI Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "n8n Blog RSS": {
+      "main": [
+        [
+          {
+            "node": "Process n8n Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process OpenAI Data": {
+      "main": [
+        [
+          {
+            "node": "Merge All Sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process n8n Data": {
+      "main": [
+        [
+          {
+            "node": "Merge All Sources",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Merge All Sources": {
+      "main": [
+        [
+          {
+            "node": "Filter New Items (Static Data)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter New Items (Static Data)": {
+      "main": [
+        [
+          {
+            "node": "Has New Items?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has New Items?": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Updates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Slack Message": {
+      "main": [
+        [
+          {
+            "node": "Send to Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "n8n Release Notes": {
+      "main": [
+        [
+          {
+            "node": "Process n8n Release Notes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process n8n Release Notes": {
+      "main": [
+        [
+          {
+            "node": "Merge All Sources",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Process Gemini Data": {
+      "main": [
+        [
+          {
+            "node": "Merge All Sources",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "Process Anthropic Data": {
+      "main": [
+        [
+          {
+            "node": "Merge All Sources",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Anthropic RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Process Anthropic Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Process Gemini Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Everyday at 7am": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Blog RSS",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "n8n Blog RSS",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "n8n Release Notes",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Gemini RSS Read",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Anthropic RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Slack Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send to Slack": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Kolkata",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    },
+    "node:Schedule Trigger1": {
+      "recurrenceRules": []
+    },
+    "global": {
+      "seenItems": [
+        "n8n-https://blog.n8n.io/evaluating-rag-aka-optimizing-the-optimization/",
+        "n8n-https://blog.n8n.io/best-autonomous-ai-agents/",
+        "n8n-https://blog.n8n.io/build-without-limits-everything-you-need-to-know-about-n8ns-new-pricing/",
+        "openai-https://openai.com/index/mixpanel-incident",
+        "openai-https://openai.com/index/expanding-data-residency-access-to-business-customers-worldwide",
+        "openai-https://openai.com/index/mental-health-litigation-approach",
+        "openai-https://openai.com/index/jetbrains-2025",
+        "openai-https://openai.com/index/chatgpt-shopping-research",
+        "openai-https://openai.com/index/gpt-5-mathematical-discovery",
+        "openai-https://openai.com/index/openai-and-foxconn-collaborate",
+        "openai-https://openai.com/index/small-business-ai-jam",
+        "openai-https://openai.com/index/accelerating-science-gpt-5",
+        "openai-https://openai.com/index/strengthening-safety-with-external-testing",
+        "openai-https://openai.com/index/evals-drive-next-chapter-of-ai",
+        "openai-https://openai.com/index/target-partnership",
+        "openai-https://openai.com/index/scania",
+        "openai-https://openai.com/index/gpt-5-1-codex-max-system-card",
+        "openai-https://openai.com/policies/education-terms",
+        "openai-https://openai.com/index/gpt-5-1-codex-max",
+        "openai-https://openai.com/index/chatgpt-for-teachers",
+        "openai-https://openai.com/index/intuit-partnership",
+        "openai-https://openai.com/index/gartner-2025-emerging-leader",
+        "openai-https://openai.com/index/openai-for-ireland",
+        "openai-https://openai.com/index/understanding-neural-networks-through-sparse-circuits",
+        "openai-https://openai.com/index/group-chats-in-chatgpt",
+        "openai-https://openai.com/index/gpt-5-1-for-developers",
+        "openai-https://openai.com/index/philips",
+        "openai-https://openai.com/index/neurogum",
+        "openai-https://openai.com/index/fighting-nyt-user-privacy-invasion",
+        "openai-https://openai.com/index/gpt-5-system-card-addendum-gpt-5-1",
+        "openai-https://openai.com/index/gpt-5-1",
+        "openai-https://openai.com/index/chatgpt-for-veterans",
+        "openai-https://openai.com/index/prompt-injections",
+        "openai-https://openai.com/index/notion",
+        "openai-https://openai.com/index/bbva-2025",
+        "openai-https://openai.com/index/ai-progress-and-recommendations",
+        "openai-https://openai.com/index/introducing-the-teen-safety-blueprint",
+        "openai-https://openai.com/index/cred-swamy-seetharaman",
+        "openai-https://openai.com/index/chime-vineet-mehra",
+        "openai-https://openai.com/index/1-million-businesses-putting-ai-to-work",
+        "openai-https://openai.com/global-affairs/brazil-ai-moment-is-here",
+        "openai-https://openai.com/index/introducing-indqa",
+        "openai-https://openai.com/index/aws-and-openai-partnership",
+        "openai-https://openai.com/index/expanding-stargate-to-michigan",
+        "openai-https://openai.com/index/introducing-aardvark",
+        "openai-https://openai.com/index/building-chatgpt-atlas",
+        "openai-https://openai.com/index/introducing-gpt-oss-safeguard",
+        "openai-https://openai.com/index/gpt-oss-safeguard-technical-report",
+        "openai-https://openai.com/index/dai-nippon-printing",
+        "openai-https://openai.com/index/doppel",
+        "openai-https://openai.com/index/next-chapter-of-microsoft-openai-partnership",
+        "openai-https://openai.com/index/built-to-benefit-everyone",
+        "openai-https://openai.com/global-affairs/seizing-the-ai-opportunity",
+        "openai-https://openai.com/index/strengthening-chatgpt-responses-in-sensitive-conversations",
+        "openai-https://openai.com/index/gpt-5-system-card-sensitive-conversations",
+        "openai-https://openai.com/index/steuerrecht",
+        "openai-https://openai.com/index/openai-acquires-software-applications-incorporated",
+        "openai-https://openai.com/index/consensus",
+        "openai-https://openai.com/index/introducing-company-knowledge",
+        "openai-https://openai.com/index/south-korea-economic-blueprint",
+        "openai-https://openai.com/index/the-next-chapter-for-uk-sovereign-ai",
+        "openai-https://openai.com/index/japan-economic-blueprint",
+        "openai-https://openai.com/index/chatgpt-whatsapp-transition",
+        "openai-https://openai.com/index/introducing-chatgpt-atlas",
+        "openai-https://openai.com/index/plex-coffee",
+        "openai-https://openai.com/index/expert-council-on-well-being-and-ai",
+        "openai-https://openai.com/global-affairs/argentinas-ai-opportunity",
+        "openai-https://openai.com/index/openai-and-broadcom-announce-strategic-collaboration",
+        "openai-https://openai.com/index/hygh",
+        "openai-https://openai.com/index/defining-and-evaluating-political-bias-in-llms",
+        "openai-https://openai.com/index/hibob",
+        "openai-https://openai.com/global-affairs/disrupting-malicious-uses-of-ai-october-2025",
+        "openai-https://openai.com/index/codex-now-generally-available",
+        "openai-https://openai.com/index/introducing-apps-in-chatgpt",
+        "openai-https://openai.com/index/openai-amd-strategic-partnership",
+        "openai-https://openai.com/global-affairs/accelerating-ai-uptake-in-europe",
+        "openai-https://openai.com/index/introducing-agentkit",
+        "openai-https://openai.com/index/wrtn",
+        "openai-https://openai.com/global-affairs/strategic-collaboration-with-japan-digital-agency",
+        "openai-https://openai.com/index/samsung-and-sk-join-stargate",
+        "openai-https://openai.com/index/sora-feed-philosophy",
+        "openai-https://openai.com/index/sora-2-system-card",
+        "openai-https://openai.com/index/launching-sora-responsibly",
+        "openai-https://openai.com/index/sora-2",
+        "openai-https://openai.com/index/openai-support-model",
+        "openai-https://openai.com/index/openai-contract-data-agent",
+        "openai-https://openai.com/index/building-openai-with-openai",
+        "openai-https://openai.com/index/openai-inbound-sales-assistant",
+        "openai-https://openai.com/index/openai-gtm-assistant",
+        "openai-https://openai.com/index/openai-research-assistant",
+        "openai-https://openai.com/index/combating-online-child-sexual-exploitation-abuse",
+        "openai-https://openai.com/index/introducing-parental-controls",
+        "openai-https://openai.com/index/buy-it-in-chatgpt",
+        "openai-https://openai.com/index/aarp-partnership-older-adults-online-safety",
+        "openai-https://openai.com/index/more-ways-to-work-with-your-team",
+        "openai-https://openai.com/index/gdpval",
+        "openai-https://openai.com/index/introducing-chatgpt-pulse",
+        "openai-https://openai.com/index/eneos-materials",
+        "openai-https://openai.com/global-affairs/openai-for-germany",
+        "openai-https://openai.com/index/five-new-stargate-sites",
+        "openai-https://openai.com/index/cna-walter-fernandez",
+        "openai-https://openai.com/global-affairs/american-made-innovation",
+        "openai-https://openai.com/index/schoolai",
+        "openai-https://openai.com/index/openai-nvidia-systems-partnership",
+        "openai-https://openai.com/policies/outbound-coordinated-disclosure-policy",
+        "openai-https://openai.com/index/detecting-and-reducing-scheming-in-ai-models",
+        "openai-https://openai.com/index/introducing-stargate-uk",
+        "openai-https://openai.com/index/building-towards-age-prediction",
+        "openai-https://openai.com/index/teen-safety-freedom-and-privacy",
+        "openai-https://openai.com/index/introducing-upgrades-to-codex",
+        "openai-https://openai.com/index/how-people-are-using-chatgpt",
+        "openai-https://openai.com/index/gpt-5-system-card-addendum-gpt-5-codex",
+        "openai-https://openai.com/index/us-caisi-uk-aisi-ai-update",
+        "openai-https://openai.com/index/openai-grove",
+        "openai-https://openai.com/index/statement-on-openai-nonprofit-and-pbc",
+        "openai-https://openai.com/index/joint-statement-from-openai-and-microsoft",
+        "openai-https://openai.com/index/safetykit",
+        "openai-https://openai.com/index/people-first-ai-fund",
+        "openai-https://openai.com/index/why-language-models-hallucinate",
+        "openai-https://openai.com/gpt-5-bio-bug-bounty",
+        "openai-https://openai.com/global-affairs/openai-for-greece",
+        "openai-https://openai.com/index/expanding-economic-opportunity-with-ai",
+        "openai-https://openai.com/index/vijaye-raji-to-become-cto-of-applications-with-acquisition-of-statsig",
+        "openai-https://openai.com/index/building-more-helpful-chatgpt-experiences-for-everyone",
+        "openai-https://openai.com/index/introducing-gpt-realtime",
+        "openai-https://openai.com/index/supporting-nonprofit-and-community-innovation",
+        "openai-https://openai.com/index/collective-alignment-aug-2025-updates",
+        "openai-https://openai.com/index/openai-anthropic-safety-evaluation",
+        "openai-https://openai.com/index/helping-people-when-they-need-it-most",
+        "openai-https://openai.com/global-affairs/learning-accelerator",
+        "openai-https://openai.com/index/accelerating-life-sciences-research-with-retro-biosciences",
+        "openai-https://openai.com/index/blue-j",
+        "openai-https://openai.com/index/mixi",
+        "openai-https://openai.com/index/doordash-mariana-garavaglia",
+        "openai-https://openai.com/index/basis",
+        "openai-https://openai.com/global-affairs/letter-to-governor-newsom-on-harmonized-regulation",
+        "openai-https://openai.com/index/gpt-5-new-era-of-work",
+        "openai-https://openai.com/index/introducing-gpt-5-for-developers",
+        "openai-https://openai.com/index/gpt-5-coding-design",
+        "openai-https://openai.com/index/gpt-5-creative-writing",
+        "openai-https://openai.com/index/gpt-5-medical-research",
+        "openai-https://openai.com/index/gpt-5-system-card",
+        "openai-https://openai.com/index/gpt-5-cursor",
+        "openai-https://openai.com/index/introducing-gpt-5",
+        "openai-https://openai.com/index/gpt-5-safe-completions",
+        "openai-https://openai.com/index/gpt-5-amgen",
+        "openai-https://openai.com/index/gpt-5-first-look",
+        "openai-https://openai.com/index/providing-chatgpt-to-the-entire-us-federal-workforce",
+        "openai-https://openai.com/index/gpt-oss-model-card",
+        "openai-https://openai.com/index/introducing-gpt-oss",
+        "openai-https://openai.com/global-affairs/open-weights-and-ai-for-all",
+        "openai-https://openai.com/index/estimating-worst-case-frontier-risks-of-open-weight-llms",
+        "openai-https://openai.com/index/optimizing-chatgpt",
+        "openai-https://openai.com/index/figma-david-kossnick",
+        "openai-https://openai.com/index/introducing-stargate-norway",
+        "openai-https://openai.com/index/intercom",
+        "openai-https://openai.com/index/chatgpt-study-mode",
+        "openai-https://openai.com/index/outtake",
+        "openai-https://openai.com/index/model-ml-chaz-englander",
+        "openai-https://openai.com/index/announcing-devday-2025",
+        "openai-https://openai.com/index/ai-clinical-copilot-penda-health",
+        "openai-https://openai.com/index/stargate-advances-with-partnership-with-oracle",
+        "openai-https://openai.com/global-affairs/new-economic-analysis",
+        "openai-https://openai.com/global-affairs/openai-and-uk-government-partnership",
+        "openai-https://openai.com/index/ai-as-the-greatest-source-of-empowerment-for-all",
+        "openai-https://openai.com/index/50-million-fund-to-build-with-communities",
+        "openai-https://openai.com/index/introducing-chatgpt-agent",
+        "openai-https://openai.com/index/chatgpt-agent-system-card",
+        "openai-https://openai.com/index/nonprofit-commission-report",
+        "openai-https://openai.com/bio-bug-bounty",
+        "openai-https://openai.com/index/invideo-ai",
+        "openai-https://openai.com/global-affairs/openai-nonprofit-jam",
+        "openai-https://openai.com/global-affairs/intellectual-freedom-by-design",
+        "openai-https://openai.com/global-affairs/eu-code-of-practice",
+        "openai-https://openai.com/sam-and-jony",
+        "openai-https://openai.com/global-affairs/aft",
+        "openai-https://openai.com/index/genspark",
+        "openai-https://openai.com/global-affairs/openais-australia-economic-blueprint",
+        "openai-https://openai.com/index/retell-ai",
+        "openai-https://openai.com/index/unify",
+        "openai-https://openai.com/index/preparing-for-future-ai-capabilities-in-biology",
+        "openai-https://openai.com/index/emergent-misalignment",
+        "openai-https://openai.com/global-affairs/introducing-openai-for-government",
+        "openai-https://openai.com/index/mattels-iconic-brands",
+        "openai-https://openai.com/index/scaling-coordinated-vulnerability-disclosure",
+        "openai-https://openai.com/index/response-to-nyt-data-demands",
+        "openai-https://openai.com/global-affairs/disrupting-malicious-uses-of-ai-june-2025",
+        "openai-https://openai.com/index/wix",
+        "openai-https://openai.com/index/o3-o4-mini-system-card-addendum-operator-o3",
+        "openai-https://openai.com/index/openai-deutschland",
+        "openai-https://openai.com/index/coderabbit",
+        "openai-https://openai.com/index/introducing-stargate-uae",
+        "openai-https://openai.com/index/new-tools-and-features-in-the-responses-api",
+        "openai-https://openai.com/index/o3-o4-mini-codex-system-card-addendum",
+        "openai-https://openai.com/index/introducing-codex",
+        "openai-https://openai.com/index/expedia-jochen-koedijk",
+        "openai-https://openai.com/index/healthbench",
+        "openai-https://openai.com/index/leadership-expansion-with-fidji-simo",
+        "openai-https://openai.com/global-affairs/response-to-department-of-energy",
+        "openai-https://openai.com/index/introducing-data-residency-in-asia",
+        "openai-https://openai.com/index/san-antonio-spurs",
+        "openai-https://openai.com/index/lowes",
+        "openai-https://openai.com/global-affairs/openai-for-countries",
+        "openai-https://openai.com/global-affairs/ai-stories-daily-benefits-bigger-opportunities",
+        "openai-https://openai.com/index/john-deere-justin-rose",
+        "openai-https://openai.com/index/evolving-our-structure",
+        "openai-https://openai.com/index/lowes-chandhu-nair",
+        "openai-https://openai.com/index/expanding-on-sycophancy",
+        "openai-https://openai.com/index/sycophancy-in-gpt-4o",
+        "openai-https://openai.com/business/new-in-chatgpt-for-business-april-updates-2025",
+        "openai-https://openai.com/index/image-generation-api",
+        "openai-https://openai.com/index/speak-connor-zwick",
+        "openai-https://openai.com/global-affairs/the-washington-post-partners-with-openai",
+        "openai-https://openai.com/index/o3-o4-mini-system-card",
+        "openai-https://openai.com/index/introducing-o3-and-o4-mini",
+        "openai-https://openai.com/index/thinking-with-images",
+        "openai-https://openai.com/index/nonprofit-commission-advisors",
+        "openai-https://openai.com/index/updating-our-preparedness-framework",
+        "openai-https://openai.com/index/gpt-4-1",
+        "openai-https://openai.com/index/browsecomp",
+        "openai-https://openai.com/index/openai-pioneers-program",
+        "openai-https://openai.com/global-affairs/openais-eu-economic-blueprint",
+        "openai-https://openai.com/index/canva-cam-adams",
+        "openai-https://openai.com/index/nonprofit-commission-guidance",
+        "openai-https://openai.com/index/paperbench",
+        "openai-https://openai.com/global-affairs/response-to-uk-copyright-consultation",
+        "openai-https://openai.com/index/march-funding-updates",
+        "openai-https://openai.com/index/zendesk",
+        "openai-https://openai.com/index/security-on-the-path-to-agi",
+        "openai-https://openai.com/index/introducing-4o-image-generation",
+        "openai-https://openai.com/index/gpt-4o-image-generation-system-card-addendum",
+        "openai-https://openai.com/index/hebbia",
+        "openai-https://openai.com/global-affairs/scaling-the-openai-academy",
+        "openai-https://openai.com/index/leadership-updates-march-2025",
+        "openai-https://openai.com/index/affective-use-study",
+        "openai-https://openai.com/index/booking-com",
+        "openai-https://openai.com/index/introducing-our-next-generation-audio-models",
+        "openai-https://openai.com/index/eliseai-minna-song",
+        "openai-https://openai.com/business/new-in-chatgpt-for-work-march-updates-2025",
+        "openai-https://openai.com/index/court-rejects-elon",
+        "openai-https://openai.com/global-affairs/openai-proposals-for-the-us-ai-action-plan",
+        "openai-https://openai.com/index/ly-corporation",
+        "openai-https://openai.com/index/new-tools-for-building-agents",
+        "openai-https://openai.com/index/chain-of-thought-monitoring",
+        "openai-https://openai.com/index/nubank",
+        "openai-https://openai.com/index/factory",
+        "openai-https://openai.com/index/launchdarkly-claire-vo",
+        "openai-https://openai.com/index/introducing-nextgenai",
+        "openai-https://openai.com/global-affairs/1000-scientist-ai-jam-session",
+        "openai-https://openai.com/index/mercari",
+        "openai-https://openai.com/index/gpt-4-5-system-card",
+        "openai-https://openai.com/index/introducing-gpt-4-5",
+        "openai-https://openai.com/index/endex",
+        "openai-https://openai.com/index/deep-research-system-card",
+        "openai-https://openai.com/index/estonia-schools-and-chatgpt",
+        "openai-https://openai.com/global-affairs/disrupting-malicious-uses-of-ai",
+        "openai-https://openai.com/index/uber-enables-outstanding-experiences",
+        "openai-https://openai.com/global-affairs/college-students-and-chatgpt",
+        "openai-https://openai.com/index/swe-lancer",
+        "openai-https://openai.com/index/openai-and-guardian-media-group-launch-content-partnership",
+        "openai-https://openai.com/index/fanatics-betting-gaming-andrea-ellis",
+        "openai-https://openai.com/index/wayfair-fiona-tan",
+        "openai-https://openai.com/index/rogo",
+        "openai-https://openai.com/index/sharing-the-latest-model-spec",
+        "openai-https://openai.com/index/openai-partners-with-schibsted-media-group",
+        "openai-https://openai.com/global-affairs/introducing-the-intelligence-age",
+        "openai-https://openai.com/global-affairs/openai-at-the-paris-ai-action-summit",
+        "openai-https://openai.com/index/introducing-data-residency-in-europe",
+        "openai-https://openai.com/index/openai-and-the-csu-system",
+        "openai-https://openai.com/index/fishing-for-first-timers",
+        "openai-https://openai.com/index/my-dog-the-math-tutor",
+        "openai-https://openai.com/index/ten-tiny-canvases",
+        "openai-https://openai.com/index/introducing-deep-research",
+        "openai-https://openai.com/index/deep-research",
+        "openai-https://openai.com/index/openai-o3-mini",
+        "openai-https://openai.com/index/o3-mini-system-card",
+        "openai-https://openai.com/index/strengthening-americas-ai-leadership-with-the-us-national-laboratories",
+        "openai-https://openai.com/global-affairs/introducing-chatgpt-gov",
+        "openai-https://openai.com/index/computer-using-agent",
+        "openai-https://openai.com/index/introducing-operator",
+        "openai-https://openai.com/index/operator-system-card",
+        "openai-https://openai.com/index/bertelsmann-powers-creativity-and-productivity-with-openai",
+        "openai-https://openai.com/index/trading-inference-time-compute-for-adversarial-robustness",
+        "openai-https://openai.com/form/stargate-infrastructure",
+        "openai-https://openai.com/index/announcing-the-stargate-project",
+        "openai-https://openai.com/global-affairs/the-power-of-personalized-ai",
+        "openai-https://openai.com/index/partnering-with-axios-expands-openai-work-with-the-news-industry",
+        "openai-https://openai.com/index/adebayo-ogunlesi-joins-openais-board-of-directors",
+        "openai-https://openai.com/global-affairs/openais-economic-blueprint",
+        "openai-https://openai.com/index/why-our-structure-must-evolve-to-advance-our-mission",
+        "openai-https://openai.com/index/deliberative-alignment",
+        "openai-https://openai.com/index/o1-and-new-tools-for-developers",
+        "openai-https://openai.com/index/elon-musk-wanted-an-openai-for-profit",
+        "openai-https://openai.com/index/zalando",
+        "openai-https://openai.com/index/sora-is-here",
+        "openai-https://openai.com/index/sora-system-card",
+        "openai-https://openai.com/index/sora-vallee-duhamel",
+        "openai-https://openai.com/index/sora-lyndon-barrois",
+        "openai-https://openai.com/index/put-ai-to-work-for-your-product-team",
+        "openai-https://openai.com/index/sora-minne-atairu",
+        "openai-https://openai.com/index/introducing-chatgpt-pro",
+        "openai-https://openai.com/index/openai-o1-system-card",
+        "openai-https://openai.com/index/openai-and-future-partner-on-specialist-content",
+        "openai-https://openai.com/index/morgan-stanley",
+        "openai-https://openai.com/index/advancing-red-teaming-with-people-and-ai",
+        "openai-https://openai.com/index/bbva",
+        "openai-https://openai.com/index/grab",
+        "openai-https://openai.com/index/rox",
+        "openai-https://openai.com/index/openai-en-france",
+        "openai-https://openai.com/chatgpt/use-cases/student-writing-guide",
+        "openai-https://openai.com/index/estee-lauder",
+        "openai-https://openai.com/global-affairs/comments-to-the-ntia-on-data-center-growth-resilience-and-security",
+        "openai-https://openai.com/index/introducing-chatgpt-search",
+        "openai-https://openai.com/index/promega",
+        "openai-https://openai.com/business/put-ai-to-work-for-marketing-teams",
+        "openai-https://openai.com/index/introducing-simpleqa",
+        "openai-https://openai.com/index/decagon",
+        "openai-https://openai.com/global-affairs/openais-approach-to-ai-and-national-security",
+        "openai-https://openai.com/index/simplifying-stabilizing-and-scaling-continuous-time-consistency-models",
+        "openai-https://openai.com/global-affairs/openai-chief-compliance-officer-announcement",
+        "openai-https://openai.com/global-affairs/openai-chief-economist-announcement",
+        "openai-https://openai.com/index/lenfest-institute",
+        "openai-https://openai.com/business/solving-complex-problems-with-openai-o1-models",
+        "openai-https://openai.com/index/evaluating-fairness-in-chatgpt",
+        "openai-https://openai.com/index/mle-bench",
+        "openai-https://openai.com/global-affairs/an-update-on-disrupting-deceptive-uses-of-ai",
+        "openai-https://openai.com/index/hearst",
+        "openai-https://openai.com/index/openai-raising-concerns-policy",
+        "openai-https://openai.com/index/introducing-canvas",
+        "openai-https://openai.com/index/new-credit-facility-enhances-financial-flexibility",
+        "openai-https://openai.com/index/scale-the-benefits-of-ai",
+        "openai-https://openai.com/index/introducing-the-realtime-api",
+        "openai-https://openai.com/index/introducing-vision-to-the-fine-tuning-api",
+        "openai-https://openai.com/index/api-prompt-caching",
+        "openai-https://openai.com/index/api-model-distillation",
+        "openai-https://openai.com/index/altera",
+        "openai-https://openai.com/business/put-ai-to-work-automate-and-scale-financial-operations",
+        "openai-https://openai.com/index/upgrading-the-moderation-api-with-our-new-multimodal-moderation-model",
+        "openai-https://openai.com/index/state-of-minnesota",
+        "openai-https://openai.com/index/gedi",
+        "openai-https://openai.com/index/mercado-libre",
+        "openai-https://openai.com/global-affairs/openai-academy",
+        "openai-https://openai.com/index/genmab",
+        "openai-https://openai.com/index/arco-education",
+        "openai-https://openai.com/index/update-on-safety-and-security-practices",
+        "openai-https://openai.com/index/introducing-openai-o1-preview",
+        "openai-https://openai.com/index/learning-to-reason-with-llms",
+        "openai-https://openai.com/index/openai-o1-mini-advancing-cost-efficient-reasoning",
+        "openai-https://openai.com/openai-o1-contributions",
+        "openai-https://openai.com/index/openai-o1-system-card/external-testers-acknowledgements",
+        "openai-https://openai.com/index/o1-quantum-physics",
+        "openai-https://openai.com/index/o1-genetics",
+        "openai-https://openai.com/index/o1-coding",
+        "openai-https://openai.com/index/o1-economics",
+        "openai-https://openai.com/business/put-ai-to-work-lessons-from-hundreds-of-successful-deployments",
+        "openai-https://openai.com/index/ada",
+        "openai-https://openai.com/index/asu",
+        "openai-https://openai.com/business/fine-tuning-gpt-4o-webinar",
+        "openai-https://openai.com/index/conde-nast",
+        "openai-https://openai.com/index/upwork",
+        "openai-https://openai.com/index/gpt-4o-fine-tuning",
+        "openai-https://openai.com/index/disrupting-a-covert-iranian-influence-operation",
+        "openai-https://openai.com/index/indeed",
+        "openai-https://openai.com/index/the-met-museum",
+        "openai-https://openai.com/index/introducing-swe-bench-verified",
+        "openai-https://openai.com/index/zico-kolter-joins-openais-board-of-directors",
+        "openai-https://openai.com/index/gpt-4o-system-card/external-testers-acknowledgements",
+        "openai-https://openai.com/business/enabling-a-data-driven-workforce-webinar",
+        "openai-https://openai.com/index/gpt-4o-system-card",
+        "openai-https://openai.com/index/rakuten",
+        "openai-https://openai.com/index/introducing-structured-outputs-in-the-api",
+        "openai-https://openai.com/global-affairs/a-primer-on-the-eu-ai-act",
+        "openai-https://openai.com/index/searchgpt-prototype",
+        "openai-https://openai.com/index/improving-model-safety-behavior-with-rule-based-rewards",
+        "openai-https://openai.com/index/gpt-4o-mini-advancing-cost-efficient-intelligence",
+        "openai-https://openai.com/index/new-tools-for-chatgpt-enterprise",
+        "openai-https://openai.com/index/prover-verifier-games-improve-legibility",
+        "openai-https://openai.com/index/openai-and-los-alamos-national-laboratory-work-together",
+        "openai-https://openai.com/index/finding-gpt4s-mistakes-with-gpt-4",
+        "openai-https://openai.com/index/strategic-content-partnership-with-time",
+        "openai-https://openai.com/index/openai-acquires-rockset",
+        "openai-https://openai.com/index/empowering-defenders-through-our-cybersecurity-grant-program",
+        "openai-https://openai.com/index/consistency-models",
+        "openai-https://openai.com/index/a-holistic-approach-to-undesired-content-detection-in-the-real-world",
+        "openai-https://openai.com/index/improved-techniques-for-training-consistency-models",
+        "openai-https://openai.com/index/paf",
+        "openai-https://openai.com/index/clay",
+        "openai-https://openai.com/index/color-health",
+        "openai-https://openai.com/index/openai-appoints-retired-us-army-general",
+        "openai-https://openai.com/index/openai-and-apple-announce-partnership",
+        "openai-https://openai.com/index/openai-welcomes-cfo-cpo",
+        "openai-https://openai.com/index/expanding-on-how-voice-engine-works-and-our-safety-research",
+        "openai-https://openai.com/index/10bedicu",
+        "openai-https://openai.com/index/extracting-concepts-from-gpt-4",
+        "openai-https://openai.com/index/securing-research-infrastructure-for-advanced-ai",
+        "openai-https://openai.com/index/disrupting-deceptive-uses-of-AI-by-covert-influence-operations",
+        "openai-https://openai.com/index/introducing-chatgpt-edu",
+        "openai-https://openai.com/index/introducing-openai-for-nonprofits",
+        "openai-https://openai.com/index/mavenagi",
+        "openai-https://openai.com/index/newsroom-ai-catalyst-global-program-with-wan-ifra",
+        "openai-https://openai.com/index/enhancing-news-in-chatgpt-with-the-atlantic",
+        "openai-https://openai.com/index/a-content-and-product-partnership-with-vox-media",
+        "openai-https://openai.com/index/openai-board-forms-safety-and-security-committee",
+        "openai-https://openai.com/index/news-corp-and-openai-sign-landmark-multi-year-global-partnership",
+        "openai-https://openai.com/index/openai-safety-update",
+        "openai-https://openai.com/index/how-the-voices-for-chatgpt-were-chosen",
+        "openai-https://openai.com/index/improvements-to-data-analysis-in-chatgpt",
+        "openai-https://openai.com/index/openai-and-reddit-partnership",
+        "openai-https://openai.com/index/canva",
+        "openai-https://openai.com/index/jakub-pachocki-announced-as-chief-scientist",
+        "openai-https://openai.com/index/collaborating-with-carlyle-to-chart-the-future-of-private-equity",
+        "openai-https://openai.com/index/hello-gpt-4o",
+        "openai-https://openai.com/index/spring-update",
+        "openai-https://openai.com/index/gpt-4o-and-more-tools-to-chatgpt-free",
+        "openai-https://openai.com/index/introducing-the-model-spec",
+        "openai-https://openai.com/index/understanding-the-source-of-what-we-see-and-hear-online",
+        "openai-https://openai.com/index/approach-to-data-and-ai",
+        "openai-https://openai.com/index/api-partnership-with-stack-overflow",
+        "openai-https://openai.com/index/reimagining-secure-infrastructure-for-advanced-ai",
+        "openai-https://openai.com/index/content-partnership-with-financial-times",
+        "openai-https://openai.com/index/moderna",
+        "openai-https://openai.com/index/gpt-4-api-general-availability",
+        "openai-https://openai.com/index/introducing-chatgpt-and-whisper-apis",
+        "openai-https://openai.com/index/more-enterprise-grade-features-for-api-customers",
+        "openai-https://openai.com/index/child-safety-adopting-sbd-principles",
+        "openai-https://openai.com/index/the-instruction-hierarchy",
+        "openai-https://openai.com/index/introducing-openai-japan",
+        "openai-https://openai.com/index/klarna",
+        "openai-https://openai.com/index/introducing-improvements-to-the-fine-tuning-api-and-expanding-our-custom-models-program",
+        "openai-https://openai.com/index/harvey",
+        "openai-https://openai.com/index/start-using-chatgpt-instantly",
+        "openai-https://openai.com/index/oscar",
+        "openai-https://openai.com/index/navigating-the-challenges-and-opportunities-of-synthetic-voices",
+        "openai-https://openai.com/index/zelma",
+        "openai-https://openai.com/global-affairs/openai-s-comment-to-the-ntia-on-open-model-weights",
+        "openai-https://openai.com/index/sora-first-impressions",
+        "openai-https://openai.com/index/jetbrains",
+        "openai-https://openai.com/index/salesforce",
+        "openai-https://openai.com/index/holiday-extras",
+        "openai-https://openai.com/index/superhuman",
+        "openai-https://openai.com/index/global-news-partnerships-le-monde-and-prisa-media",
+        "openai-https://openai.com/index/healthify",
+        "openai-https://openai.com/index/review-completed-altman-brockman-to-continue-to-lead-openai",
+        "openai-https://openai.com/index/openai-announces-new-members-to-board-of-directors",
+        "openai-https://openai.com/index/paradigm",
+        "openai-https://openai.com/index/match-group",
+        "openai-https://openai.com/index/lifespan",
+        "openai-https://openai.com/index/openai-elon-musk",
+        "openai-https://openai.com/index/video-generation-models-as-world-simulators",
+        "openai-https://openai.com/index/disrupting-malicious-uses-of-ai-by-state-affiliated-threat-actors",
+        "openai-https://openai.com/index/memory-and-new-controls-for-chatgpt",
+        "openai-https://openai.com/global-affairs/response-to-nist-executive-order-on-ai",
+        "openai-https://openai.com/index/building-an-early-warning-system-for-llm-aided-biological-threat-creation",
+        "openai-https://openai.com/index/new-embedding-models-and-api-updates",
+        "openai-https://openai.com/index/democratic-inputs-to-ai-grant-program-update",
+        "openai-https://openai.com/index/how-openai-is-approaching-2024-worldwide-elections",
+        "openai-https://openai.com/index/digital-green",
+        "openai-https://openai.com/index/introducing-the-gpt-store",
+        "openai-https://openai.com/index/introducing-chatgpt-team",
+        "openai-https://openai.com/index/openai-and-journalism",
+        "openai-https://openai.com/index/whoop",
+        "openai-https://openai.com/index/summer-health",
+        "openai-https://openai.com/index/superalignment-fast-grants",
+        "openai-https://openai.com/index/practices-for-governing-agentic-ai-systems",
+        "openai-https://openai.com/index/weak-to-strong-generalization",
+        "openai-https://openai.com/index/axel-springer-partnership",
+        "openai-https://openai.com/index/sam-altman-returns-as-ceo-openai-has-a-new-initial-board",
+        "openai-https://openai.com/index/openai-announces-leadership-transition",
+        "openai-https://openai.com/index/data-partnerships",
+        "openai-https://openai.com/index/introducing-gpts",
+        "openai-https://openai.com/index/new-models-and-developer-products-announced-at-devday",
+        "openai-https://openai.com/global-affairs/our-approach-to-frontier-risk",
+        "openai-https://openai.com/index/frontier-risk-and-preparedness",
+        "openai-https://openai.com/index/frontier-model-forum-updates",
+        "openai-https://openai.com/index/dall-e-3-is-now-available-in-chatgpt-plus-and-enterprise",
+        "openai-https://openai.com/index/retool",
+        "openai-https://openai.com/index/ironclad",
+        "openai-https://openai.com/global-affairs/openai-technology-explained",
+        "openai-https://openai.com/index/typeform",
+        "openai-https://openai.com/index/dall-e-3-system-card",
+        "openai-https://openai.com/index/chatgpt-can-now-see-hear-and-speak",
+        "openai-https://openai.com/index/gpt-4v-system-card",
+        "openai-https://openai.com/index/red-teaming-network",
+        "openai-https://openai.com/index/introducing-openai-dublin",
+        "openai-https://openai.com/index/announcing-openai-devday",
+        "openai-https://openai.com/index/teaching-with-ai",
+        "openai-https://openai.com/index/introducing-chatgpt-enterprise",
+        "openai-https://openai.com/index/openai-partners-with-scale-to-provide-support-for-enterprises-fine-tuning-models",
+        "openai-https://openai.com/index/gpt-3-5-turbo-fine-tuning-and-api-updates",
+        "openai-https://openai.com/index/openai-acquires-global-illumination",
+        "openai-https://openai.com/index/using-gpt-4-for-content-moderation",
+        "openai-https://openai.com/index/confidence-building-measures-for-artificial-intelligence",
+        "openai-https://openai.com/index/frontier-model-forum",
+        "openai-https://openai.com/index/moving-ai-governance-forward",
+        "openai-https://openai.com/index/custom-instructions-for-chatgpt",
+        "openai-https://openai.com/index/partnership-with-american-journalism-project-to-support-local-news",
+        "openai-https://openai.com/index/viable",
+        "openai-https://openai.com/index/frontier-ai-regulation",
+        "openai-https://openai.com/index/insights-from-global-conversations",
+        "openai-https://openai.com/index/introducing-openai-london",
+        "openai-https://openai.com/global-affairs/testimony-of-sam-altman-before-the-us-senate",
+        "openai-https://openai.com/global-affairs/sam-altman-senate-questions-for-the-record",
+        "openai-https://openai.com/index/function-calling-and-other-api-updates",
+        "openai-https://openai.com/global-affairs/comment-on-ntia-ai-accountability-policy",
+        "openai-https://openai.com/index/openai-cybersecurity-grant-program",
+        "openai-https://openai.com/index/improving-mathematical-reasoning-with-process-supervision",
+        "openai-https://openai.com/index/democratic-inputs-to-ai",
+        "openai-https://openai.com/index/governance-of-superintelligence",
+        "openai-https://openai.com/index/introducing-the-chatgpt-app-for-ios",
+        "openai-https://openai.com/index/language-models-can-explain-neurons-in-language-models",
+        "openai-https://openai.com/index/new-ways-to-manage-your-data-in-chatgpt",
+        "openai-https://openai.com/index/bug-bounty-program",
+        "openai-https://openai.com/index/our-approach-to-ai-safety",
+        "openai-https://openai.com/index/march-20-chatgpt-outage",
+        "openai-https://openai.com/index/chatgpt-plugins",
+        "openai-https://openai.com/index/gpts-are-gpts",
+        "openai-https://openai.com/index/be-my-eyes",
+        "openai-https://openai.com/index/duolingo",
+        "openai-https://openai.com/index/khan-academy",
+        "openai-https://openai.com/index/stripe",
+        "openai-https://openai.com/index/government-of-iceland",
+        "openai-https://openai.com/index/gpt-4-research",
+        "openai-https://openai.com/index/planning-for-agi-and-beyond",
+        "openai-https://openai.com/index/how-should-ai-systems-behave",
+        "openai-https://openai.com/index/chatgpt-plus",
+        "openai-https://openai.com/index/new-ai-classifier-for-indicating-ai-written-text",
+        "openai-https://openai.com/index/openai-and-microsoft-extend-partnership",
+        "openai-https://openai.com/index/forecasting-misuse",
+        "openai-https://openai.com/index/yabble",
+        "openai-https://openai.com/index/waymark",
+        "openai-https://openai.com/index/inworld-ai-DO-NOT-PUBLISH",
+        "openai-https://openai.com/index/the-power-of-continuous-learning",
+        "openai-https://openai.com/index/point-e",
+        "openai-https://openai.com/index/new-and-improved-embedding-model",
+        "openai-https://openai.com/index/discovering-the-minutiae-of-backend-systems",
+        "openai-https://openai.com/index/chatgpt",
+        "openai-https://openai.com/index/dall-e-api-now-available-in-public-beta",
+        "openai-https://openai.com/index/scaling-laws-for-reward-model-overoptimization",
+        "openai-https://openai.com/index/dall-e-now-available-without-waitlist",
+        "openai-https://openai.com/index/whisper",
+        "openai-https://openai.com/index/dall-e-introducing-outpainting",
+        "openai-https://openai.com/index/our-approach-to-alignment-research",
+        "openai-https://openai.com/index/new-and-improved-content-moderation-tooling",
+        "openai-https://openai.com/index/efficient-training-of-language-models-to-fill-in-the-middle",
+        "openai-https://openai.com/index/a-hazard-analysis-framework-for-code-synthesis-large-language-models",
+        "openai-https://openai.com/index/dall-e-now-available-in-beta",
+        "openai-https://openai.com/index/reducing-bias-and-improving-safety-in-dall-e-2",
+        "openai-https://openai.com/index/dall-e-2-extending-creativity",
+        "openai-https://openai.com/index/dall-e-2-pre-training-mitigations",
+        "openai-https://openai.com/index/vpt",
+        "openai-https://openai.com/index/evolution-through-large-models",
+        "openai-https://openai.com/index/critiques",
+        "openai-https://openai.com/index/techniques-for-training-large-neural-networks",
+        "openai-https://openai.com/index/best-practices-for-deploying-language-models",
+        "openai-https://openai.com/index/teaching-models-to-express-their-uncertainty-in-words",
+        "openai-https://openai.com/index/codex-apps",
+        "openai-https://openai.com/index/dall-e-2-update",
+        "openai-https://openai.com/index/leadership-team-update",
+        "openai-https://openai.com/index/hierarchical-text-conditional-image-generation-with-clip-latents",
+        "openai-https://openai.com/index/measuring-goodharts-law",
+        "openai-https://openai.com/index/gpt-3-edit-insert",
+        "openai-https://openai.com/index/economic-impacts-research",
+        "openai-https://openai.com/index/economic-impacts",
+        "openai-https://openai.com/index/language-model-safety-and-misuse",
+        "openai-https://openai.com/index/formal-math",
+        "openai-https://openai.com/index/instruction-following",
+        "openai-https://openai.com/index/introducing-text-and-code-embeddings",
+        "openai-https://openai.com/index/text-and-code-embeddings-by-contrastive-pre-training",
+        "openai-https://openai.com/index/webgpt",
+        "openai-https://openai.com/index/customizing-gpt-3",
+        "openai-https://openai.com/index/openai-residency",
+        "openai-https://openai.com/index/api-no-waitlist",
+        "openai-https://openai.com/index/solving-math-word-problems",
+        "openai-https://openai.com/index/summarizing-books",
+        "openai-https://openai.com/index/truthfulqa",
+        "openai-https://openai.com/index/helen-toner-joins",
+        "openai-https://openai.com/index/openai-codex",
+        "openai-https://openai.com/index/triton",
+        "openai-https://openai.com/index/evaluating-large-language-models-trained-on-code",
+        "openai-https://openai.com/index/improving-language-model-behavior",
+        "openai-https://openai.com/index/openai-scholars-2021-final-projects",
+        "openai-https://openai.com/index/will-hurd-joins",
+        "openai-https://openai.com/index/gpt-3-apps",
+        "openai-https://openai.com/index/multimodal-neurons",
+        "openai-https://openai.com/index/understanding-the-capabilities-limitations-and-societal-impact-of-large-language-models",
+        "openai-https://openai.com/index/scaling-kubernetes-to-7500-nodes",
+        "openai-https://openai.com/index/clip",
+        "openai-https://openai.com/index/dall-e",
+        "openai-https://openai.com/index/organizational-update",
+        "openai-https://openai.com/index/openai-licenses-gpt-3-technology-to-microsoft",
+        "openai-https://openai.com/index/generative-language-modeling-for-automated-theorem-proving",
+        "openai-https://openai.com/index/learning-to-summarize-with-human-feedback",
+        "openai-https://openai.com/index/openai-scholars-2020-final-projects",
+        "openai-https://openai.com/index/procgen-minerl-competitions",
+        "openai-https://openai.com/index/image-gpt",
+        "openai-https://openai.com/index/openai-api",
+        "openai-https://openai.com/index/language-models-are-few-shot-learners",
+        "openai-https://openai.com/index/ai-and-efficiency",
+        "openai-https://openai.com/index/jukebox",
+        "openai-https://openai.com/index/improving-verifiability",
+        "openai-https://openai.com/index/microscope",
+        "openai-https://openai.com/index/openai-pytorch",
+        "openai-https://openai.com/index/scaling-laws-for-neural-language-models",
+        "openai-https://openai.com/index/dota-2-with-large-scale-deep-reinforcement-learning",
+        "openai-https://openai.com/index/deep-double-descent",
+        "openai-https://openai.com/index/procgen-benchmark",
+        "openai-https://openai.com/index/safety-gym",
+        "openai-https://openai.com/index/benchmarking-safe-exploration-in-deep-reinforcement-learning",
+        "openai-https://openai.com/index/gpt-2-1-5b-release",
+        "openai-https://openai.com/index/solving-rubiks-cube",
+        "openai-https://openai.com/index/openai-scholars-2020",
+        "openai-https://openai.com/index/fine-tuning-gpt-2",
+        "openai-https://openai.com/index/emergent-tool-use",
+        "openai-https://openai.com/index/testing-robustness",
+        "openai-https://openai.com/index/gpt-2-6-month-follow-up",
+        "openai-https://openai.com/index/learning-day",
+        "openai-https://openai.com/index/microsoft-invests-in-and-partners-with-openai",
+        "openai-https://openai.com/index/cooperation-on-safety",
+        "openai-https://openai.com/index/symposium-2019",
+        "openai-https://openai.com/index/openai-scholars-2019-final-projects",
+        "openai-https://openai.com/index/openai-fellows-fall-2018",
+        "openai-https://openai.com/index/transfer-of-adversarial-robustness-between-perturbation-types",
+        "openai-https://openai.com/index/musenet",
+        "openai-https://openai.com/index/sparse-transformer",
+        "openai-https://openai.com/index/openai-five-defeats-dota-2-world-champions",
+        "openai-https://openai.com/index/openai-five-finals",
+        "openai-https://openai.com/index/energy-based-models",
+        "openai-https://openai.com/index/openai-scholars-2019-meet-our-scholars",
+        "openai-https://openai.com/index/openai-lp",
+        "openai-https://openai.com/index/introducing-activation-atlases",
+        "openai-https://openai.com/index/neural-mmo",
+        "openai-https://openai.com/index/spinning-up-in-deep-rl-workshop-review",
+        "openai-https://openai.com/index/ai-safety-needs-social-scientists",
+        "openai-https://openai.com/index/better-language-models",
+        "openai-https://openai.com/index/computational-limitations-in-robust-classification-and-win-win-results",
+        "openai-https://openai.com/index/openai-summer-fellows-2018",
+        "openai-https://openai.com/index/how-ai-training-scales",
+        "openai-https://openai.com/index/quantifying-generalization-in-reinforcement-learning",
+        "openai-https://openai.com/index/spinning-up-in-deep-rl",
+        "openai-https://openai.com/index/learning-concepts-with-energy-functions",
+        "openai-https://openai.com/index/plan-online-learn-offline",
+        "openai-https://openai.com/index/reinforcement-learning-with-prediction-based-rewards",
+        "openai-https://openai.com/index/learning-complex-goals-with-iterated-amplification",
+        "openai-https://openai.com/index/openai-scholars-2019",
+        "openai-https://openai.com/index/openai-fellows-interns-2019",
+        "openai-https://openai.com/index/ffjord",
+        "openai-https://openai.com/index/openai-scholars-2018-final-projects",
+        "openai-https://openai.com/index/the-international-2018-results",
+        "openai-https://openai.com/index/large-scale-study-of-curiosity-driven-learning",
+        "openai-https://openai.com/index/openai-five-benchmark-results",
+        "openai-https://openai.com/index/learning-dexterity",
+        "openai-https://openai.com/index/variational-option-discovery-algorithms",
+        "openai-https://openai.com/index/openai-scholars-2018-meet-our-scholars",
+        "openai-https://openai.com/index/openai-five-benchmark",
+        "openai-https://openai.com/index/glow",
+        "openai-https://openai.com/index/learning-montezumas-revenge-from-a-single-demonstration",
+        "openai-https://openai.com/index/openai-five",
+        "openai-https://openai.com/index/retro-contest-results",
+        "openai-https://openai.com/index/learning-policy-representations-in-multiagent-systems",
+        "openai-https://openai.com/index/language-unsupervised",
+        "openai-https://openai.com/index/gamepad",
+        "openai-https://openai.com/index/openai-fellows",
+        "openai-https://openai.com/index/gym-retro",
+        "openai-https://openai.com/index/ai-and-compute",
+        "openai-https://openai.com/index/debate",
+        "openai-https://openai.com/index/evolved-policy-gradients",
+        "openai-https://openai.com/index/gotta-learn-fast",
+        "openai-https://openai.com/index/retro-contest",
+        "openai-https://openai.com/index/variance-reduction-for-policy-gradient-with-action-dependent-factorized-baselines",
+        "openai-https://openai.com/index/hackathon-follow-up",
+        "openai-https://openai.com/index/improving-gans-using-optimal-transport",
+        "openai-https://openai.com/index/on-first-order-meta-learning-algorithms",
+        "openai-https://openai.com/index/reptile",
+        "openai-https://openai.com/index/openai-scholars",
+        "openai-https://openai.com/index/some-considerations-on-learning-to-explore-via-meta-reinforcement-learning",
+        "openai-https://openai.com/index/multi-goal-reinforcement-learning",
+        "openai-https://openai.com/index/ingredients-for-robotics-research",
+        "openai-https://openai.com/index/openai-hackathon",
+        "openai-https://openai.com/index/openai-supporters",
+        "openai-https://openai.com/index/preparing-for-malicious-uses-of-ai",
+        "openai-https://openai.com/index/interpretable-machine-learning-through-teaching",
+        "openai-https://openai.com/index/discovering-types-for-entity-disambiguation",
+        "openai-https://openai.com/index/requests-for-research-2",
+        "openai-https://openai.com/index/scaling-kubernetes-to-2500-nodes",
+        "openai-https://openai.com/index/block-sparse-gpu-kernels",
+        "openai-https://openai.com/index/learning-sparse-neural-networks-through-l0-regularization",
+        "openai-https://openai.com/index/interpretable-and-pedagogical-examples",
+        "openai-https://openai.com/index/learning-a-hierarchy",
+        "openai-https://openai.com/index/generalizing-from-simulation",
+        "openai-https://openai.com/index/sim-to-real-transfer-of-robotic-control-with-dynamics-randomization",
+        "openai-https://openai.com/index/asymmetric-actor-critic-for-image-based-robot-learning",
+        "openai-https://openai.com/index/domain-randomization-and-generative-models-for-robotic-grasping",
+        "openai-https://openai.com/index/competitive-self-play",
+        "openai-https://openai.com/index/meta-learning-for-wrestling",
+        "openai-https://openai.com/index/nonlinear-computation-in-deep-linear-networks",
+        "openai-https://openai.com/index/learning-to-model-other-minds",
+        "openai-https://openai.com/index/learning-with-opponent-learning-awareness",
+        "openai-https://openai.com/index/openai-baselines-acktr-a2c",
+        "openai-https://openai.com/index/more-on-dota-2",
+        "openai-https://openai.com/index/dota-2",
+        "openai-https://openai.com/index/gathering-human-feedback",
+        "openai-https://openai.com/index/better-exploration-with-parameter-noise",
+        "openai-https://openai.com/index/openai-baselines-ppo",
+        "openai-https://openai.com/index/robust-adversarial-inputs",
+        "openai-https://openai.com/index/hindsight-experience-replay",
+        "openai-https://openai.com/index/teacher-student-curriculum-learning",
+        "openai-https://openai.com/index/faster-physics-in-python",
+        "openai-https://openai.com/index/learning-from-human-preferences",
+        "openai-https://openai.com/index/learning-to-cooperate-compete-and-communicate",
+        "openai-https://openai.com/index/ucb-exploration-via-q-ensembles",
+        "openai-https://openai.com/index/openai-baselines-dqn",
+        "openai-https://openai.com/index/robots-that-learn",
+        "openai-https://openai.com/index/roboschool",
+        "openai-https://openai.com/index/equivalence-between-policy-gradients-and-soft-q-learning",
+        "openai-https://openai.com/index/stochastic-neural-networks-for-hierarchical-reinforcement-learning",
+        "openai-https://openai.com/index/unsupervised-sentiment-neuron",
+        "openai-https://openai.com/index/spam-detection-in-the-physical-world",
+        "openai-https://openai.com/index/evolution-strategies",
+        "openai-https://openai.com/index/one-shot-imitation-learning",
+        "openai-https://openai.com/index/distill",
+        "openai-https://openai.com/index/learning-to-communicate",
+        "openai-https://openai.com/index/emergence-of-grounded-compositional-language-in-multi-agent-populations",
+        "openai-https://openai.com/index/prediction-and-control-with-temporal-segment-models",
+        "openai-https://openai.com/index/third-person-imitation-learning",
+        "openai-https://openai.com/index/attacking-machine-learning-with-adversarial-examples",
+        "openai-https://openai.com/index/adversarial-attacks-on-neural-network-policies",
+        "openai-https://openai.com/index/team-update-january",
+        "openai-https://openai.com/index/pixelcnn-plus-plus",
+        "openai-https://openai.com/index/faulty-reward-functions",
+        "openai-https://openai.com/index/universe",
+        "openai-https://openai.com/index/openai-and-microsoft",
+        "openai-https://openai.com/index/exploration",
+        "openai-https://openai.com/index/on-the-quantitative-analysis-of-decoder-based-generative-models",
+        "openai-https://openai.com/index/a-connection-between-generative-adversarial-networks-inverse-reinforcement-learning-and-energy-based-models",
+        "openai-https://openai.com/index/rl2",
+        "openai-https://openai.com/index/variational-lossy-autoencoder",
+        "openai-https://openai.com/index/extensions-and-limitations-of-the-neural-gpu",
+        "openai-https://openai.com/index/semi-supervised-knowledge-transfer-for-deep-learning-from-private-training-data",
+        "openai-https://openai.com/index/report-from-the-self-organizing-conference",
+        "openai-https://openai.com/index/transfer-from-simulation-to-real-world-through-learning-deep-inverse-dynamics-model",
+        "openai-https://openai.com/index/infrastructure-for-deep-learning",
+        "openai-https://openai.com/index/machine-learning-unconference",
+        "openai-https://openai.com/index/team-update-august",
+        "openai-https://openai.com/index/special-projects",
+        "openai-https://openai.com/index/concrete-ai-safety-problems",
+        "openai-https://openai.com/index/openai-technical-goals",
+        "openai-https://openai.com/index/generative-models",
+        "openai-https://openai.com/index/adversarial-training-methods-for-semi-supervised-text-classification",
+        "openai-https://openai.com/index/team-update",
+        "openai-https://openai.com/index/openai-gym-beta",
+        "openai-https://openai.com/index/welcome-pieter-and-shivon",
+        "openai-https://openai.com/index/team-plus-plus",
+        "openai-https://openai.com/index/weight-normalization",
+        "openai-https://openai.com/index/introducing-openai",
+        "anthropic-https://www.anthropic.com/news/claude-opus-4-5",
+        "n8n-https://blog.n8n.io/best-ai-workflow-automation-tools/",
+        "n8n-https://blog.n8n.io/build-a-fast-deep-research-automation-flow-with-oxylabs-and-n8n/",
+        "n8n-https://blog.n8n.io/n8n-expands-whats-possible-in-enterprise-automation-with-microsoft-agent-365/",
+        "n8n-https://blog.n8n.io/implementing-rerankers-in-your-ai-workflows/",
+        "n8n-https://blog.n8n.io/ai-agent-orchestration-frameworks/",
+        "n8n-https://blog.n8n.io/series-c/",
+        "n8n-https://blog.n8n.io/the-n8n-scalability-benchmark/",
+        "n8n-https://blog.n8n.io/practical-evaluation-methods-for-enterprise-ready-llms/",
+        "n8n-https://blog.n8n.io/agentic-rag/",
+        "n8n-https://blog.n8n.io/best-ai-agents/",
+        "n8n-https://blog.n8n.io/ai-sentiment-analysis/",
+        "n8n-https://blog.n8n.io/best-ai-agent-builders/",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.122.3",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.121.3",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.121.3-exp.0",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.122.2",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.122.1",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.122.0",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.121.2",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.121.1",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.120.4",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.121.0",
+        "gemini-https://blog.google/technology/ai/sundar-pichai-ai-release-notes-podcast/",
+        "gemini-https://blog.google/products/gemini/gemini-drop-november-2025/",
+        "gemini-https://blog.google/products/gemini/holiday-tips-prompts-ai-tools/",
+        "gemini-https://blog.google/products/pixel/google-holiday-hosting-tips-2024/",
+        "gemini-https://blog.google/products/shopping/black-friday-cyber-monday-shopping-tips-ai/",
+        "gemini-https://blog.google/outreach-initiatives/education/gemini-interactive-images/",
+        "gemini-https://blog.google/products/gemini/prompting-tips-nano-banana-pro/",
+        "gemini-https://blog.google/technology/developers/gemini-3-pro-image-developers/",
+        "gemini-https://blog.google/technology/ai/nano-banana-pro/",
+        "gemini-https://blog.google/technology/ai/ai-image-verification-gemini-app/",
+        "gemini-https://blog.google/inside-google/company-announcements/mclaren-gemini/",
+        "gemini-https://blog.google/technology/developers/gemini-3-developers/",
+        "gemini-https://blog.google/products/search/gemini-3-search-ai-mode/",
+        "gemini-https://blog.google/products/gemini/gemini-3-collection/",
+        "gemini-https://blog.google/products/gemini/gemini-3-gemini-app/",
+        "gemini-https://blog.google/products/gemini/gemini-3/",
+        "gemini-https://blog.google/products/workspace/google-vids-expands-ai-access/",
+        "gemini-https://blog.google/inside-google/company-announcements/investing-in-america-2025/",
+        "gemini-https://blog.google/products/shopping/agentic-checkout-holiday-ai-shopping/",
+        "gemini-https://blog.google/products/pixel/google-pixel-and-golden-goose-partner-to-bring-ai-to-global-ateliers/",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.122.4",
+        "openai-https://openai.com/index/ai-mental-health-research-grants",
+        "openai-https://openai.com/index/norad-holiday-collaboration",
+        "openai-https://openai.com/index/accenture-partnership",
+        "openai-https://openai.com/index/thrive-holdings",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.123.0",
+        "gemini-https://blog.google/products/search/gemini-3-ai-mode-more-countries/",
+        "openai-https://openai.com/index/mirakl",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.0.0-rc.0",
+        "openai-https://openai.com/index/how-confessions-can-keep-language-models-honest",
+        "openai-https://openai.com/index/openai-to-acquire-neptune",
+        "openai-https://openai.com/index/people-first-ai-fund-grantees",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.123.1",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.0.0-rc.3",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.0.0-rc.2",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.0.0-rc.1",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.123.2",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.122.5",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.122.4-exp.0",
+        "gemini-https://blog.google/products/gemini/gemini-3-deep-think/",
+        "openai-https://openai.com/global-affairs/openai-for-australia",
+        "anthropic-https://www.anthropic.com/news/anthropic-raises-124-million-to-build-more-reliable-general-ai-systems",
+        "anthropic-https://www.anthropic.com/news/anthropic-raises-series-b-to-build-safe-reliable-ai",
+        "anthropic-https://www.anthropic.com/news/anthropic-partners-with-google-cloud",
+        "anthropic-https://www.anthropic.com/news/core-views-on-ai-safety",
+        "anthropic-https://www.anthropic.com/news/introducing-claude",
+        "anthropic-https://www.anthropic.com/news/an-ai-policy-tool-for-today-ambitiously-invest-in-nist",
+        "anthropic-https://www.anthropic.com/news/partnering-with-scale",
+        "anthropic-https://www.anthropic.com/news/claudes-constitution",
+        "anthropic-https://www.anthropic.com/news/100k-context-windows",
+        "anthropic-https://www.anthropic.com/news/zoom-partnership-and-investment",
+        "anthropic-https://www.anthropic.com/news/anthropic-series-c",
+        "anthropic-https://www.anthropic.com/news/charting-a-path-to-ai-accountability",
+        "anthropic-https://www.anthropic.com/news/claude-2",
+        "anthropic-https://www.anthropic.com/news/frontier-model-security",
+        "anthropic-https://www.anthropic.com/news/frontier-threats-red-teaming-for-ai-safety",
+        "anthropic-https://www.anthropic.com/news/releasing-claude-instant-1-2",
+        "anthropic-https://www.anthropic.com/news/skt-partnership-announcement",
+        "anthropic-https://www.anthropic.com/news/claude-pro",
+        "anthropic-https://www.anthropic.com/news/anthropic-bcg",
+        "anthropic-https://www.anthropic.com/news/the-long-term-benefit-trust",
+        "anthropic-https://www.anthropic.com/news/anthropics-responsible-scaling-policy",
+        "anthropic-https://www.anthropic.com/news/prompting-long-context",
+        "anthropic-https://www.anthropic.com/news/anthropic-amazon",
+        "anthropic-https://www.anthropic.com/news/uk-ai-safety-summit",
+        "anthropic-https://www.anthropic.com/news/policy-recap-q4-2023",
+        "anthropic-https://www.anthropic.com/news/claude-2-1",
+        "anthropic-https://www.anthropic.com/news/expanded-legal-protections-api-improvements",
+        "anthropic-https://www.anthropic.com/news/preparing-for-global-elections-in-2024",
+        "anthropic-https://www.anthropic.com/news/prompt-engineering-for-business-performance",
+        "anthropic-https://www.anthropic.com/news/claude-3-family",
+        "anthropic-https://www.anthropic.com/news/claude-3-haiku",
+        "anthropic-https://www.anthropic.com/news/google-vertex-general-availability",
+        "anthropic-https://www.anthropic.com/news/accenture-aws-anthropic",
+        "anthropic-https://www.anthropic.com/news/third-party-testing",
+        "anthropic-https://www.anthropic.com/news/child-safety-principles",
+        "anthropic-https://www.anthropic.com/news/updating-our-usage-policy",
+        "anthropic-https://www.anthropic.com/news/claude-europe",
+        "anthropic-https://www.anthropic.com/news/mike-krieger-joins-anthropic",
+        "anthropic-https://www.anthropic.com/news/reflections-on-our-responsible-scaling-policy",
+        "anthropic-https://www.anthropic.com/news/krishna-rao-joins-anthropic",
+        "anthropic-https://www.anthropic.com/news/golden-gate-claude",
+        "anthropic-https://www.anthropic.com/news/jay-kreps-appointed-to-board-of-directors",
+        "anthropic-https://www.anthropic.com/news/introducing-claude-to-canada",
+        "anthropic-https://www.anthropic.com/news/testing-and-mitigating-elections-related-risks",
+        "anthropic-https://www.anthropic.com/news/challenges-in-red-teaming-ai-systems",
+        "anthropic-https://www.anthropic.com/news/claude-3-5-sonnet",
+        "anthropic-https://www.anthropic.com/news/projects",
+        "anthropic-https://www.anthropic.com/news/expanding-access-to-claude-for-government",
+        "anthropic-https://www.anthropic.com/news/a-new-initiative-for-developing-third-party-model-evaluations",
+        "anthropic-https://www.anthropic.com/news/fine-tune-claude-3-haiku",
+        "anthropic-https://www.anthropic.com/news/anthropic-partners-with-menlo-ventures-to-launch-anthology-fund",
+        "anthropic-https://www.anthropic.com/news/claude-brazil",
+        "anthropic-https://www.anthropic.com/news/model-safety-bug-bounty",
+        "anthropic-https://www.anthropic.com/news/salesforce-partnership",
+        "anthropic-https://www.anthropic.com/news/contextual-retrieval",
+        "anthropic-https://www.anthropic.com/news/us-elections-readiness",
+        "anthropic-https://www.anthropic.com/news/announcing-our-updated-responsible-scaling-policy",
+        "anthropic-https://www.anthropic.com/news/3-5-models-and-computer-use",
+        "anthropic-https://www.anthropic.com/news/developing-computer-use",
+        "anthropic-https://www.anthropic.com/news/github-copilot",
+        "anthropic-https://www.anthropic.com/news/the-case-for-targeted-regulation",
+        "anthropic-https://www.anthropic.com/news/anthropic-amazon-trainium",
+        "anthropic-https://www.anthropic.com/news/model-context-protocol",
+        "anthropic-https://www.anthropic.com/news/elections-ai-2024",
+        "anthropic-https://www.anthropic.com/news/anthropic-achieves-iso-42001-certification-for-responsible-ai",
+        "anthropic-https://www.anthropic.com/news/lyft-announcement",
+        "anthropic-https://www.anthropic.com/news/the-anthropic-economic-index",
+        "anthropic-https://www.anthropic.com/news/paris-ai-summit",
+        "anthropic-https://www.anthropic.com/news/mou-uk-government",
+        "anthropic-https://www.anthropic.com/news/claude-3-7-sonnet",
+        "anthropic-https://www.anthropic.com/news/claude-and-alexa-plus",
+        "anthropic-https://www.anthropic.com/news/introducing-anthropic-transparency-hub",
+        "anthropic-https://www.anthropic.com/news/anthropic-partners-with-u-s-national-labs-for-first-1-000-scientist-ai-jam",
+        "anthropic-https://www.anthropic.com/news/anthropic-raises-series-e-at-usd61-5b-post-money-valuation",
+        "anthropic-https://www.anthropic.com/news/anthropic-s-recommendations-ostp-u-s-ai-action-plan",
+        "anthropic-https://www.anthropic.com/news/strategic-warning-for-ai-risk-progress-and-insights-from-our-frontier-red-team",
+        "anthropic-https://www.anthropic.com/news/anthropic-s-response-to-governor-newsom-s-ai-working-group-draft-report",
+        "anthropic-https://www.anthropic.com/news/anthropic-economic-index-insights-from-claude-sonnet-3-7",
+        "anthropic-https://www.anthropic.com/news/introducing-claude-for-education",
+        "anthropic-https://www.anthropic.com/news/Introducing-code-with-claude",
+        "anthropic-https://www.anthropic.com/news/head-of-EMEA-new-roles",
+        "anthropic-https://www.anthropic.com/news/anthropic-education-report-how-university-students-use-claude",
+        "anthropic-https://www.anthropic.com/news/our-approach-to-understanding-and-addressing-ai-harms",
+        "anthropic-https://www.anthropic.com/news/detecting-and-countering-malicious-uses-of-claude-march-2025",
+        "anthropic-https://www.anthropic.com/news/introducing-the-anthropic-economic-advisory-council",
+        "anthropic-https://www.anthropic.com/news/securing-america-s-compute-advantage-anthropic-s-position-on-the-diffusion-rule",
+        "anthropic-https://www.anthropic.com/news/ai-for-science-program",
+        "anthropic-https://www.anthropic.com/news/testing-our-safety-defenses-with-a-new-bug-bounty-program",
+        "anthropic-https://www.anthropic.com/news/claude-4",
+        "anthropic-https://www.anthropic.com/news/activating-asl3-protections",
+        "anthropic-https://www.anthropic.com/news/reed-hastings",
+        "anthropic-https://www.anthropic.com/news/claude-gov-models-for-u-s-national-security-customers",
+        "anthropic-https://www.anthropic.com/news/national-security-expert-richard-fontaine-appointed-to-anthropic-s-long-term-benefit-trust",
+        "anthropic-https://www.anthropic.com/news/claude-in-amazon-bedrock-fedramp-high",
+        "anthropic-https://www.anthropic.com/news/how-people-use-claude-for-support-advice-and-companionship",
+        "anthropic-https://www.anthropic.com/news/introducing-the-anthropic-economic-futures-program",
+        "anthropic-https://www.anthropic.com/news/the-need-for-transparency-in-frontier-ai",
+        "anthropic-https://www.anthropic.com/news/lawrence-livermore-national-laboratory-expands-claude-for-enterprise-to-empower-scientists-and",
+        "anthropic-https://www.anthropic.com/news/advancing-claude-for-education",
+        "anthropic-https://www.anthropic.com/news/anthropic-and-the-department-of-defense-to-advance-responsible-ai-in-defense-operations",
+        "anthropic-https://www.anthropic.com/news/investing-in-energy-to-secure-america-s-ai-future",
+        "anthropic-https://www.anthropic.com/news/claude-for-financial-services",
+        "anthropic-https://www.anthropic.com/news/paul-smith-to-join-anthropic",
+        "anthropic-https://www.anthropic.com/news/eu-code-practice",
+        "anthropic-https://www.anthropic.com/news/build-ai-in-america",
+        "anthropic-https://www.anthropic.com/news/anthropic-partners-with-the-university-of-chicago-s-becker-friedman-institute-on-ai-economic",
+        "anthropic-https://www.anthropic.com/news/thoughts-on-america-s-ai-action-plan",
+        "anthropic-https://www.anthropic.com/news/anthropic-signs-cms-health-tech-ecosystem-pledge-to-advance-healthcare-interoperability",
+        "anthropic-https://www.anthropic.com/news/our-framework-for-developing-safe-and-trustworthy-agents",
+        "anthropic-https://www.anthropic.com/news/federal-government-departments-and-agencies-can-now-purchase-claude-through-the-gsa-schedule",
+        "anthropic-https://www.anthropic.com/news/claude-opus-4-1",
+        "anthropic-https://www.anthropic.com/news/head-of-japan-hiring-plans",
+        "anthropic-https://www.anthropic.com/news/offering-expanded-claude-access-across-all-three-branches-of-government",
+        "anthropic-https://www.anthropic.com/news/building-safeguards-for-claude",
+        "anthropic-https://www.anthropic.com/news/usage-policy-update",
+        "anthropic-https://www.anthropic.com/news/claude-code-on-team-and-enterprise",
+        "anthropic-https://www.anthropic.com/news/developing-nuclear-safeguards-for-ai-through-public-private-partnership",
+        "anthropic-https://www.anthropic.com/news/anthropic-higher-education-initiatives",
+        "anthropic-https://www.anthropic.com/news/anthropic-education-report-how-educators-use-claude",
+        "anthropic-https://www.anthropic.com/news/introducing-the-anthropic-national-security-and-public-sector-advisory-council",
+        "anthropic-https://www.anthropic.com/news/detecting-countering-misuse-aug-2025",
+        "anthropic-https://www.anthropic.com/news/updates-to-our-consumer-terms",
+        "anthropic-https://www.anthropic.com/news/anthropic-raises-series-f-at-usd183b-post-money-valuation",
+        "anthropic-https://www.anthropic.com/news/anthropic-signs-pledge-to-americas-youth-investing-in-ai-education",
+        "anthropic-https://www.anthropic.com/news/updating-restrictions-of-sales-to-unsupported-regions",
+        "anthropic-https://www.anthropic.com/news/anthropic-is-endorsing-sb-53",
+        "anthropic-https://www.anthropic.com/news/strengthening-our-safeguards-through-collaboration-with-us-caisi-and-uk-aisi",
+        "anthropic-https://www.anthropic.com/news/claude-in-xcode",
+        "anthropic-https://www.anthropic.com/news/anthropic-expands-global-leadership-in-enterprise-ai-naming-chris-ciauri-as-managing-director-of",
+        "anthropic-https://www.anthropic.com/news/enabling-claude-code-to-work-more-autonomously",
+        "anthropic-https://www.anthropic.com/news/claude-sonnet-4-5",
+        "anthropic-https://www.anthropic.com/news/deloitte-anthropic-partnership",
+        "anthropic-https://www.anthropic.com/news/rahul-patil-joins-anthropic",
+        "anthropic-https://www.anthropic.com/news/expanding-global-operations-to-india",
+        "anthropic-https://www.anthropic.com/news/salesforce-anthropic-expanded-partnership",
+        "anthropic-https://www.anthropic.com/news/claude-haiku-4-5",
+        "anthropic-https://www.anthropic.com/news/claude-for-life-sciences",
+        "anthropic-https://www.anthropic.com/news/statement-dario-amodei-american-ai-leadership",
+        "anthropic-https://www.anthropic.com/news/expanding-our-use-of-google-cloud-tpus-and-services",
+        "anthropic-https://www.anthropic.com/news/seoul-becomes-third-anthropic-office-in-asia-pacific",
+        "anthropic-https://www.anthropic.com/news/advancing-claude-for-financial-services",
+        "anthropic-https://www.anthropic.com/news/opening-our-tokyo-office",
+        "anthropic-https://www.anthropic.com/news/cognizant-partnership",
+        "anthropic-https://www.anthropic.com/news/anthropic-and-iceland-announce-one-of-the-world-s-first-national-ai-education-pilots",
+        "anthropic-https://www.anthropic.com/news/economic-futures-uk-europe",
+        "anthropic-https://www.anthropic.com/news/new-offices-in-paris-and-munich-expand-european-presence",
+        "anthropic-https://www.anthropic.com/news/anthropic-invests-50-billion-in-american-ai-infrastructure",
+        "anthropic-https://www.anthropic.com/news/political-even-handedness",
+        "anthropic-https://www.anthropic.com/news/maryland-partnership",
+        "anthropic-https://www.anthropic.com/news/disrupting-AI-espionage",
+        "anthropic-https://www.anthropic.com/news/rwandan-government-partnership-ai-education",
+        "anthropic-https://www.anthropic.com/news/microsoft-nvidia-anthropic-announce-strategic-partnerships",
+        "anthropic-https://www.anthropic.com/news/claude-in-microsoft-foundry",
+        "anthropic-https://www.anthropic.com/news/claude-for-nonprofits",
+        "anthropic-https://www.anthropic.com/news/anthropic-acquires-bun-as-claude-code-reaches-usd1b-milestone",
+        "anthropic-https://www.anthropic.com/news/snowflake-anthropic-expanded-partnership",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.0.0-rc.4",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.123.3",
+        "gemini-https://blog.google/technology/ai/google-ai-updates-november-2025/",
+        "gemini-https://blog.google/products/gemini/gemini-3-examples-demos/",
+        "gemini-https://blog.google/feed/new-antigravity-rate-limits-pro-ultra-subsribers/",
+        "gemini-https://blog.google/technology/developers/gemini-3-pro-vision/",
+        "openai-https://openai.com/index/instacart-partnership",
+        "openai-https://openai.com/index/the-state-of-enterprise-ai-2025-report",
+        "openai-https://openai.com/index/virgin-atlantic-oliver-byers",
+        "n8n-https://blog.n8n.io/introducing-n8n-2-0/",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.0.0",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.123.4",
+        "gemini-https://blog.google/products/gemini/meta-prompting-veo-gemini-tips/",
+        "openai-https://openai.com/index/scout24",
+        "openai-https://openai.com/index/agentic-ai-foundation",
+        "openai-https://openai.com/index/openai-certificate-courses",
+        "openai-https://openai.com/index/deutsche-telekom-collaboration",
+        "openai-https://openai.com/index/openai-appoints-denise-dresser",
+        "openai-https://openai.com/index/commonwealth-bank-of-australia",
+        "anthropic-https://www.anthropic.com/news/anthropic-accenture-partnership",
+        "anthropic-https://www.anthropic.com/news/donating-the-model-context-protocol-and-establishing-of-the-agentic-ai-foundation",
+        "gemini-https://blog.google/technology/ai/look-back-2025/",
+        "openai-https://openai.com/index/strengthening-cyber-resilience",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.0.1",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.123.5",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.123.5-exp.0",
+        "gemini-https://blog.google/products/search/tools-partnerships-web-ecosystem/",
+        "gemini-https://blog.google/technology/developers/gemini-2-5-text-to-speech/",
+        "openai-https://openai.com/index/gpt-5-2-for-science-and-math",
+        "openai-https://openai.com/index/ten-years",
+        "openai-https://openai.com/index/introducing-gpt-5-2",
+        "openai-https://openai.com/index/disney-sora-agreement",
+        "openai-https://openai.com/index/gpt-5-system-card-update-gpt-5-2",
+        "openai-https://openai.com/index/podium",
+        "gemini-https://blog.google/technology/developers/deep-research-agent-gemini-api/",
+        "gemini-https://blog.google/products/shopping/studio-quality-digital-try-on/",
+        "openai-https://openai.com/index/bbva-collaboration-expansion",
+        "openai-https://openai.com/index/bny",
+        "openai-https://openai.com/index/shipping-sora-for-android-with-codex",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.0.2",
+        "gemini-https://blog.google/products/search/live-audio-gemini-model-update/",
+        "gemini-https://blog.google/products/gemini/gemini-audio-model-updates/",
+        "n8n-https://blog.n8n.io/llm-evaluation-framework/",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.1.0",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.123.6",
+        "gemini-https://blog.google/products/gemini/visual-reports/",
+        "openai-https://openai.com/index/frontierscience",
+        "openai-https://openai.com/index/accelerating-biological-research-in-the-wet-lab",
+        "openai-https://openai.com/index/new-chatgpt-images-is-here",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.123.6-exp.0",
+        "gemini-https://blog.google/technology/google-labs/mini-apps-opal-gemini-app-experiment/",
+        "openai-https://openai.com/index/openai-academy-for-news-organizations",
+        "openai-https://openai.com/index/developers-can-now-submit-apps-to-chatgpt",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.1.1",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.0.3",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.123.7",
+        "gemini-https://blog.google/products/gemini/gemini-3-flash-gemini-app/",
+        "gemini-https://blog.google/products/gemini/gemini-3-flash/",
+        "gemini-https://blog.google/technology/developers/build-with-gemini-3-flash/",
+        "openai-https://openai.com/index/evaluating-chain-of-thought-monitorability",
+        "openai-https://openai.com/index/updating-model-spec-with-teen-protections",
+        "openai-https://openai.com/index/ai-literacy-resources-for-teens-and-parents",
+        "openai-https://openai.com/index/us-department-of-energy-collaboration",
+        "openai-https://openai.com/index/introducing-gpt-5-2-codex",
+        "openai-https://openai.com/index/gpt-5-2-codex-system-card",
+        "openai-https://openai.com/index/gpt-5-2-codex",
+        "anthropic-https://www.anthropic.com/news/protecting-well-being-of-users",
+        "anthropic-https://www.anthropic.com/news/genesis-mission-partnership",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.0.3-exp.0",
+        "gemini-https://blog.google/technology/developers/ai-agents-intensive-recap/",
+        "gemini-https://blog.google/technology/ai/release-notes-podcast-search/",
+        "anthropic-https://www.anthropic.com/news/compliance-framework-SB53",
+        "gemini-https://blog.google/products/gemini/gemini-drop-december-2025/",
+        "gemini-https://blog.google/technology/ai/ai-tips-2025/",
+        "gemini-https://blog.google/products/gemini/google-gemini-prompts-new-years-resolutions/",
+        "openai-https://openai.com/index/one-in-a-million-customers",
+        "openai-https://openai.com/index/hardening-atlas-against-prompt-injection",
+        "n8n-https://blog.n8n.io/rag-pipeline/",
+        "n8n-https://blog.n8n.io/multi-agent-systems/",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.2.0",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.1.2",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.123.8",
+        "gemini-https://blog.google/technology/ai/google-ai-news-recap-2025/",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.2.1",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.1.4",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.1.3",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.123.9",
+        "gemini-https://blog.google/products/gemini/where-to-use-nano-banana-pro/",
+        "gemini-https://blog.google/technology/ai/google-ai-updates-december-2025/",
+        "gemini-https://blog.google/products/gemini/nano-banana-google-trends-2025/",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.2.2",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.1.5",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.123.10",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.3.0",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.2.3",
+        "gemini-https://blog.google/products/google-tv/ces-2026/",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.2.4",
+        "openai-https://openai.com/index/netomi",
+        "openai-https://openai.com/index/openai-for-healthcare",
+        "openai-https://openai.com/index/tolan",
+        "openai-https://openai.com/index/introducing-chatgpt-health",
+        "n8n-https://blog.n8n.io/security-advisory-20260108/",
+        "n8n-https://blog.n8n.io/best-practices-for-deploying-ai-agents-in-production/",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.2.5",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.123.11",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.3.1",
+        "gemini-https://blog.google/products-and-platforms/products/gmail/gmail-is-entering-the-gemini-era/",
+        "gemini-https://blog.google/products-and-platforms/platforms/google-tv/ces-2026/",
+        "gemini-https://blog.google/innovation-and-ai/products/google-ai-updates-december-2025/",
+        "gemini-https://blog.google/products-and-platforms/products/gemini/nano-banana-google-trends-2025/",
+        "gemini-https://blog.google/products-and-platforms/products/gemini/where-to-use-nano-banana-pro/",
+        "gemini-https://blog.google/innovation-and-ai/products/google-ai-news-recap-2025/",
+        "gemini-https://blog.google/products-and-platforms/products/gemini/gemini-drop-december-2025/",
+        "gemini-https://blog.google/innovation-and-ai/products/ai-tips-2025/",
+        "gemini-https://blog.google/products-and-platforms/products/gemini/google-gemini-prompts-new-years-resolutions/",
+        "gemini-https://blog.google/innovation-and-ai/technology/developers-tools/ai-agents-intensive-recap/",
+        "gemini-https://blog.google/innovation-and-ai/products/release-notes-podcast-search/",
+        "gemini-https://blog.google/products-and-platforms/products/gemini/gemini-3-flash-gemini-app/",
+        "gemini-https://blog.google/products-and-platforms/products/gemini/gemini-3-flash/",
+        "gemini-https://blog.google/innovation-and-ai/technology/developers-tools/build-with-gemini-3-flash/",
+        "gemini-https://blog.google/innovation-and-ai/models-and-research/google-labs/mini-apps-opal-gemini-app-experiment/",
+        "gemini-https://blog.google/products-and-platforms/products/gemini/visual-reports/",
+        "gemini-https://blog.google/products-and-platforms/products/search/live-audio-gemini-model-update/",
+        "gemini-https://blog.google/products-and-platforms/products/gemini/gemini-audio-model-updates/",
+        "gemini-https://blog.google/innovation-and-ai/technology/developers-tools/deep-research-agent-gemini-api/",
+        "gemini-https://blog.google/products-and-platforms/products/shopping/studio-quality-digital-try-on/",
+        "openai-https://openai.com/index/stargate-sb-energy-partnership",
+        "openai-https://openai.com/index/datadog",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.3.2",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.2.6",
+        "anthropic-https://www.anthropic.com/news/healthcare-life-sciences",
+        "n8n-https://blog.n8n.io/ai-workflow-builder-best-practices/",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.4.0",
+        "gemini-https://blog.google/innovation-and-ai/technology/developers-tools/gemini-api-new-file-limits/",
+        "gemini-https://blog.google/company-news/inside-google/company-announcements/joint-statement-google-apple/",
+        "openai-https://openai.com/index/zenken",
+        "anthropic-https://www.anthropic.com/news/introducing-anthropic-labs",
+        "n8n-https://blog.n8n.io/announcing-autosave/",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.4.1",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.3.4",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.3.3",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.123.13",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.123.12",
+        "openai-https://openai.com/index/cerebras-partnership",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.4.2",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.3.5",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.123.14",
+        "gemini-https://blog.google/innovation-and-ai/products/gemini-app/personal-intelligence/",
+        "openai-https://openai.com/index/investing-in-merge-labs",
+        "openai-https://openai.com/index/strengthening-the-us-ai-supply-chain",
+        "anthropic-https://www.anthropic.com/news/accelerating-scientific-research",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.4.3",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.123.15",
+        "gemini-https://blog.google/products-and-platforms/products/gemini/how-nano-banana-got-its-name/",
+        "openai-https://openai.com/index/the-truth-elon-left-out",
+        "openai-https://openai.com/index/introducing-chatgpt-go",
+        "openai-https://openai.com/index/our-approach-to-advertising-and-expanding-access",
+        "anthropic-https://www.anthropic.com/news/anthropic-appoints-irina-ghose-as-managing-director-of-india",
+        "n8n-https://blog.n8n.io/human-in-the-loop-automation/",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.4.4",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.3.6",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.123.16",
+        "openai-https://openai.com/index/ai-for-human-agency",
+        "openai-https://openai.com/index/a-business-that-scales-with-the-value-of-intelligence",
+        "openai-https://openai.com/index/ai-for-self-empowerment",
+        "openai-https://openai.com/index/cisco",
+        "openai-https://openai.com/index/servicenow-powers-actionable-enterprise-ai-with-openai",
+        "openai-https://openai.com/index/our-approach-to-age-prediction",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.5.0",
+        "openai-https://openai.com/index/higgsfield",
+        "openai-https://openai.com/index/edu-for-countries",
+        "openai-https://openai.com/index/how-countries-can-end-the-capability-overhang",
+        "openai-https://openai.com/index/horizon-1000",
+        "openai-https://openai.com/index/stargate-community",
+        "anthropic-https://www.anthropic.com/news/claude-new-constitution",
+        "anthropic-https://www.anthropic.com/news/anthropic-teach-for-all",
+        "anthropic-https://www.anthropic.com/news/mariano-florentino-long-term-benefit-trust",
+        "n8n-https://blog.n8n.io/introducing-custom-project-roles-and-user-provisioning-via-sso-built-for-enterprise-governance/",
+        "gemini-https://blog.google/products-and-platforms/products/education/practice-sat-gemini/",
+        "gemini-https://blog.google/products-and-platforms/products/education/bett-2026-gemini-classroom-updates/",
+        "openai-https://openai.com/index/scaling-postgresql",
+        "openai-https://openai.com/index/praktika",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.5.1",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.4.5",
+        "openai-https://openai.com/index/unrolling-the-codex-agent-loop",
+        "openai-https://openai.com/business/guides-and-resources/chatgpt-usage-and-adoption-patterns-at-work",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.5.2",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.4.6",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.123.17",
+        "openai-https://openai.com/index/indeed-maggie-hulce",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.6.0",
+        "openai-https://openai.com/index/pvh-future-of-fashion",
+        "openai-https://openai.com/index/introducing-prism",
+        "anthropic-https://www.anthropic.com/news/gov-UK-partnership",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.6.1",
+        "gemini-https://blog.google/innovation-and-ai/technology/developers-tools/agentic-vision-gemini-3-flash/",
+        "gemini-https://blog.google/innovation-and-ai/technology/developers-tools/gdp-premium-ai-pro-ultra/",
+        "gemini-https://blog.google/products-and-platforms/products/google-one/google-ai-plus-availability/",
+        "gemini-https://blog.google/products-and-platforms/products/search/ai-mode-ai-overviews-updates/",
+        "gemini-https://blog.google/products-and-platforms/products/gemini/release-notes-podcast-smokejumpers/",
+        "openai-https://openai.com/index/the-next-chapter-for-ai-in-the-eu",
+        "openai-https://openai.com/index/emea-youth-and-wellbeing-grant",
+        "openai-https://openai.com/index/ai-agent-link-safety",
+        "openai-https://openai.com/index/trustbank",
+        "n8n-https://blog.n8n.io/introducing-chat-hub/",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.6.2",
+        "gemini-https://blog.google/products-and-platforms/products/chrome/gemini-3-auto-browse/",
+        "openai-https://openai.com/index/inside-our-in-house-data-agent",
+        "openai-https://openai.com/index/taisei",
+        "openai-https://openai.com/index/retiring-gpt-4o-and-older-models",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.4.8",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.4.8-exp.0",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.4.7-exp.0",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.4.6-exp.0",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.123.18",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.4.7",
+        "openai-https://openai.com/index/disrupting-deceptive-uses-of-ai-by-covert-influence-operations",
+        "gemini-https://blog.google/innovation-and-ai/products/gemini-app/gemini-drop-january-2026/",
+        "openai-https://openai.com/index/snowflake-partnership",
+        "openai-https://openai.com/index/introducing-the-codex-app",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.7.0",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.6.3",
+        "gemini-https://blog.google/innovation-and-ai/products/gemini-app/gemini-budget-planning-tips/",
+        "anthropic-https://www.anthropic.com/news/apple-xcode-claude-agent-sdk",
+        "anthropic-https://www.anthropic.com/news/anthropic-partners-with-allen-institute-and-howard-hughes-medical-institute",
+        "anthropic-https://www.anthropic.com/news/servicenow-anthropic-claude",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.7.1",
+        "openai-https://openai.com/index/navigating-health-questions",
+        "openai-https://openai.com/index/unlocking-the-codex-harness",
+        "openai-https://openai.com/index/vfl-wolfsburg",
+        "anthropic-https://www.anthropic.com/news/claude-is-a-space-to-think",
+        "gemini-https://blog.google/innovation-and-ai/products/google-ai-updates-january-2026/",
+        "openai-https://openai.com/index/gpt-5-lowers-protein-synthesis-cost",
+        "openai-https://openai.com/index/trusted-access-for-cyber",
+        "openai-https://openai.com/index/introducing-openai-frontier",
+        "openai-https://openai.com/index/gpt-5-3-codex-system-card",
+        "openai-https://openai.com/index/introducing-gpt-5-3-codex",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.7.2",
+        "gemini-https://blog.google/company-news/inside-google/company-announcements/gemini-ad-new-home/",
+        "openai-https://openai.com/policies/kr-privacy-policy",
+        "openai-https://openai.com/index/our-approach-to-localization",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.6.4",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.123.20",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.123.19",
+        "openai-https://openai.com/index/bringing-chatgpt-to-genaimil",
+        "openai-https://openai.com/index/testing-ads-in-chatgpt",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.7.3",
+        "anthropic-https://www.anthropic.com/news/claude-opus-4-6",
+        "openai-https://openai.com/index/harness-engineering",
+        "anthropic-https://www.anthropic.com/news/covering-electricity-price-increases",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.8.1",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.7.4",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.8.0",
+        "openai-https://openai.com/index/introducing-gpt-5-3-codex-spark",
+        "anthropic-https://www.anthropic.com/news/donate-public-first-action",
+        "anthropic-https://www.anthropic.com/news/anthropic-raises-30-billion-series-g-funding-380-billion-post-money-valuation",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.8.2",
+        "gemini-https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-deep-think/",
+        "openai-https://openai.com/index/new-result-theoretical-physics",
+        "openai-https://openai.com/index/introducing-lockdown-mode-and-elevated-risk-labels-in-chatgpt",
+        "openai-https://openai.com/index/beyond-rate-limits",
+        "openai-https://openai.com/index/scaling-social-science-research",
+        "anthropic-https://www.anthropic.com/news/chris-liddell-appointed-anthropic-board",
+        "anthropic-https://www.anthropic.com/news/anthropic-codepath-partnership",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.8.3",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.7.5",
+        "gemini-https://blog.google/products-and-platforms/products/education/gemini-features-for-students/",
+        "gemini-https://blog.google/products-and-platforms/devices/pixel/pixel-camera-photo-tips-lunar-new-year/",
+        "anthropic-https://www.anthropic.com/news/bengaluru-office-partnerships-across-india",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.9.0",
+        "anthropic-https://www.anthropic.com/news/anthropic-infosys",
+        "anthropic-https://www.anthropic.com/news/anthropic-rwanda-mou",
+        "anthropic-https://www.anthropic.com/news/claude-sonnet-4-6",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@2.9.1",
+        "gemini-https://blog.google/innovation-and-ai/products/gemini-app/lyria-3/",
+        "openai-https://openai.com/index/advancing-independent-research-ai-alignment",
+        "openai-https://openai.com/index/openai-for-india",
+        "openai-https://openai.com/business/guides-and-resources/the-state-of-enterprise-ai-2025-report",
+        "n8n-tag:github.com,2008:Repository/193215554/beta",
+        "n8n-tag:github.com,2008:Repository/193215554/stable",
+        "gemini-https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-pro/",
+        "openai-https://openai.com/index/first-proof-submissions",
+        "anthropic-https://www.anthropic.com/news/claude-code-security",
+        "n8n-tag:github.com,2008:Repository/193215554/n8n@1.123.21"
+      ]
+    },
+    "node:Everyday at 10am": {
+      "recurrenceRules": []
+    },
+    "node:Everyday at 7am": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Everyday at 7am": [
+      {
+        "json": {
+          "timestamp": "2025-12-06T07:00:47.022+05:30",
+          "Readable date": "December 6th 2025, 7:00:47 am",
+          "Readable time": "7:00:47 am",
+          "Day of week": "Saturday",
+          "Year": "2025",
+          "Month": "December",
+          "Day of month": "06",
+          "Hour": "07",
+          "Minute": "00",
+          "Second": "47",
+          "Timezone": "Asia/Kolkata (UTC+05:30)"
+        }
+      }
+    ]
+  },
+  "versionId": "ab98b11e-b165-4c97-9f11-af84e798285b",
+  "activeVersionId": "ab98b11e-b165-4c97-9f11-af84e798285b",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-11-27T18:34:45.491Z",
+      "createdAt": "2025-11-27T18:34:45.491Z",
+      "role": "workflow:owner",
+      "workflowId": "rZMKj0UvVFexuQHc",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2025-12-08T12:45:57.453Z",
+    "createdAt": "2025-12-08T12:45:57.453Z",
+    "versionId": "ab98b11e-b165-4c97-9f11-af84e798285b",
+    "workflowId": "rZMKj0UvVFexuQHc",
+    "nodes": [
+      {
+        "parameters": {
+          "url": "https://openai.com/blog/rss.xml",
+          "options": {}
+        },
+        "id": "dc20a9e0-816e-4971-9a2b-742f631a0bf1",
+        "name": "OpenAI Blog RSS",
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1.1,
+        "position": [
+          1024,
+          304
+        ]
+      },
+      {
+        "parameters": {
+          "url": "https://blog.n8n.io/rss/",
+          "options": {}
+        },
+        "id": "ae9e2393-4668-4091-8fd4-46fbe5e9be68",
+        "name": "n8n Blog RSS",
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1.1,
+        "position": [
+          1024,
+          672
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "// Process OpenAI RSS feed items\nconst items = $input.all();\nconst processedItems = [];\n\nfor (const item of items) {\n  processedItems.push({\n    source: 'OpenAI',\n    title: item.json.title,\n    link: item.json.link,\n    pubDate: item.json.pubDate || item.json.isoDate,\n    description: item.json.contentSnippet || item.json.content?.substring(0, 200) || '',\n    uniqueId: `openai-${item.json.link}`\n  });\n}\n\nreturn processedItems.map(item => ({ json: item }));"
+        },
+        "id": "9e195286-c2c8-4ef3-a069-6d2f852d7a9b",
+        "name": "Process OpenAI Data",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1248,
+          304
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "// Process n8n RSS feed items\nconst items = $input.all();\nconst processedItems = [];\n\nfor (const item of items) {\n  processedItems.push({\n    source: 'n8n Blog',\n    title: item.json.title,\n    link: item.json.link,\n    pubDate: item.json.pubDate || item.json.isoDate,\n    description: item.json.contentSnippet || item.json.content?.substring(0, 200) || '',\n    uniqueId: `n8n-${item.json.link}`\n  });\n}\n\nreturn processedItems.map(item => ({ json: item }));"
+        },
+        "id": "c90b6deb-9a5a-4953-8f4a-e5e20b4365a4",
+        "name": "Process n8n Data",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1248,
+          672
+        ]
+      },
+      {
+        "parameters": {
+          "numberInputs": 5
+        },
+        "id": "babc2304-3532-41c3-b31d-260e4641aa9f",
+        "name": "Merge All Sources",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3,
+        "position": [
+          1552,
+          624
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "// Filter out already seen updates using Static Data\nconst items = $input.all();\nconst staticData = $getWorkflowStaticData('global');\n\nconsole.log(`static data is ${staticData.seenItems}`)\n\n// Initialize seen items array if it doesn't exist\nif (!staticData.seenItems) {\n  staticData.seenItems = [];\n}\n\nconst newItems = [];\n\nfor (const item of items) {\n  const uniqueId = item.json.uniqueId;\n  \n  // Check if we've seen this item before\n  if (!staticData.seenItems.includes(uniqueId)) {\n    newItems.push(item.json);\n    staticData.seenItems.push(uniqueId);\n  }\n}\n\n// Keep only the last n items to prevent unlimited growth\nconst n_items = 300000\nif (staticData.seenItems.length > n_items) {\n  staticData.seenItems = staticData.seenItems.slice(-n_items);\n}\n\nconsole.log(`Total items checked: ${items.length}`);\nconsole.log(`New items found: ${newItems.length}`);\nconsole.log(`Total tracked items: ${staticData.seenItems.length}`);\n\n// Return new items or empty array if none\nif (newItems.length === 0) {\n  return [];\n}\n\nreturn newItems.map(item => ({ json: item }));"
+        },
+        "id": "3de6dc2b-60e5-4421-9899-e6a4a57c22a2",
+        "name": "Filter New Items (Static Data)",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1744,
+          672
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 1
+            },
+            "conditions": [
+              {
+                "id": "has-new-items",
+                "leftValue": "={{ $json.source }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "string",
+                  "operation": "exists",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "74f3cccf-6fe7-40c5-9b34-21e7c17687aa",
+        "name": "Has New Items?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          1952,
+          672
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "// Format Slack message with all new updates\nconst items = $input.all();\n\nif (items.length === 0) {\n  return [];\n}\n\n// Group items by source\nconst groupedBySource = {};\nfor (const item of items) {\n  const source = item.json.source;\n  if (!groupedBySource[source]) {\n    groupedBySource[source] = [];\n  }\n  groupedBySource[source].push(item.json);\n}\n\n// Create Slack blocks\nconst blocks = [\n  {\n    type: \"header\",\n    text: {\n      type: \"plain_text\",\n      text: \"🚨 New Platform Updates Detected!\",\n      emoji: true\n    }\n  },\n  {\n    type: \"context\",\n    elements: [\n      {\n        type: \"mrkdwn\",\n        text: `Found ${items.length} new update${items.length > 1 ? 's' : ''} • ${new Date().toLocaleString()}`\n      }\n    ]\n  },\n  {\n    type: \"divider\"\n  }\n];\n\n// Add sections for each source\nfor (const [source, updates] of Object.entries(groupedBySource)) {\n  // Source header\n  blocks.push({\n    type: \"section\",\n    text: {\n      type: \"mrkdwn\",\n      text: `*${source}* (${updates.length} update${updates.length > 1 ? 's' : ''})`\n    }\n  });\n  \n  // Add each update\n  for (const update of updates) {\n    const dateStr = update.pubDate ? new Date(update.pubDate).toLocaleDateString('en-US', { \n      month: 'short', \n      day: 'numeric', \n      year: 'numeric' \n    }) : 'Recent';\n    \n    let text = `• *<${update.link}|${update.title}>*\\n   _${dateStr}_`;\n    \n    if (update.description) {\n      const shortDesc = update.description.length > 150 \n        ? update.description.substring(0, 150) + '...' \n        : update.description;\n      text += `\\n   ${shortDesc.replace(/\\n/g, ' ')}`;\n    }\n    \n    blocks.push({\n      type: \"section\",\n      text: {\n        type: \"mrkdwn\",\n        text: text\n      }\n    });\n  }\n  \n  blocks.push({\n    type: \"divider\"\n  });\n}\n\n// Create the final message\nconst slackMessage = {\n  text: `🚨 ${items.length} New Platform Update${items.length > 1 ? 's' : ''} Detected!`,\n  blocks: blocks\n};\n\nreturn [{ json: slackMessage }];"
+        },
+        "id": "78b58ce3-bfb3-4da1-8f40-f8e36bc0decc",
+        "name": "Format Slack Message",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2496,
+          560
+        ]
+      },
+      {
+        "parameters": {
+          "authentication": "oAuth2",
+          "select": "channel",
+          "channelId": {
+            "__rl": true,
+            "value": "C09ADULQJG1",
+            "mode": "list",
+            "cachedResultName": "all-notification"
+          },
+          "messageType": "block",
+          "blocksUi": "={\n \"blocks\": {{ JSON.stringify($json.blocks) }}\n}",
+          "text": "={{ $json.text }}",
+          "otherOptions": {
+            "includeLinkToWorkflow": false
+          }
+        },
+        "id": "1c63e03e-cef0-434f-851d-7ea010351296",
+        "name": "Send to Slack",
+        "type": "n8n-nodes-base.slack",
+        "typeVersion": 2.2,
+        "position": [
+          2752,
+          560
+        ],
+        "webhookId": "144c71c1-d924-43e1-a014-a9f2bfc15e22",
+        "credentials": {
+          "slackOAuth2Api": {
+            "id": "ZC8Jm1dyTNehWjKR",
+            "name": "Slack account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "mode": "raw",
+          "jsonOutput": "={{ { \"status\": \"No new updates found\", \"checked_at\": $now.toISO() } }}",
+          "options": {}
+        },
+        "id": "7ba4693b-2072-42dc-9e75-1ba27b51dc50",
+        "name": "No Updates",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          2272,
+          832
+        ]
+      },
+      {
+        "parameters": {
+          "url": "https://github.com/n8n-io/n8n/releases.atom",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1.2,
+        "position": [
+          1024,
+          848
+        ],
+        "id": "cba0043b-d2ba-40bd-b03b-13c275ace1e6",
+        "name": "n8n Release Notes"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Process n8n RSS feed items\nconst items = $input.all();\nconst processedItems = [];\n\nfor (const item of items) {\n  processedItems.push({\n    source: 'n8n Release Notes',\n    title: item.json.title,\n    link: item.json.link,\n    pubDate: item.json.pubDate || item.json.isoDate,\n    description: item.json.contentSnippet || item.json.content?.substring(0, 200) || '',\n    uniqueId: `n8n-${item.json.id}`\n  });\n}\n\nreturn processedItems.map(item => ({ json: item }));"
+        },
+        "id": "e3e951f0-ed48-4600-8c35-db64a16864b6",
+        "name": "Process n8n Release Notes",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1248,
+          864
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "// Process n8n RSS feed items\nconst items = $input.all();\nconst processedItems = [];\n\nfor (const item of items) {\n  processedItems.push({\n    source: 'Gemini Update',\n    title: item.json.title,\n    link: item.json.link,\n    pubDate: item.json.pubDate || item.json.isoDate,\n    description: item.json.contentSnippet || item.json.content?.substring(0, 200) || '',\n    uniqueId: `gemini-${item.json.guid}`\n  });\n}\n\nreturn processedItems.map(item => ({ json: item }));"
+        },
+        "id": "e2fb82b7-62de-40a7-a1b6-ca0cacdfe2c5",
+        "name": "Process Gemini Data",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1248,
+          1072
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "// Process OpenAI RSS feed items\nconst items = $input.all();\nconst processedItems = [];\n\nfor (const item of items) {\n  processedItems.push({\n    source: 'Anthropic',\n    title: item.json.title,\n    link: item.json.link,\n    pubDate: item.json.pubDate || item.json.isoDate,\n    description: item.json.contentSnippet || item.json.content?.substring(0, 200) || '',\n    uniqueId: `anthropic-${item.json.guid}`\n  });\n}\n\nreturn processedItems.map(item => ({ json: item }));"
+        },
+        "id": "9479345d-16b6-4b84-85dd-52c6bd0e2ca5",
+        "name": "Process Anthropic Data",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1248,
+          480
+        ]
+      },
+      {
+        "parameters": {
+          "url": "https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_anthropic_news.xml",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1.2,
+        "position": [
+          1024,
+          480
+        ],
+        "id": "67998bc6-7f3e-4890-b36b-9d43000c7a22",
+        "name": "Anthropic RSS Read"
+      },
+      {
+        "parameters": {
+          "url": "https://blog.google/products/gemini/rss/",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1.2,
+        "position": [
+          1024,
+          1072
+        ],
+        "id": "194d934d-1791-450d-b52d-78a085517fe3",
+        "name": "Gemini RSS Read"
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "triggerAtHour": 7
+              }
+            ]
+          }
+        },
+        "id": "b0f98196-bf1b-404c-865b-93def031f504",
+        "name": "Everyday at 7am",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          688,
+          672
+        ]
+      },
+      {
+        "parameters": {
+          "batchSize": 40,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.splitInBatches",
+        "typeVersion": 3,
+        "position": [
+          2272,
+          544
+        ],
+        "id": "d0faa060-69bd-479f-9938-b85543688534",
+        "name": "Loop Over Items"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.noOp",
+        "typeVersion": 1,
+        "position": [
+          2496,
+          384
+        ],
+        "id": "d4dd0f7c-67cb-46f2-8354-445a871b5475",
+        "name": "No Operation, do nothing"
+      }
+    ],
+    "connections": {
+      "OpenAI Blog RSS": {
+        "main": [
+          [
+            {
+              "node": "Process OpenAI Data",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "n8n Blog RSS": {
+        "main": [
+          [
+            {
+              "node": "Process n8n Data",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Process OpenAI Data": {
+        "main": [
+          [
+            {
+              "node": "Merge All Sources",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Process n8n Data": {
+        "main": [
+          [
+            {
+              "node": "Merge All Sources",
+              "type": "main",
+              "index": 2
+            }
+          ]
+        ]
+      },
+      "Merge All Sources": {
+        "main": [
+          [
+            {
+              "node": "Filter New Items (Static Data)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Filter New Items (Static Data)": {
+        "main": [
+          [
+            {
+              "node": "Has New Items?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Has New Items?": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "No Updates",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Format Slack Message": {
+        "main": [
+          [
+            {
+              "node": "Send to Slack",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "n8n Release Notes": {
+        "main": [
+          [
+            {
+              "node": "Process n8n Release Notes",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Process n8n Release Notes": {
+        "main": [
+          [
+            {
+              "node": "Merge All Sources",
+              "type": "main",
+              "index": 3
+            }
+          ]
+        ]
+      },
+      "Process Gemini Data": {
+        "main": [
+          [
+            {
+              "node": "Merge All Sources",
+              "type": "main",
+              "index": 4
+            }
+          ]
+        ]
+      },
+      "Process Anthropic Data": {
+        "main": [
+          [
+            {
+              "node": "Merge All Sources",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Anthropic RSS Read": {
+        "main": [
+          [
+            {
+              "node": "Process Anthropic Data",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gemini RSS Read": {
+        "main": [
+          [
+            {
+              "node": "Process Gemini Data",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Everyday at 7am": {
+        "main": [
+          [
+            {
+              "node": "OpenAI Blog RSS",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "n8n Blog RSS",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "n8n Release Notes",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Gemini RSS Read",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Anthropic RSS Read",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Loop Over Items": {
+        "main": [
+          [
+            {
+              "node": "No Operation, do nothing",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Format Slack Message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send to Slack": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Lakshit Ukani",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "tags": []
+}
