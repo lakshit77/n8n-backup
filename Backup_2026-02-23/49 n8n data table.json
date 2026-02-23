@@ -1,0 +1,120 @@
+{
+  "updatedAt": "2025-09-27T12:19:56.000Z",
+  "createdAt": "2025-09-27T12:15:06.166Z",
+  "id": "WZy3E1H6gmRPOe18",
+  "name": "49 n8n data table",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        -144
+      ],
+      "id": "faec31e0-d35c-4f88-9964-1e6f02487f55",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "cGtC1V4JQgpqQT6m",
+          "mode": "list",
+          "cachedResultName": "Prompt Library",
+          "cachedResultUrl": "/projects/iOyc3VpWKvgHH9fv/datatables/cGtC1V4JQgpqQT6m"
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        -144
+      ],
+      "id": "718ff475-67c7-4b33-bf6d-e68546c12bcf",
+      "name": "Get row(s)"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1N3c5q6NSqFHlGNr_GWb99wiQjYn1qmlH2T31EWv8pDg",
+          "mode": "list",
+          "cachedResultName": "prompt library example",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1N3c5q6NSqFHlGNr_GWb99wiQjYn1qmlH2T31EWv8pDg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1N3c5q6NSqFHlGNr_GWb99wiQjYn1qmlH2T31EWv8pDg/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        -144
+      ],
+      "id": "97b34d7d-c308-4daa-b7ac-2fcede8f9746",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cZc9FZPSLRtIq9IL",
+          "name": "Lakshit77 Account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s)": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "f9c84d96-9c02-4a85-87d8-15eedffd3d97",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-09-27T12:15:06.172Z",
+      "createdAt": "2025-09-27T12:15:06.172Z",
+      "role": "workflow:owner",
+      "workflowId": "WZy3E1H6gmRPOe18",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
