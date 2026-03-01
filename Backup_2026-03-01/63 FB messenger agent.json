@@ -1,0 +1,164 @@
+{
+  "updatedAt": "2025-11-13T11:25:07.000Z",
+  "createdAt": "2025-11-12T13:28:25.694Z",
+  "id": "lotq43VqsfTLCqND",
+  "name": "63 FB messenger agent",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "path": "aeba235a-0688-40f8-b026-26a08753c745",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ebc07b39-fb9a-4bf4-b465-e738ce1a1487",
+      "name": "Webhook",
+      "webhookId": "aeba235a-0688-40f8-b026-26a08753c745"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "56b3751e-cd54-46ba-a4c2-083dbbeb7b9a",
+              "leftValue": "={{ $json.query['hub.mode'] }}",
+              "rightValue": "subscribe",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "da53b3ed-f6fb-48b2-8173-5525fa2b55cb",
+              "leftValue": "={{ $json.query['hub.verify_token'] }}",
+              "rightValue": "hello",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        -144
+      ],
+      "id": "84ea1838-8524-4a97-be8a-abe97a519121",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.query['hub.challenge'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        416,
+        -144
+      ],
+      "id": "1a93fd3b-543e-491d-93f0-9a2e1a21a720",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v24.0/{{ $json.body.entry[0].messaging[0].recipient.id }}/messages",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "access_token",
+              "value": "EAALnYeDjbUsBP3BGv9iCx1dSx4MifvOWpP0ZAUFAVDUe1wpKSn8gFpZAZCf4ZCLrHkSSPJ2NPXum9KNZARZAiLXE2sveL8Cc9NVtcJVuNFxU581ThfUcyYUAytkQMVmDbvlCKZAebT87X1nypBnPjTMDqbIxB0AWKHbaXZCRsy5iksmjTXEHDmTvd06SB21wUigxUSWC"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"recipient\": {\n    \"id\": \"{{ $json.body.entry[0].messaging[0].sender.id }}\"\n  },\n  \"messaging_type\": \"RESPONSE\",\n  \"message\": {\n    \"text\": \"Hello, world!\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        208,
+        96
+      ],
+      "id": "3646c8ca-dc99-43d3-a5d7-9e86ce003a81",
+      "name": "HTTP Request"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "c66647c4-d734-47fe-ac47-acd12c6e0f8b",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-11-12T13:28:25.700Z",
+      "createdAt": "2025-11-12T13:28:25.700Z",
+      "role": "workflow:owner",
+      "workflowId": "lotq43VqsfTLCqND",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
