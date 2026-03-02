@@ -1,0 +1,99 @@
+{
+  "updatedAt": "2026-02-14T06:35:52.659Z",
+  "createdAt": "2026-02-14T05:56:42.717Z",
+  "id": "nEmq19xMPE-womiruQ8Zt",
+  "name": "Graphy",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "61c7e5e3-f80e-40d8-abc8-606414b35370",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://api.ongraphy.com/t/api/public/v3/products/activelearners",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "mid",
+              "value": "lakshitukani"
+            },
+            {
+              "name": "key",
+              "value": "a8e09188-28cb-4047-9bfc-af39dadba27d"
+            },
+            {
+              "name": "productIds",
+              "value": "64b0fedde4b010cd7c3ee158"
+            },
+            {
+              "name": "dateFrom",
+              "value": "2026-02-08"
+            },
+            {
+              "name": "dateTo",
+              "value": "2026-02-14"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "2a26dad1-3c62-48b5-87c7-4e9bf1e7d863",
+      "name": "HTTP Request"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "26a76e40-954c-408f-aa92-d55c663f9d56",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-02-14T05:56:42.744Z",
+      "createdAt": "2026-02-14T05:56:42.744Z",
+      "role": "workflow:owner",
+      "workflowId": "nEmq19xMPE-womiruQ8Zt",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
