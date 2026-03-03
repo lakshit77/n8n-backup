@@ -1,0 +1,251 @@
+{
+  "updatedAt": "2025-11-14T14:51:09.000Z",
+  "createdAt": "2025-11-14T14:35:03.891Z",
+  "id": "5Ejhs9cXFoeww8ek",
+  "name": "My workflow 23",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "path": "bbbb6d99-2af4-4bb3-91fe-04a4df4f3832",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -256,
+        -64
+      ],
+      "id": "f0939461-ddb3-48b7-b843-c90539c72289",
+      "name": "Webhook",
+      "webhookId": "bbbb6d99-2af4-4bb3-91fe-04a4df4f3832"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d4e8e304-545b-48dc-9edd-574ab4f5a9b6",
+              "leftValue": "={{ $json.query['hub.mode'] }}",
+              "rightValue": "subscribe",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "3e2168f7-4224-4dba-89df-925c416c1263",
+              "leftValue": "={{ $json.query['hub.verify_token'] }}",
+              "rightValue": "hello",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        -240
+      ],
+      "id": "8b4a0191-76df-435d-a18f-3c4f65844132",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.query['hub.challenge'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        416,
+        -240
+      ],
+      "id": "0997b0b1-0714-46a4-8e67-688df509dcda",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v24.0/{{ $('Webhook').item.json.body.entry[0].messaging[0].recipient.id }}/messages ",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "access_token",
+              "value": "EAAgnSQ1haQwBPzSoh3EtcZBDXf9cPPLGJfvVTNXszrExEvLggzlNI488q2CDPe4hOO5lQFILQudU3j59iSWV6MVECZApOV5HjiDxUoVZBQauCYm4ku7gE6UUamZCj7lxBlBZAB1hLqgpWTNSwNKzBXQ80gHJoX44BzoqmYdGSZCi0ZA2oxDikLcTGBZCGBDZBTucQOq3k"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"recipient\": {\n    \"id\": \"{{ $('Webhook').item.json.body.entry[0].messaging[0].sender.id }}\"\n  },\n  \"messaging_type\": \"RESPONSE\",\n  \"message\": {\n    \"text\": \"{{ $json.output.replace(/\\\"/g, '\\\\\\\"').replace(/\\n/g, '\\\\n') }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        288,
+        32
+      ],
+      "id": "33893150-a5b9-42e7-8c40-4d5d45974d4b",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.entry[0].messaging[0].message.text }}",
+        "options": {
+          "systemMessage": "You are a helpful assistant "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -48,
+        32
+      ],
+      "id": "ba1cface-895b-4622-adca-c338ac1a18cc",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        240
+      ],
+      "id": "4e975a71-27f1-4ae9-9d77-5f2512b5c865",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "TLy9RuRkIKncoUiy",
+          "name": "OpenRouter Freelance account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.body.entry[0].messaging[0].sender.id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -48,
+        240
+      ],
+      "id": "a44bfcef-5def-4b83-ad63-14ceeddbc29c",
+      "name": "Simple Memory"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "192be4a2-3074-4a81-90a7-bd19918a7b54",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-11-14T14:35:03.901Z",
+      "createdAt": "2025-11-14T14:35:03.901Z",
+      "role": "workflow:owner",
+      "workflowId": "5Ejhs9cXFoeww8ek",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
