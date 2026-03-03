@@ -1,0 +1,130 @@
+{
+  "updatedAt": "2026-03-03T12:59:09.051Z",
+  "createdAt": "2026-03-03T12:25:20.636Z",
+  "id": "U2REbuyiOawSjTidJjTYT",
+  "name": "Siri Task Automation",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "siri",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -192,
+        0
+      ],
+      "id": "2166004b-c318-4b70-a7aa-a488cc541d30",
+      "name": "Webhook",
+      "webhookId": "327ec3ce-d0e1-4483-86a0-af51a510c227"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "team": "90161509643",
+        "space": "90166454992",
+        "folder": "90168770864",
+        "list": "901613829435",
+        "additionalFields": {
+          "assignees": "={{ [100993403,88904698] }}"
+        }
+      },
+      "type": "n8n-nodes-base.clickUp",
+      "typeVersion": 1,
+      "position": [
+        336,
+        0
+      ],
+      "id": "b2e09ffa-ee74-4fc0-a95c-a3f7a126fc3d",
+      "name": "Create a task",
+      "credentials": {
+        "clickUpOAuth2Api": {
+          "id": "nO8Ga77U6a9RNcu6",
+          "name": "ClickUp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "responses": {
+          "values": [
+            {}
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        16,
+        0
+      ],
+      "id": "a0b41da8-ee59-4eb2-bf60-9435e414c9a6",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "U0FfOj4uWFY6nYAE",
+          "name": "Pankaj OpenAI Account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Create a task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "6fb5dbb8-86e4-4315-960f-9746cc549365",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-03-03T12:25:20.640Z",
+      "createdAt": "2026-03-03T12:25:20.640Z",
+      "role": "workflow:owner",
+      "workflowId": "U2REbuyiOawSjTidJjTYT",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
