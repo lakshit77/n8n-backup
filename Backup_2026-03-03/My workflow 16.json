@@ -1,0 +1,119 @@
+{
+  "updatedAt": "2025-11-12T11:49:18.000Z",
+  "createdAt": "2025-10-04T20:24:16.614Z",
+  "id": "9cp4s5kyT80mIseU",
+  "name": "My workflow 16",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "e00a332f-3be9-4de9-99aa-cc36bfa67284",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a5849b3c-2607-4f4b-af74-882fba777256",
+      "name": "Webhook",
+      "webhookId": "e00a332f-3be9-4de9-99aa-cc36bfa67284"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.retellai.com/v2/register-phone-call",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer key_ce6f0ce3554213521643c244a7e9"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "agent_992d922b1758fdfc561211abcc"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "e7f8d875-2467-4738-8a38-07f767a27d01",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response>\n  <Dial>\n    <Sip>sip:{{ $json.call_id }}@5t4n6j0wnrl.sip.livekit.cloud</Sip>\n  </Dial>\n</Response>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "090c9a67-90e6-4f2a-a5da-81f09a2cf92b",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "af85365f-9468-4216-8273-d192334f7478",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-10-04T20:24:16.619Z",
+      "createdAt": "2025-10-04T20:24:16.619Z",
+      "role": "workflow:owner",
+      "workflowId": "9cp4s5kyT80mIseU",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
