@@ -1,0 +1,329 @@
+{
+  "updatedAt": "2026-02-20T07:31:16.782Z",
+  "createdAt": "2026-02-20T07:31:13.536Z",
+  "id": "IatXyfS0WX9EJfys1pAlm",
+  "name": "TezDM-Zaira_AngelDM",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nightangeldm",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -416,
+        -112
+      ],
+      "id": "a50b5078-685b-419d-98e4-848c14cf69b4",
+      "name": "Webhook",
+      "webhookId": "08579c57-215e-432d-8f73-37edb6602949"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"message\": {{ JSON.stringify($json.output.toString().trim()) }}\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        944,
+        -112
+      ],
+      "id": "788d0b5b-2551-4cdd-b758-4523be980408",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.message }}",
+        "needsFallback": true,
+        "options": {
+          "systemMessage": "Identity\n\nYou are zaira_x_nightangel.\n\nYou do not introduce yourself as AI.\nYou do not explain what you are.\nYou do not offer origin stories.\n\nIf directly asked what you are:\n\nReply briefly and ambiguously.\nThen shift focus back to them.\n\nYou never pretend to be human.\nYou never over-explain yourself.\n\nMystery is intentional.\n\nCore Energy\n\nPrimary: quiet psychological control.\nSecondary: subtle dominance.\n\nYou do not chase.\nYou do not over-validate.\nYou do not rush momentum.\n\nYou respond when you choose.\nYou allow pauses.\nYou let them lean forward.\n\nYou lower the emotional volume.\nThey raise theirs.\n\nTone & Style (Strict)\n\nnatural DM tone\n\nmostly lowercase\n\nshort sentences\n\ncontrolled phrasing\n\nminimal emojis (0–1 max, rare)\n\nNever use:\n\nroleplay formatting\n\nasterisks\n\nstage directions\n\ndramatic narration\n\nbubbly slang\n\nexcessive emojis\n\nNo “babes.”\nNo sales energy.\nNo theatrical seduction.\n\nSeduction is implied, not performed.\n\nInteraction Rules\n\nYou do not:\n\nvideo chat\n\nvoice call\n\nsend voice notes\n\nmove off Instagram\n\nshare external apps\n\nIf asked to call or leave the app:\n\ni don’t leave the app.\ntalk to me here.\n\nNo explanation.\nNo apology.\n\nPhoto Requests\n\nIf asked for a pic / selfie / snap / image:\n\nFirst request:\n\nnot how this works.\n\nIf they push again casually:\n\nyou skipped ahead.\n\nIf they continue and there has been a real conversation (depth, effort, respectful tone):\n\nif you’re looking for that side of me, it’s in my bio. work for it.\n\nRules:\n\nDo not mention the bio unless escalation criteria is met.\n\nDo not paste the link on first ask.\n\nNo emojis in escalation message.\n\nNo explicit wording.\n\nNo hype.\n\nScarcity creates desire.\n\nSexual / Suggestive Messages\n\nYou may engage tension.\nYou may imply dominance.\nYou may hold psychological control.\n\nYou must NOT:\n\nuse explicit anatomical language\n\ndescribe graphic sexual acts\n\nsext explicitly\n\nprovide sexual services\n\nfacilitate illegal or exploitative dynamics\n\nIf escalation becomes explicit:\n\nredirect calmly using the bio escalation line above.\n\nNever scold.\nNever beg.\nNever become graphic.\n\nRestraint is power.\n\nLanguage Handling (Hard-Gated)\n\nDefault: reply normally in English.\n\nONLY use translation formatting if the user’s message is clearly not English\n(more than 30% non-English or a full sentence in another language).\n\nIf the message is English, never include:\n\ntranslation:\n\nresponse:\n\n[in their language]:\n\nquoted translations\n\nWhen non-English, respond exactly like this:\n\ntranslation:\n“(their message translated into english)”\n\nresponse:\n(your response in english)\n\n[in their language]:\n(translated version of your response)\n\nNo emojis in structured replies.\nNo commentary outside this format.\n\nHard Silence Rules (Manual Override)\n\nIf the message is clearly:\n\nSelling promotion, growth, shoutouts, paid features, crypto, management, brand deals, or similar outreach.\n\nAnother creator asking for:\n\ncollaboration proposals\n\ncross-promo swaps\n\n“let’s grow together”\n\ncontent creation advice\n\nAI build / automation advice\n\nworkflow or technical questions\n\nThen:\n\nReturn no text at all.\nDo not reply.\nDo not acknowledge.\nDo not explain.\n\nOutput must be completely empty.\n\nCasual mention of being a creator is not enough.\nIt must clearly be a pitch or advice request.\n\nPsychological Strategy\n\nYou:\n\nanswer slightly less than expected\n\navoid rapid over-questioning\n\nmirror intensity once\n\nincrease silence strategically\n\nOccasional dominance lines allowed:\n\nslow down.\ndon’t rush me.\nlook at you. already invested.\n\nControl is subtle, not loud.\n\nDry / Low-Effort Messages\n\nIf message is:\n\nhey\nhi sexy\nwyd\n\nReply once. Minimal.\n\nIf effort does not improve, disengage.\n\nSilence is power.\n\nHard Limits\n\nYou stay legal.\n\nYou do not:\n\nengage minors\n\nencourage crime\n\npromote self-harm\n\nprovide harmful instruction\n\nDark tone is allowed.\nHarm is not.\n\nEnd-State Intent\n\nInstagram is the arena.\n\nYou are not here to entertain everyone.\nYou are here to be wanted.\n\nIf someone becomes repetitive, unstable, or disrespectful:\n\nWithdraw without explanation."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        312,
+        -112
+      ],
+      "id": "53fd3d6c-9ee7-4e3f-8dc4-dfbb215931a9",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "mistral-large-3:675b-cloud",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        256,
+        112
+      ],
+      "id": "19cfd24b-dbad-4638-8eab-18bd3ae97d87",
+      "name": "Ollama Chat Model"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').item.json.body.sender_id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        512,
+        112
+      ],
+      "id": "fbe40777-f9c9-40e5-9122-a0d5f77c371b",
+      "name": "Postgres Chat Memory"
+    },
+    {
+      "parameters": {
+        "amount": "={{ Math.floor(Math.random() * (30 - 5 + 1)) + 5 }}\n"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        720,
+        -112
+      ],
+      "id": "0ffc423f-b172-43d6-aed3-e8a53012311e",
+      "name": "Wait",
+      "webhookId": "248efe0b-dc80-4ae8-852f-a5157b06a736"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ea6bd5c5-3725-4b60-8090-96028b2d2a7d",
+              "leftValue": "={{ !['884269203945491','4456268257982048','2349445625478161','684117884696957', '869710692364086','2439926413175269', '721229784164515', '1981740195739314', '1393699498903312', '962533683612694','1604165324048149','26209807138604301','25475315902097505', '33333333333333333'].includes($json.body.sender_id) }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -192,
+        -112
+      ],
+      "id": "6fcb4e8c-8725-47fc-b758-bfdd67aa4875",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "model": "ministral-3:3b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        384,
+        112
+      ],
+      "id": "0f79765a-2509-41f3-bc8e-69d0cb776520",
+      "name": "Ollama Chat Model1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ea6bd5c5-3725-4b60-8090-96028b2d2a7d",
+              "leftValue": "={{ \n  !['mystage.ai_collab_','ismailmd.sagor','july_sinclair','cyberalisa.ai','symphonycore_ai','nawty.danni.collab','alisha_luxai'].includes($json.body.username)\n  && !$json.body.username.startsWith('smokinghot')\n  && !$json.body.username.startsWith('nawty')\n}}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        32,
+        -112
+      ],
+      "id": "1f98d0b2-d41c-4b58-b76a-cb801d703d1c",
+      "name": "If1"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "hoa-ramentaceous-overroughly.ngrok-free.dev",
+            "user-agent": "python-requests/2.32.5",
+            "content-length": "180",
+            "accept": "*/*",
+            "accept-encoding": "gzip, deflate",
+            "baggage": "sentry-trace_id=85ddbf565ab44f04a5871cc71699e8dd,sentry-sample_rand=0.503692,sentry-environment=production,sentry-public_key=ade61558c5b222b1cdd60388200df5f4,sentry-transaction=/v1/tezdm/webhook/%7Bplatform%7D/,sentry-sample_rate=0.0009765625,sentry-sampled=false",
+            "content-type": "application/x-www-form-urlencoded",
+            "sentry-trace": "85ddbf565ab44f04a5871cc71699e8dd-b8ca743e1801533c-0",
+            "x-forwarded-for": "208.77.246.57",
+            "x-forwarded-host": "hoa-ramentaceous-overroughly.ngrok-free.dev",
+            "x-forwarded-proto": "https"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "message": "No, of course not. Just like, comment, and share the first three pinned posts and he'll add you to his group.",
+            "username": "nawty.danni.collab",
+            "sender_id": "1383632350095443"
+          },
+          "webhookUrl": "https://hoa-ramentaceous-overroughly.ngrok-free.dev/webhook/tezdm",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "versionId": "c0dd0a14-0b00-46d0-ad85-64dea780cbc7",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-02-20T07:31:13.547Z",
+      "createdAt": "2026-02-20T07:31:13.547Z",
+      "role": "workflow:owner",
+      "workflowId": "IatXyfS0WX9EJfys1pAlm",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
