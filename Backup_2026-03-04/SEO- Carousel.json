@@ -1,0 +1,357 @@
+{
+  "updatedAt": "2025-11-12T11:50:19.000Z",
+  "createdAt": "2025-10-13T17:48:37.931Z",
+  "id": "BgAZE6CXmkRlkUYf",
+  "name": "SEO- Carousel",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "dd599195-1a89-46ca-9641-94e48b4f94ae",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        560,
+        992
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "operation": "executeTool",
+        "toolName": "search_engine",
+        "toolParameters": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Tool_Parameters', ``, 'json') }}"
+      },
+      "id": "1feddbcf-bd64-4ad1-b71b-f099386bfeea",
+      "name": "MCP Client",
+      "type": "n8n-nodes-mcp.mcpClientTool",
+      "position": [
+        720,
+        976
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "70dc026d-0392-4161-8e7f-a5a2b70b2bc3",
+      "name": "ðŸ•’ Trigger: Run Daily/Weekly",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        176,
+        800
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "95b1399f-4709-46e0-89a9-cbf17ce9c06c",
+              "name": "keyword",
+              "type": "string",
+              "value": "best running shoes"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1186f697-b571-4d56-a04f-41b473158134",
+      "name": "ðŸ“ Input: Keyword & Domain",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        336,
+        800
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Based on the following keyword, provide me ranking of the 1st 5 website.\nkeyword: {{ $json.keyword }}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "id": "7db86557-9106-4397-aa0b-522adc5f74d1",
+      "name": "ðŸ¤– SERP Scraper Agent (MCP)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        736,
+        640
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the SERP list from the incoming item\nconst serpList = items[0].json.output;\n\n// Emit each result as a separate item\nreturn serpList.map(result => {\n  return {\n    json: result\n  };\n});\n"
+      },
+      "id": "9cf53a3c-7014-455c-b498-491a1215d3d2",
+      "name": "ðŸ§  Format SERP Results",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1280,
+        800
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1p64unH_JjzG978cAxPZC4kSZmoXgvYTA-Q7qdfnxr8Y",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1p64unH_JjzG978cAxPZC4kSZmoXgvYTA-Q7qdfnxr8Y/edit?usp=drivesdk",
+          "cachedResultName": "Website Ranking"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1p64unH_JjzG978cAxPZC4kSZmoXgvYTA-Q7qdfnxr8Y/edit#gid=0",
+          "cachedResultName": "Sheet1"
+        },
+        "columns": {
+          "value": {
+            "URL": "={{ $json.url }}",
+            "Rank": "={{ $json.rank }}",
+            "Title": "={{ $json.title }}",
+            "Description": "={{ $json.description }}"
+          },
+          "schema": [
+            {
+              "id": "Title",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Title",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "URL",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "URL",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Description",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Description",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Rank",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Rank",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "42f667f0-46d0-45fc-be93-3d41cbe13934",
+      "name": "ðŸ“Š Log to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        1504,
+        800
+      ],
+      "typeVersion": 4.6
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "7a4832d9-628c-417e-bffb-5af103f5e965",
+      "name": "Auto-fixing Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserAutofixing",
+      "position": [
+        848,
+        976
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "9ca40121-384f-4adf-9a7a-db18bb7ca2f4",
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        832,
+        1168
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "[\n  {\n    \"rank\": 1,\n    \"title\": \"Runner's World\",\n    \"url\": \"https://www.runnersworld.com/gear/a19663621/best-running-shoes/\",\n    \"description\": \"A comprehensive guide on the best running shoes, recommending models like Brooks Ghost and Nike Pegasus for new runners.\"\n  },\n  {\n    \"rank\": 2,\n    \"title\": \"RunRepeat\",\n    \"url\": \"https://runrepeat.com/catalog/running-shoes\",\n    \"description\": \"Offers running shoe reviews with ratings for various models such as Nike Pegasus 41 and Hoka Mach 6.\"\n  },\n  {\n    \"rank\": 3,\n    \"title\": \"Believe in the Run\",\n    \"url\": \"https://believeintherun.com/shoe-reviews/best-running-shoes-2025/\",\n    \"description\": \"Features an in-depth guide to the best running shoes of 2025 across different categories.\"\n  },\n  {\n    \"rank\": 4,\n    \"title\": \"The Run Testers\",\n    \"url\": \"https://theruntesters.com/running-shoes/the-best-running-shoes-to-buy/\",\n    \"description\": \"Reviews the best running shoes available, highlighting their performance and value.\"\n  },\n  {\n    \"rank\": 5,\n    \"title\": \"Men's Health\",\n    \"url\": \"https://www.menshealth.com/fitness/a64476227/running-shoes-editors-picks/\",\n    \"description\": \"Provides a selection of top running shoes recommended by Men's Health editors.\"\n  }\n]\n"
+      },
+      "id": "3dd1da38-2b1e-4178-8cfc-399a8b3afc66",
+      "name": "Structured Output Parser1",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        1008,
+        1168
+      ],
+      "typeVersion": 1.2
+    }
+  ],
+  "connections": {
+    "MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "ðŸ¤– SERP Scraper Agent (MCP)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "ðŸ¤– SERP Scraper Agent (MCP)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Auto-fixing Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ðŸ§  Format SERP Results": {
+      "main": [
+        [
+          {
+            "node": "ðŸ“Š Log to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auto-fixing Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "ðŸ¤– SERP Scraper Agent (MCP)",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Auto-fixing Output Parser",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ðŸ“ Input: Keyword & Domain": {
+      "main": [
+        [
+          {
+            "node": "ðŸ¤– SERP Scraper Agent (MCP)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ðŸ¤– SERP Scraper Agent (MCP)": {
+      "main": [
+        [
+          {
+            "node": "ðŸ§  Format SERP Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ðŸ•’ Trigger: Run Daily/Weekly": {
+      "main": [
+        [
+          {
+            "node": "ðŸ“ Input: Keyword & Domain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "c834b92e-a4b6-4a70-9f4d-53cf4fd9b5d6",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-10-13T17:48:37.936Z",
+      "createdAt": "2025-10-13T17:48:37.936Z",
+      "role": "workflow:owner",
+      "workflowId": "BgAZE6CXmkRlkUYf",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
