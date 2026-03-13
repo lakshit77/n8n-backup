@@ -1,0 +1,160 @@
+{
+  "updatedAt": "2026-03-11T15:00:58.162Z",
+  "createdAt": "2026-03-11T14:51:25.362Z",
+  "id": "eOr26bUwR0ih7ujboUXsT",
+  "name": "My workflow 32",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "test-chatsyncs",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -400,
+        -80
+      ],
+      "id": "fef714b0-6866-42ab-86c8-a4d4d61bf6ab",
+      "name": "Webhook",
+      "webhookId": "92059b65-dffd-4544-be85-b00cd79364e6"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://app.chatsyncs.com/api/v2/whatsapp-business/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 7abc70990b6813b6c08bde9197d6dec39d8dfdb46ce225a0e6ba6ab40554820f"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "to",
+              "value": "={{ $json.body.data.senderPhoneNumber }}"
+            },
+            {
+              "name": "phoneNoId",
+              "value": "={{ $json.body.data.recipientPhoneNumberId }}"
+            },
+            {
+              "name": "type",
+              "value": "text"
+            },
+            {
+              "name": "text",
+              "value": "Hello from Postman!"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "1f74a5a3-8788-417b-be0c-adc63a15ec9e",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "input": "hey there",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        336,
+        -192
+      ],
+      "id": "158cc9d4-8f63-43bc-8066-e724aaebee52",
+      "name": "Generate audio",
+      "credentials": {
+        "openAiApi": {
+          "id": "L3P9Ae81haTD2rYm",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        64,
+        -192
+      ],
+      "id": "4dd78f0b-b378-479c-aa37-8be58bd80123",
+      "name": "When clicking ‘Execute workflow’"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        []
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Generate audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "1e1daf3d-1a84-40b1-8fdb-240c80ddac96",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-03-11T14:51:25.367Z",
+      "createdAt": "2026-03-11T14:51:25.367Z",
+      "role": "workflow:owner",
+      "workflowId": "eOr26bUwR0ih7ujboUXsT",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
