@@ -1,0 +1,1229 @@
+{
+  "updatedAt": "2026-01-13T07:15:42.965Z",
+  "createdAt": "2026-01-12T07:14:59.165Z",
+  "id": "EJSwJDcRgwKtSdwW",
+  "name": "77. whatsapp flow creation using api",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "path": "create-flow-with-api",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -704,
+        176
+      ],
+      "id": "1f0acd0d-f80e-4b4d-ac31-8bc5de46d152",
+      "name": "Webhook",
+      "webhookId": "e0001cca-1abe-4bdc-aa96-f4c16e7ef68e"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cb84fa11-ec27-4877-83ea-3a11a195fc92",
+              "leftValue": "={{ $json.query['hub.mode'] }}",
+              "rightValue": "subscribe",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "cc0f2c01-431e-4fc0-9386-3c31b52fec46",
+              "leftValue": "={{ $json.query['hub.verify_token'] }}",
+              "rightValue": "lakshit",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -480,
+        80
+      ],
+      "id": "dd12620f-0d0e-4bf2-a6c8-2a2017cd7d96",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.query['hub.challenge'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -256,
+        80
+      ],
+      "id": "9ec0a03c-980b-41d1-97d8-2b32973904ac",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6de59eb4-a400-4c3a-b553-5ab74987778c",
+              "leftValue": "={{ $json.body.entry[0].changes[0].value.statuses[0].status }}",
+              "rightValue": "read",
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -480,
+        272
+      ],
+      "id": "6830a85f-4249-4552-812b-b0290bf9e3aa",
+      "name": "Filter1"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -688,
+        -384
+      ],
+      "id": "607dbfdc-3ade-4b9b-a93b-08d15ce0fbf2",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1SoJi_dWsDZxGuvU27dChihxgU1ggC8VapT-ngVeKIFw",
+          "mode": "list",
+          "cachedResultName": "Dynamic Flow Data - Travel Package",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SoJi_dWsDZxGuvU27dChihxgU1ggC8VapT-ngVeKIFw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Packages",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SoJi_dWsDZxGuvU27dChihxgU1ggC8VapT-ngVeKIFw/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -480,
+        -384
+      ],
+      "id": "518b86e9-0c34-403d-9a12-6019ceb03052",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cZc9FZPSLRtIq9IL",
+          "name": "Lakshit77 Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -272,
+        -384
+      ],
+      "id": "2108e7a2-1e3e-4f2b-bc7e-f4bf7743b38c",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        640,
+        -272
+      ],
+      "id": "ff5878ef-c408-4d32-8174-b9a3aa13756d",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1SoJi_dWsDZxGuvU27dChihxgU1ggC8VapT-ngVeKIFw",
+          "mode": "list",
+          "cachedResultName": "Dynamic Flow Data - Travel Package",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SoJi_dWsDZxGuvU27dChihxgU1ggC8VapT-ngVeKIFw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Packages",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SoJi_dWsDZxGuvU27dChihxgU1ggC8VapT-ngVeKIFw/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Loop Over Items').item.json.row_number }}",
+            "image": "={{ $json.data }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "img_url",
+              "displayName": "img_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "image",
+              "displayName": "image",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        800,
+        -272
+      ],
+      "id": "2043acdf-5af3-458b-9b4e-3508e90c60d8",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cZc9FZPSLRtIq9IL",
+          "name": "Lakshit77 Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "resize",
+        "width": 150,
+        "height": 150,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1,
+      "position": [
+        480,
+        -272
+      ],
+      "id": "528dd711-8c70-4315-8343-c43d9f703d5f",
+      "name": "reduce size"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.img_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        320,
+        -272
+      ],
+      "id": "06502b8c-c80e-40f2-9c4d-0edf20e55088",
+      "name": "Get Image"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "00dfc72f-38d7-4071-87f5-cb04f222a712",
+              "leftValue": "={{ $json.image }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        144,
+        -288
+      ],
+      "id": "0addc64d-fff2-4f05-9917-a241e9f62b30",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -704,
+        -768
+      ],
+      "id": "70af9063-91c0-426c-bd6d-f9adce5cc80b",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "328089d2-6470-4a39-957e-436fc02cf492",
+              "name": "flow_name",
+              "value": "Travel Packages",
+              "type": "string"
+            },
+            {
+              "id": "79a61f0b-0838-4b15-b5d2-1bfdecd7bc9e",
+              "name": "version",
+              "value": "v24.0",
+              "type": "string"
+            },
+            {
+              "id": "0376caac-d866-4f1c-bac1-d328ec6b5a23",
+              "name": "WABA-ID",
+              "value": "1513036893303968",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -496,
+        -768
+      ],
+      "id": "0f34b8ef-31a6-4e6b-8b4b-5beb59ec9f43",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/{{ $json.version }}/{{ $json['WABA-ID'] }}/flows",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $json.flow_name }}"
+            },
+            {
+              "name": "categories",
+              "value": "[\"OTHER\"]"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -288,
+        -768
+      ],
+      "id": "d3a24f63-5cec-4589-ac1d-cabdb369f581",
+      "name": "Create Flow Using API",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "iR5q4Pc809XWa04V",
+          "name": "whatsapp wa-agent-alister app Lakshit"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Step 1: Create Flow Using API",
+        "height": 304,
+        "width": 704
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -752,
+        -880
+      ],
+      "id": "b136941f-d89c-45bf-8eb0-1785986dca0c",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f5dca97c-dd67-4225-8766-b122fceff669",
+              "name": "flow_id",
+              "value": "908995768268588",
+              "type": "string"
+            },
+            {
+              "id": "487aa86f-cece-4c28-ac99-316a77ca6687",
+              "name": "flow_json",
+              "value": "={\n  \"version\": \"7.3\",\n  \"screens\": [\n    {\n      \"id\": \"TRAVEL_PACKAGES\",\n      \"title\": \"Travel Packages\",\n      \"terminal\": true,\n      \"layout\": {\n        \"type\": \"SingleColumnLayout\",\n        \"children\": [\n          {\n            \"type\": \"RadioButtonsGroup\",\n            \"name\": \"packages\",\n            \"required\": true,\n            \"data-source\": [],\n            \"label\": \"Explore our exciting packages\"\n          },\n          {\n            \"type\": \"Footer\",\n            \"label\": \"Continue\",\n            \"on-click-action\": {\n              \"name\": \"complete\",\n              \"payload\": {\n                 \"package\": \"${form.packages}\"\n              }\n            }\n          }\n        ]\n      }\n    }\n  ]\n}",
+              "type": "object"
+            },
+            {
+              "id": "2e1ae3fe-5436-45e4-8079-793939e9cf8f",
+              "name": "version",
+              "value": "v24.0",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        112,
+        -480
+      ],
+      "id": "31aae0f3-5824-444d-a48f-7154f0e91b79",
+      "name": "Set fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Define the columns you want to keep\nconst columnsToKeep = ['id', 'title', 'description', 'image'];\n\n// Filter and map the data from all items\nconst filteredData = $input.all().map(item => {\n  const filtered = {};\n  columnsToKeep.forEach(col => {\n    if (item.json[col] !== undefined) {\n      filtered[col] = item.json[col];\n    }\n  });\n  return filtered;\n});\n\nconsole.log(filteredData)\n\n// Find the RadioButtonsGroup in the flow_json and add data-source\n// Get the flow_json from the first item\nconst flowJson = $('Set fields').first().json.flow_json;\n\nif (flowJson.screens && flowJson.screens[0] && flowJson.screens[0].layout) {\n  const children = flowJson.screens[0].layout.children;\n  \n  // Find the RadioButtonsGroup (packages)\n  const radioButton = children.find(child => child.type === \"RadioButtonsGroup\");\n  \n  if (radioButton) {\n    // Add the filtered data to data-source\n    radioButton[\"data-source\"] = filteredData;\n  }\n}\n\n// Return the updated flow_json\nreturn {\n  json:  flowJson\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        -480
+      ],
+      "id": "39c60b08-7fe2-4866-b5bc-4596bbd978a6",
+      "name": "Column to keep"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1SoJi_dWsDZxGuvU27dChihxgU1ggC8VapT-ngVeKIFw",
+          "mode": "list",
+          "cachedResultName": "Dynamic Flow Data - Travel Package",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SoJi_dWsDZxGuvU27dChihxgU1ggC8VapT-ngVeKIFw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Packages",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SoJi_dWsDZxGuvU27dChihxgU1ggC8VapT-ngVeKIFw/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        288,
+        -480
+      ],
+      "id": "584ec082-f23e-44e2-8948-414c67f2aa2a",
+      "name": "Get all entry",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cZc9FZPSLRtIq9IL",
+          "name": "Lakshit77 Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "mode": "each",
+        "options": {
+          "fileName": "travel_package.json"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        624,
+        -480
+      ],
+      "id": "968804ae-a2af-4ae7-847b-ce43418079f7",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/{{ $node['Set fields'].json.version }}/{{ $('Set fields').first().json.flow_id }}/assets",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "flow.json"
+            },
+            {
+              "name": "asset_type",
+              "value": "FLOW_JSON"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        784,
+        -480
+      ],
+      "id": "ade759fd-bd24-4ebe-b2a7-c2b21f155d35",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "iR5q4Pc809XWa04V",
+          "name": "whatsapp wa-agent-alister app Lakshit"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Step 2: Update Flow Json with Proper  Data\n",
+        "height": 480,
+        "width": 2048
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -752,
+        -528
+      ],
+      "id": "30d957c0-978c-4ace-9a17-3ef060a3a23e",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/{{ $('Add this Variable').item.json.app_version }}/{{ $('Add this Variable').item.json.phone_number_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"recipient_type\": \"individual\",\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Add this Variable').item.json.user_number }}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"flow\",\n    \"header\": {\n      \"type\": \"image\",\n      \"image\": {\n        \"link\": \"https://images.pexels.com/photos/457882/pexels-photo-457882.jpeg\"\n      }\n    },\n    \"body\": {\n      \"text\": \"Hey there! 👋\\nI’ve put together a few travel packages to match different travel styles and budgets ✈️🌍\\n\\nJust click the button below, explore the options, and choose the package that feels right for you.\\nIt’s quick, simple, and you’re just a step away from planning your next trip 😄\"\n    },\n    \"footer\": {\n      \"text\": \"✨ No pressure—just explore and pick what you love.\"\n    },\n    \"action\": {\n      \"name\": \"flow\",\n      \"parameters\": {\n        \"flow_message_version\": \"3\",\n        \"flow_id\": \"{{ $('Add this Variable').item.json.flow_id }}\",\n        \"flow_cta\": \"Choose Your Travel Package\"\n      }\n    }\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        160,
+        368
+      ],
+      "id": "60af6001-fb89-42e9-a8b5-54967830d509",
+      "name": "Send Flow",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "iR5q4Pc809XWa04V",
+          "name": "whatsapp wa-agent-alister app Lakshit"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8adf164e-e24e-4693-ad9c-540031adbc66",
+              "name": "phone_number_id",
+              "value": "={{ $json.body.entry[0].changes[0].value.metadata.phone_number_id }}",
+              "type": "string"
+            },
+            {
+              "id": "e90a0536-0be2-43e2-9580-4fd111f19d57",
+              "name": "user_number",
+              "value": "={{ $json.body.entry[0].changes[0].value.contacts[0].wa_id }}",
+              "type": "string"
+            },
+            {
+              "id": "ffe41fb9-29de-4fbc-8855-209c48946961",
+              "name": "bot_number",
+              "value": "={{ $json.body.entry[0].changes[0].value.metadata.display_phone_number }}",
+              "type": "string"
+            },
+            {
+              "id": "678e1e3f-c93a-4339-bd3a-77f3b6a2f832",
+              "name": "WABA_id",
+              "value": "={{ $json.body.entry[0].id }}",
+              "type": "string"
+            },
+            {
+              "id": "1dfdb50b-aae0-4614-9923-d73c50aa9cc9",
+              "name": "app_version",
+              "value": "v24.0",
+              "type": "string"
+            },
+            {
+              "id": "52235fb8-0f8f-4951-8280-a4139212f0f6",
+              "name": "flow_id",
+              "value": "908995768268588",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -256,
+        272
+      ],
+      "id": "cfc057b4-ad21-407b-ac03-0834add31c92",
+      "name": "Add this Variable"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/{{ $('Set fields').first().json.version }}/{{ $('Set fields').first().json.flow_id }}/publish",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1104,
+        -480
+      ],
+      "id": "5ad37ab9-c63e-4717-b129-014e6ce3db02",
+      "name": "HTTP Request1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "iR5q4Pc809XWa04V",
+          "name": "whatsapp wa-agent-alister app Lakshit"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7a6a8e85-1e70-44f2-8ced-ffb5464a94ae",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        944,
+        -480
+      ],
+      "id": "3bb9877f-b2f8-465a-b49b-b1e0e5b77f43",
+      "name": "Filter2"
+    },
+    {
+      "parameters": {
+        "content": "## Step 3: Send the Flow",
+        "height": 608,
+        "width": 1680
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -752,
+        0
+      ],
+      "id": "29c6a5cb-c84c-4c47-bc56-7eb7f01dcf17",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "74717940-6fa3-4c3d-a731-2f02ec2cdabd",
+              "leftValue": "={{ $('Webhook').item.json.body.entry[0].changes[0].value.messages[0].interactive.type }}",
+              "rightValue": "nfm_reply",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -48,
+        272
+      ],
+      "id": "35975bb9-bc37-4048-9af8-c52c7b32b906",
+      "name": "Is Flow response?"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1SoJi_dWsDZxGuvU27dChihxgU1ggC8VapT-ngVeKIFw",
+          "mode": "list",
+          "cachedResultName": "Dynamic Flow Data - Travel Package",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SoJi_dWsDZxGuvU27dChihxgU1ggC8VapT-ngVeKIFw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Packages",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SoJi_dWsDZxGuvU27dChihxgU1ggC8VapT-ngVeKIFw/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        160,
+        176
+      ],
+      "id": "cd84b821-ce1a-4180-b0bc-6bd57f690856",
+      "name": "Get Package",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cZc9FZPSLRtIq9IL",
+          "name": "Lakshit77 Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const response_json = $('Webhook').first().json.body.entry[0].changes[0].value.messages[0].interactive.nfm_reply.response_json\n\n// Step 2: Parse response_json\nlet parsedResponseJson;\ntry {\n  parsedResponseJson = JSON.parse(response_json);\n} catch (error) {\n  throw new Error('Invalid JSON in response_json: ' + error.message);\n}\n\nconst selected_package = parsedResponseJson.package\n\nconsole.log(selected_package)\n\n// Filter and map the data from all items\nconst matching_item = $input.all().find(item => item.json.id == selected_package)\n\nconst title = matching_item ? matching_item.json.title : \"\"\n\nreturn {\n  json: {\n    title\n  }\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        368,
+        176
+      ],
+      "id": "1c93368f-b0f8-41c5-b5be-b3e95ee98631",
+      "name": "Find Package User selected"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v24.0/{{ $items('Add this Variable')[0].json.phone_number_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Add this Variable').first().json.user_number }}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"Package you selected is - {{ $json.title }}\"\n  }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        576,
+        176
+      ],
+      "id": "a9d33bae-be3f-494e-a2c1-fec2d53f5538",
+      "name": "Send msg",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "iR5q4Pc809XWa04V",
+          "name": "whatsapp wa-agent-alister app Lakshit"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        -480
+      ],
+      "id": "5c1024ee-a208-4dfa-b826-16c083c60c0a",
+      "name": "Limit"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Filter1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter1": {
+      "main": [
+        [
+          {
+            "node": "Add this Variable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "reduce size": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Image": {
+      "main": [
+        [
+          {
+            "node": "reduce size",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Create Flow Using API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set fields": {
+      "main": [
+        [
+          {
+            "node": "Get all entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get all entry": {
+      "main": [
+        [
+          {
+            "node": "Column to keep",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Column to keep": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add this Variable": {
+      "main": [
+        [
+          {
+            "node": "Is Flow response?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Filter2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Flow response?": {
+      "main": [
+        [
+          {
+            "node": "Get Package",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Flow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Package": {
+      "main": [
+        [
+          {
+            "node": "Find Package User selected",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Package User selected": {
+      "main": [
+        [
+          {
+            "node": "Send msg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Set fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "89daabc4-9446-4418-a336-1bd62e4a796e",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-01-12T07:14:59.178Z",
+      "createdAt": "2026-01-12T07:14:59.178Z",
+      "role": "workflow:owner",
+      "workflowId": "EJSwJDcRgwKtSdwW",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
