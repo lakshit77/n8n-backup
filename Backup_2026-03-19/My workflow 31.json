@@ -1,0 +1,113 @@
+{
+  "updatedAt": "2026-03-11T12:54:51.194Z",
+  "createdAt": "2026-03-11T06:01:40.315Z",
+  "id": "T866ym8T6QKNPoD3i0BcL",
+  "name": "My workflow 31",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "httpMethod": [
+          "POST"
+        ],
+        "path": "chatsync-test",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -112,
+        0
+      ],
+      "id": "25f8ed2a-febe-4aa2-be8c-7efdbf892b5c",
+      "name": "Webhook",
+      "webhookId": "d8afcf02-4b1c-46e0-9464-9926e159ebac"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://app.chatsyncs.com/api/v2/whatsapp-business/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 7abc70990b6813b6c08bde9197d6dec39d8dfdb46ce225a0e6ba6ab40554820f"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "to",
+              "value": "={{ $json.body.data.senderPhoneNumber }}"
+            },
+            {
+              "name": "phoneNoId",
+              "value": "={{ $json.body.data.recipientPhoneNumberId }}"
+            },
+            {
+              "name": "type",
+              "value": "text"
+            },
+            {
+              "name": "text",
+              "value": "Hello from Postman!"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        224,
+        0
+      ],
+      "id": "ab669381-303c-4fa2-b903-2ad731d98c5a",
+      "name": "HTTP Request"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "28e5181e-1ff6-4476-a055-3866c17452c3",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-03-11T06:01:40.321Z",
+      "createdAt": "2026-03-11T06:01:40.321Z",
+      "role": "workflow:owner",
+      "workflowId": "T866ym8T6QKNPoD3i0BcL",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
