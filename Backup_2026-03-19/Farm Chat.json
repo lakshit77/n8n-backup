@@ -1,0 +1,133 @@
+{
+  "updatedAt": "2026-03-18T21:33:29.644Z",
+  "createdAt": "2026-03-18T19:57:35.754Z",
+  "id": "cbAwknIrGFvXKVlnyOFUy",
+  "name": "Farm Chat",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chat-test",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "76747d2e-e974-434d-8bdf-70cf539c2420",
+      "name": "Webhook",
+      "webhookId": "d0275aff-a6e3-4646-887c-034031fc956a"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"text\": \"reply from n8n\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        208,
+        0
+      ],
+      "id": "4627a177-95b7-499c-bd50-4f4255e48cbe",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "f433fa79-f07e-4b85-ac4f-e0824c260253",
+  "activeVersionId": "f433fa79-f07e-4b85-ac4f-e0824c260253",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-03-18T19:57:35.761Z",
+      "createdAt": "2026-03-18T19:57:35.761Z",
+      "role": "workflow:owner",
+      "workflowId": "cbAwknIrGFvXKVlnyOFUy",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-03-18T21:33:32.000Z",
+    "createdAt": "2026-03-18T21:33:29.647Z",
+    "versionId": "f433fa79-f07e-4b85-ac4f-e0824c260253",
+    "workflowId": "cbAwknIrGFvXKVlnyOFUy",
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "chat-test",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "76747d2e-e974-434d-8bdf-70cf539c2420",
+        "name": "Webhook",
+        "webhookId": "d0275aff-a6e3-4646-887c-034031fc956a"
+      },
+      {
+        "parameters": {
+          "respondWith": "json",
+          "responseBody": "{\n  \"text\": \"reply from n8n\"\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.5,
+        "position": [
+          208,
+          0
+        ],
+        "id": "4627a177-95b7-499c-bd50-4f4255e48cbe",
+        "name": "Respond to Webhook"
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Lakshit Ukani",
+    "name": "Version f433fa79",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
