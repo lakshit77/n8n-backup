@@ -1,0 +1,201 @@
+{
+  "updatedAt": "2026-03-21T11:22:01.700Z",
+  "createdAt": "2026-03-18T19:57:35.754Z",
+  "id": "cbAwknIrGFvXKVlnyOFUy",
+  "name": "Farm Chat",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chat-test",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "76747d2e-e974-434d-8bdf-70cf539c2420",
+      "name": "Webhook",
+      "webhookId": "d0275aff-a6e3-4646-887c-034031fc956a"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"text\": \"reply from n8n\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        352,
+        -192
+      ],
+      "id": "4627a177-95b7-499c-bd50-4f4255e48cbe",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"text\": \"Are you sure you want to delete CHECKPOINT from the schedule?\",\n  \"custom\": {\n    \"actions\": [\n      { \"id\": \"confirm_delete\", \"label\": \"Yes, delete it\", \"style\": \"danger\" },\n      { \"id\": \"cancel\",         \"label\": \"No, keep it\",    \"style\": \"secondary\" }\n    ],\n    \"action_context\": {\n      \"intent\": \"delete_horse\",\n      \"horse_name\": \"CHECKPOINT\",\n      \"entry_id\": \"entry-uuid-abc123\"\n    }\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        288,
+        0
+      ],
+      "id": "3299db36-b1cc-4e86-bf05-a4ac257c3fd4",
+      "name": "Respond to Webhook1"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.srv894857.hstgr.cloud",
+            "user-agent": "python-httpx/0.28.1",
+            "content-length": "266",
+            "accept": "*/*",
+            "accept-encoding": "gzip, deflate",
+            "content-type": "application/json",
+            "x-forwarded-for": "44.197.122.197",
+            "x-forwarded-host": "n8n.srv894857.hstgr.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "f5ddd63a4643",
+            "x-real-ip": "44.197.122.197"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "channel_id": "farm-191798cf-all-team",
+            "channel_context": "all-team",
+            "farm_id": "191798cf",
+            "message_id": "43b4ae59-d963-4614-b79c-6912b6afc21a",
+            "message_text": "hello",
+            "user_id": "c5ebec04-6f2e-4ea3-846d-cf8e845a3041",
+            "user_name": "lakshit@gmail.com",
+            "mentioned_users": []
+          },
+          "webhookUrl": "https://n8n.srv894857.hstgr.cloud/webhook/chat-test",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "versionId": "b9f4dfc7-ce25-4cbf-a50a-fd78a55500b9",
+  "activeVersionId": "b9f4dfc7-ce25-4cbf-a50a-fd78a55500b9",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-03-18T19:57:35.761Z",
+      "createdAt": "2026-03-18T19:57:35.761Z",
+      "role": "workflow:owner",
+      "workflowId": "cbAwknIrGFvXKVlnyOFUy",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-03-21T11:22:03.000Z",
+    "createdAt": "2026-03-21T11:22:01.702Z",
+    "versionId": "b9f4dfc7-ce25-4cbf-a50a-fd78a55500b9",
+    "workflowId": "cbAwknIrGFvXKVlnyOFUy",
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "chat-test",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "76747d2e-e974-434d-8bdf-70cf539c2420",
+        "name": "Webhook",
+        "webhookId": "d0275aff-a6e3-4646-887c-034031fc956a"
+      },
+      {
+        "parameters": {
+          "respondWith": "json",
+          "responseBody": "{\n  \"text\": \"reply from n8n\"\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.5,
+        "position": [
+          352,
+          -192
+        ],
+        "id": "4627a177-95b7-499c-bd50-4f4255e48cbe",
+        "name": "Respond to Webhook"
+      },
+      {
+        "parameters": {
+          "respondWith": "json",
+          "responseBody": "{\n  \"text\": \"Are you sure you want to delete CHECKPOINT from the schedule?\",\n  \"custom\": {\n    \"actions\": [\n      { \"id\": \"confirm_delete\", \"label\": \"Yes, delete it\", \"style\": \"danger\" },\n      { \"id\": \"cancel\",         \"label\": \"No, keep it\",    \"style\": \"secondary\" }\n    ],\n    \"action_context\": {\n      \"intent\": \"delete_horse\",\n      \"horse_name\": \"CHECKPOINT\",\n      \"entry_id\": \"entry-uuid-abc123\"\n    }\n  }\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.5,
+        "position": [
+          288,
+          0
+        ],
+        "id": "3299db36-b1cc-4e86-bf05-a4ac257c3fd4",
+        "name": "Respond to Webhook1"
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Lakshit Ukani",
+    "name": "Version b9f4dfc7",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
