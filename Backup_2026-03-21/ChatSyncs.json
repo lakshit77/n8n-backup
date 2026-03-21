@@ -1,0 +1,211 @@
+{
+  "updatedAt": "2026-03-19T10:15:23.839Z",
+  "createdAt": "2026-03-11T14:51:25.362Z",
+  "id": "eOr26bUwR0ih7ujboUXsT",
+  "name": "ChatSyncs",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "test-chatsyncs",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -352,
+        -80
+      ],
+      "id": "fef714b0-6866-42ab-86c8-a4d4d61bf6ab",
+      "name": "Webhook",
+      "webhookId": "92059b65-dffd-4544-be85-b00cd79364e6"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://app.chatsyncs.com/api/v2/whatsapp-business/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 7abc70990b6813b6c08bde9197d6dec39d8dfdb46ce225a0e6ba6ab40554820f"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "to",
+              "value": "={{ $json.body.data.senderPhoneNumber }}"
+            },
+            {
+              "name": "phoneNoId",
+              "value": "={{ $json.body.data.recipientPhoneNumberId }}"
+            },
+            {
+              "name": "type",
+              "value": "text"
+            },
+            {
+              "name": "text",
+              "value": "Hello from Postman!"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        0,
+        -80
+      ],
+      "id": "1f74a5a3-8788-417b-be0c-adc63a15ec9e",
+      "name": "HTTP Request"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "d629c137-64f4-47bc-bdf9-d367e9e3d6c6",
+  "activeVersionId": "1f34397f-26cd-4e8c-85a8-f060ada1d1bb",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-03-11T14:51:25.367Z",
+      "createdAt": "2026-03-11T14:51:25.367Z",
+      "role": "workflow:owner",
+      "workflowId": "eOr26bUwR0ih7ujboUXsT",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-03-19T10:14:32.000Z",
+    "createdAt": "2026-03-16T08:40:51.831Z",
+    "versionId": "1f34397f-26cd-4e8c-85a8-f060ada1d1bb",
+    "workflowId": "eOr26bUwR0ih7ujboUXsT",
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "test-chatsyncs",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          -400,
+          -80
+        ],
+        "id": "fef714b0-6866-42ab-86c8-a4d4d61bf6ab",
+        "name": "Webhook",
+        "webhookId": "92059b65-dffd-4544-be85-b00cd79364e6"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://app.chatsyncs.com/api/v2/whatsapp-business/messages",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Bearer 7abc70990b6813b6c08bde9197d6dec39d8dfdb46ce225a0e6ba6ab40554820f"
+              }
+            ]
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "to",
+                "value": "={{ $json.body.data.senderPhoneNumber }}"
+              },
+              {
+                "name": "phoneNoId",
+                "value": "={{ $json.body.data.recipientPhoneNumberId }}"
+              },
+              {
+                "name": "type",
+                "value": "text"
+              },
+              {
+                "name": "text",
+                "value": "Hello from Postman!"
+              }
+            ]
+          },
+          "options": {
+            "redirect": {
+              "redirect": {}
+            }
+          }
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          0,
+          -80
+        ],
+        "id": "1f74a5a3-8788-417b-be0c-adc63a15ec9e",
+        "name": "HTTP Request"
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "HTTP Request": {
+        "main": [
+          []
+        ]
+      }
+    },
+    "authors": "Lakshit Ukani",
+    "name": "Version 1f34397f",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
