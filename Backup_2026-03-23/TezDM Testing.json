@@ -1,0 +1,118 @@
+{
+  "updatedAt": "2025-12-17T16:28:37.000Z",
+  "createdAt": "2025-12-17T11:23:38.983Z",
+  "id": "Ri8zbazkFxQ2zwFZ",
+  "name": "TezDM Testing",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"comment\": \"comment from n8n\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        96,
+        -80
+      ],
+      "id": "32cf01ab-a9c0-4453-9bfa-ee7b6ee5ba7e",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "comment-auto",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -112,
+        -80
+      ],
+      "id": "faf8cad9-ebd4-4c75-9b75-023589eb0608",
+      "name": "Comment Webhook",
+      "webhookId": "008080f5-b2be-4c58-b335-45871b9a3ec5"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "dm-automation",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -112,
+        96
+      ],
+      "id": "652a5bf3-388a-42d5-a9ba-c2e35a130eb3",
+      "name": "DM Webhook",
+      "webhookId": "3ef99f5f-c712-48ce-b135-4e1b5b11dc3f"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"message\": \"Message from n8n\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        96,
+        96
+      ],
+      "id": "765da526-f682-41bd-b3a9-03433fcad383",
+      "name": "Respond to Webhook1"
+    }
+  ],
+  "connections": {
+    "Comment Webhook": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DM Webhook": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "4e3268ee-f795-4a9f-8b7f-3b4abee7f8cf",
+  "activeVersionId": null,
+  "triggerCount": 2,
+  "shared": [
+    {
+      "updatedAt": "2025-12-17T11:23:38.987Z",
+      "createdAt": "2025-12-17T11:23:38.987Z",
+      "role": "workflow:owner",
+      "workflowId": "Ri8zbazkFxQ2zwFZ",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
