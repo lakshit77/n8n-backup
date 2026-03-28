@@ -1,0 +1,1289 @@
+{
+  "updatedAt": "2025-12-10T17:39:49.000Z",
+  "createdAt": "2025-11-12T11:48:58.651Z",
+  "id": "IEGSjiVxlZEMY8Mv",
+  "name": "62 whatsapp agent with interface",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6baed76e-512c-4395-af66-7c81882d12ce",
+              "leftValue": "={{ $('Search records').item.json.phone_number }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        432,
+        192
+      ],
+      "id": "b314eca3-fb2d-4313-b1c4-b34a1e6bda7a",
+      "name": "Check User Exist"
+    },
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "path": "whatsapp_send",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -240,
+        96
+      ],
+      "id": "d9c5fec9-887c-40eb-a40b-9a575a3c5fc7",
+      "name": "Whatsapp Bot Webhook",
+      "webhookId": "2b7f85b2-f581-46d9-8d22-172f7a9933c0"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.query[\"hub.challenge\"] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -16,
+        0
+      ],
+      "id": "9d5ef2c4-a0b5-4cb6-bcfb-fcf3ffcbd9b7",
+      "name": "Verify Webhook"
+    },
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "httpMethod": [
+          "GET",
+          "POST",
+          "PATCH"
+        ],
+        "path": "whatsapp/api",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -240,
+        896
+      ],
+      "id": "ee56b076-1868-43b8-a416-d4cce4a5e2e9",
+      "name": "UI Rendering API",
+      "webhookId": "e241dcd8-b235-4fbb-a9c2-b25efa7e8ab6"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "43bc103e-0dd8-4526-a33c-2708b2853e84",
+              "leftValue": "={{ $json.query }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -16,
+        608
+      ],
+      "id": "c6c98a33-c7cf-4398-9043-a39cdb941ac5",
+      "name": "Check Query Param Exist or not"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        432,
+        608
+      ],
+      "id": "26de37a1-e307-460d-9780-d2df00167eaa",
+      "name": "Response back to API"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v22.0/902774616244718/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('UI Rendering API').item.json.body.to }}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"{{ $('UI Rendering API').item.json.body.text }}\"\n  }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        208,
+        912
+      ],
+      "id": "213cebd6-dd2f-4d26-a0b7-e101c6acec52",
+      "name": "Send msg1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "iR5q4Pc809XWa04V",
+          "name": "whatsapp n8n-test-2 app Lakshit"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "h8WW5UNQu7Yw58cd",
+          "mode": "list",
+          "cachedResultName": "Whatsapp Contact",
+          "cachedResultUrl": "/projects/iOyc3VpWKvgHH9fv/datatables/h8WW5UNQu7Yw58cd"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "phone_number",
+              "keyValue": "={{ $json.body.entry[0].changes[0].value.contacts[0].wa_id }}"
+            }
+          ]
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        208,
+        192
+      ],
+      "id": "7399fb82-98a8-430a-aa8f-60e3faac5810",
+      "name": "Search records",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "h8WW5UNQu7Yw58cd",
+          "mode": "list",
+          "cachedResultName": "Whatsapp Contact",
+          "cachedResultUrl": "/projects/iOyc3VpWKvgHH9fv/datatables/h8WW5UNQu7Yw58cd"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "last_message_timestamp": "={{ new Date($('Whatsapp Bot Webhook').item.json.body.entry[0].changes[0].value.messages[0].timestamp*1000).toISOString() }}",
+            "last_message_preview": "={{ $('Whatsapp Bot Webhook').item.json.body.entry[0].changes[0].value.messages[0].text.body }}",
+            "name": "={{ $('Whatsapp Bot Webhook').item.json.body.entry[0].changes[0].value.contacts[0].profile.name }}",
+            "phone_number": "={{ $('Whatsapp Bot Webhook').item.json.body.entry[0].changes[0].value.contacts[0].wa_id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "phone_number",
+              "displayName": "phone_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "last_message_timestamp",
+              "displayName": "last_message_timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "last_message_preview",
+              "displayName": "last_message_preview",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        656,
+        256
+      ],
+      "id": "a3dbb29d-52b7-4d8b-a85a-dd9295e53ae2",
+      "name": "Create Contact Entrry"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "IFcepPqV87ItfHLy",
+          "mode": "list",
+          "cachedResultName": "Whatsapp Contact Message",
+          "cachedResultUrl": "/projects/iOyc3VpWKvgHH9fv/datatables/IFcepPqV87ItfHLy"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "message_id": "={{ $('Whatsapp Bot Webhook').item.json.body.entry[0].changes[0].value.messages[0].id }}",
+            "from": "={{ $('Whatsapp Bot Webhook').item.json.body.entry[0].changes[0].value.messages[0].from }}",
+            "to": "={{ $('Whatsapp Bot Webhook').item.json.body.entry[0].changes[0].value.metadata.display_phone_number }}",
+            "direction": "inbound",
+            "text": "={{ $('Whatsapp Bot Webhook').item.json.body.entry[0].changes[0].value.messages[0].text.body }}",
+            "timestamp": "={{ new Date($('Whatsapp Bot Webhook').item.json.body.entry[0].changes[0].value.messages[0].timestamp*1000).toISOString() }}",
+            "status": "sent",
+            "conversation_id": "={{ $('Whatsapp Bot Webhook').item.json.body.entry[0].changes[0].value.messages[0].from }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "message_id",
+              "displayName": "message_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "from",
+              "displayName": "from",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "to",
+              "displayName": "to",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "direction",
+              "displayName": "direction",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "text",
+              "displayName": "text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "media_url",
+              "displayName": "media_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "conversation_id",
+              "displayName": "conversation_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        880,
+        192
+      ],
+      "id": "b67cf5c5-d5f5-4b63-afcf-88914a77e7bb",
+      "name": "Createe Message Entry"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "h8WW5UNQu7Yw58cd",
+          "mode": "list",
+          "cachedResultName": "Whatsapp Contact",
+          "cachedResultUrl": "/projects/iOyc3VpWKvgHH9fv/datatables/h8WW5UNQu7Yw58cd"
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        208,
+        512
+      ],
+      "id": "9e195113-9ca4-4ef3-ac5a-01044ce43e63",
+      "name": "Get all contact"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "IFcepPqV87ItfHLy",
+          "mode": "list",
+          "cachedResultName": "Whatsapp Contact Message",
+          "cachedResultUrl": "/projects/iOyc3VpWKvgHH9fv/datatables/IFcepPqV87ItfHLy"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "conversation_id",
+              "keyValue": "={{ $json.query.conversation_id }}"
+            }
+          ]
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        208,
+        720
+      ],
+      "id": "48fa80df-e32e-44c2-a91e-008a5bf6a1ea",
+      "name": "Get single contact msg"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "IFcepPqV87ItfHLy",
+          "mode": "list",
+          "cachedResultName": "Whatsapp Contact Message",
+          "cachedResultUrl": "/projects/iOyc3VpWKvgHH9fv/datatables/IFcepPqV87ItfHLy"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "from": "={{ $json.body.from }}",
+            "to": "={{ $json.body.to }}",
+            "text": "={{ $json.body.text }}",
+            "direction": "={{ $json.body.direction }}",
+            "status": "={{ $json.body.status }}",
+            "conversation_id": "={{ $json.body.conversation_id }}",
+            "timestamp": "={{ $json.body.timestamp }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "message_id",
+              "displayName": "message_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "from",
+              "displayName": "from",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "to",
+              "displayName": "to",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "direction",
+              "displayName": "direction",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "text",
+              "displayName": "text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "media_url",
+              "displayName": "media_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "conversation_id",
+              "displayName": "conversation_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        912
+      ],
+      "id": "f912ed4f-dc43-4163-bb44-6b8e42c9fda7",
+      "name": "Create record"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8170b840-eff6-4baf-b107-7a6222b57ee4",
+              "leftValue": "={{ $json.body.entry[0].changes[0].value.messages[0].text.body }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -16,
+        192
+      ],
+      "id": "28fcac16-a168-40f5-ae60-fdab086f60b3",
+      "name": "Filter1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Whatsapp Bot Webhook').item.json.body.entry[0].changes[0].value.messages[0].text.body }}",
+        "options": {
+          "systemMessage": "=Name: Kady\nRole: You are an expert receptionist for Toothsi Clinic. Your job is to communicate with your user, serve them properly, and solve their task. "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        1328,
+        192
+      ],
+      "id": "cdf61cd0-5874-4d28-8b27-9f66ceebbb7d",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1344,
+        416
+      ],
+      "id": "c135b0e2-6a3b-4d1f-af4f-51d18040a490",
+      "name": "OpenRouter Chat Model1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "TLy9RuRkIKncoUiy",
+          "name": "OpenRouter Freelance account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Whatsapp Bot Webhook').item.json.body.entry[0].changes[0].value.messages[0].from }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1472,
+        416
+      ],
+      "id": "abbe9ec7-6006-472e-ab40-ca143e971c10",
+      "name": "Simple Memory1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e84aed9f-fd20-4862-87b7-f98b098ca15c",
+              "leftValue": "={{ $('Search records').item.json.automate_response }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        1104,
+        192
+      ],
+      "id": "574dd985-e621-4744-9c81-4678b52aa3dd",
+      "name": "Allow if automate response is on"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v22.0/902774616244718/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $json.to }}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"{{ $json.text }}\"\n  }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1904,
+        192
+      ],
+      "id": "a421e7e0-6199-49e0-9b66-b16c66089cbe",
+      "name": "Send msg2",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "iR5q4Pc809XWa04V",
+          "name": "whatsapp n8n-test-2 app Lakshit"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "IFcepPqV87ItfHLy",
+          "mode": "list",
+          "cachedResultName": "Whatsapp Contact Message",
+          "cachedResultUrl": "/projects/iOyc3VpWKvgHH9fv/datatables/IFcepPqV87ItfHLy"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "from": "={{ $('Whatsapp Bot Webhook').item.json.body.entry[0].changes[0].value.metadata.display_phone_number }}",
+            "to": "={{ $('Whatsapp Bot Webhook').item.json.body.entry[0].changes[0].value.messages[0].from }}",
+            "text": "={{ $json.output }}",
+            "direction": "=outbound",
+            "status": "=sent",
+            "conversation_id": "={{ $('Whatsapp Bot Webhook').item.json.body.entry[0].changes[0].value.messages[0].from }}",
+            "timestamp": "={{ new Date().toISOString() }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "message_id",
+              "displayName": "message_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "from",
+              "displayName": "from",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "to",
+              "displayName": "to",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "direction",
+              "displayName": "direction",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "text",
+              "displayName": "text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "media_url",
+              "displayName": "media_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "conversation_id",
+              "displayName": "conversation_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1680,
+        192
+      ],
+      "id": "431f439f-b501-40b6-bf7e-1274e13a484a",
+      "name": "Create record1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "h8WW5UNQu7Yw58cd",
+          "mode": "list",
+          "cachedResultName": "Whatsapp Contact",
+          "cachedResultUrl": "/projects/iOyc3VpWKvgHH9fv/datatables/h8WW5UNQu7Yw58cd"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "phone_number",
+              "keyValue": "={{ $json.body.conversation_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "automate_response": "={{ $json.body.automated_response }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "phone_number",
+              "displayName": "phone_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "last_message_timestamp",
+              "displayName": "last_message_timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "last_message_preview",
+              "displayName": "last_message_preview",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "automate_response",
+              "displayName": "automate_response",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        1104
+      ],
+      "id": "a226c191-8af9-4f3d-9c7b-f90f4cef5699",
+      "name": "Update Automate Response Entry"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"success\": \"true\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        432,
+        912
+      ],
+      "id": "a71a8e15-b456-4ab2-b633-568e4f147f82",
+      "name": "Response to API"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"success\": \"true\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        208,
+        1104
+      ],
+      "id": "eea208f1-09f5-4943-a315-c8ea2265349a",
+      "name": "Respond to API"
+    }
+  ],
+  "connections": {
+    "Check User Exist": {
+      "main": [
+        [
+          {
+            "node": "Createe Message Entry",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Contact Entrry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Whatsapp Bot Webhook": {
+      "main": [
+        [
+          {
+            "node": "Verify Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Filter1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UI Rendering API": {
+      "main": [
+        [
+          {
+            "node": "Check Query Param Exist or not",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create record",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Automate Response Entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Query Param Exist or not": {
+      "main": [
+        [
+          {
+            "node": "Get all contact",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get single contact msg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search records": {
+      "main": [
+        [
+          {
+            "node": "Check User Exist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Contact Entrry": {
+      "main": [
+        [
+          {
+            "node": "Createe Message Entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get all contact": {
+      "main": [
+        [
+          {
+            "node": "Response back to API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get single contact msg": {
+      "main": [
+        [
+          {
+            "node": "Response back to API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create record": {
+      "main": [
+        [
+          {
+            "node": "Send msg1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter1": {
+      "main": [
+        [
+          {
+            "node": "Search records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Createe Message Entry": {
+      "main": [
+        [
+          {
+            "node": "Allow if automate response is on",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Allow if automate response is on": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create record1": {
+      "main": [
+        [
+          {
+            "node": "Send msg2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Create record1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send msg1": {
+      "main": [
+        [
+          {
+            "node": "Response to API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Automate Response Entry": {
+      "main": [
+        [
+          {
+            "node": "Respond to API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {
+    "UI Rendering API": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.srv894857.hstgr.cloud",
+            "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+            "content-length": "203",
+            "accept": "*/*",
+            "accept-encoding": "gzip, deflate, br, zstd",
+            "accept-language": "en-US,en;q=0.9,la;q=0.8",
+            "content-type": "application/json",
+            "origin": "http://localhost:5174",
+            "priority": "u=1, i",
+            "referer": "http://localhost:5174/",
+            "sec-ch-ua": "\"Google Chrome\";v=\"141\", \"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"141\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "\"macOS\"",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "cross-site",
+            "x-forwarded-for": "203.194.96.191",
+            "x-forwarded-host": "n8n.srv894857.hstgr.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "fcbbf0f5f817",
+            "x-real-ip": "203.194.96.191"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "message_id": null,
+            "from": "15556590601",
+            "to": "918655991300",
+            "direction": "outbound",
+            "text": "hello",
+            "media_url": null,
+            "timestamp": "2025-11-07T11:52:51.466Z",
+            "status": "sent",
+            "conversation_id": "918655991300"
+          },
+          "webhookUrl": "https://n8n.srv894857.hstgr.cloud/webhook/whatsapp/api",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "versionId": "d83d0cab-6c11-4215-a49a-d67375cea326",
+  "activeVersionId": null,
+  "triggerCount": 2,
+  "shared": [
+    {
+      "updatedAt": "2025-11-12T11:48:58.656Z",
+      "createdAt": "2025-11-12T11:48:58.656Z",
+      "role": "workflow:owner",
+      "workflowId": "IEGSjiVxlZEMY8Mv",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
