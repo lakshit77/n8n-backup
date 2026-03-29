@@ -1,0 +1,354 @@
+{
+  "updatedAt": "2026-01-16T06:03:07.517Z",
+  "createdAt": "2026-01-16T05:50:05.051Z",
+  "id": "VXtyRrUtSPSsAW2g",
+  "name": "My workflow 28",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        -160
+      ],
+      "id": "3561156f-f113-4500-ab2d-310cbbe82099",
+      "name": "WhatsApp Trigger",
+      "webhookId": "df51621d-63d8-4d9d-ac99-c7bafc25280c",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "mg4NVatn4BL0ef7N",
+          "name": "Alex Whatsapp"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "be697d87-3501-419d-9c36-7bb37f0f91a3",
+              "name": "img_url",
+              "value": "={{ $json.images }}",
+              "type": "string"
+            },
+            {
+              "id": "414c0198-18b0-4146-99ef-2d8a28a6a8eb",
+              "name": "method",
+              "value": "id",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        256,
+        64
+      ],
+      "id": "5f79b26e-0207-4c0c-8cff-8ccad0fe1223",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "resource": "media",
+        "phoneNumberId": "941035345761451",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        928,
+        352
+      ],
+      "id": "6793704c-ac1b-42e5-9d41-e3706939bfbc",
+      "name": "Upload media",
+      "webhookId": "64d36152-39bd-4818-ba99-05ea4ad97bb5",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "B9qyidXselCy5bkY",
+          "name": "Alex Whatsapp"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.img_url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        704,
+        256
+      ],
+      "id": "24cebf6f-a160-4fe1-b9c2-e7bba36e2744",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "941035345761451",
+        "recipientPhoneNumber": "+916355243777",
+        "messageType": "image",
+        "mediaLink": "={{ $json.img_url }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        704,
+        64
+      ],
+      "id": "eff17c83-6b00-404f-a24d-8e3243da6709",
+      "name": "Send message",
+      "webhookId": "50a4a6d2-9151-4c48-a862-ae15820e7cf5",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "B9qyidXselCy5bkY",
+          "name": "Alex Whatsapp"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "77dc3c65-9538-4b83-97dd-5511e484ecbc",
+              "leftValue": "={{ $json.method }}",
+              "rightValue": "url",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        480,
+        64
+      ],
+      "id": "8e896771-c265-49f6-bf47-5e15c3161c02",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "91b63670-e5f6-4ed3-b5cd-3138adffc4ba",
+              "name": "images",
+              "value": "=[\n\"https://res.cloudinary.com/dshy6b8rc/image/upload/v1767516429/Screenshot_2026-01-04_141452_jiyqwj.png\",\n\"https://res.cloudinary.com/dshy6b8rc/image/upload/v1767516429/Screenshot_2026-01-04_141452_jiyqwj.png\"\n]",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -416,
+        224
+      ],
+      "id": "a298bca7-7b38-4607-aec6-a210cf886ecc",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        32,
+        232
+      ],
+      "id": "86365563-5dbe-4c98-b7e7-beb29360c419",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "images",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        232
+      ],
+      "id": "ddef7a5f-cf61-4a64-95ba-467e8492d647",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        224
+      ],
+      "id": "8c95bcbf-ee85-4c10-8a9d-8a253f17b3cd",
+      "name": "When clicking ‘Execute workflow’"
+    }
+  ],
+  "connections": {
+    "WhatsApp Trigger": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Upload media",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload media": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "17994360-8a14-4f8c-ba86-18b58f0871ec",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-01-16T05:50:05.055Z",
+      "createdAt": "2026-01-16T05:50:05.055Z",
+      "role": "workflow:owner",
+      "workflowId": "VXtyRrUtSPSsAW2g",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
