@@ -1,0 +1,2618 @@
+{
+  "updatedAt": "2026-02-05T15:13:25.718Z",
+  "createdAt": "2026-02-05T13:02:11.189Z",
+  "id": "U_YJ5akvD5NAJHESM11lg",
+  "name": "Gmail Scrapper",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "sender": "lakshitukani77@gmail.com"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        944,
+        1696
+      ],
+      "id": "66937b5c-b31d-4e47-9ae3-d01f87f9d4d5",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "3TtZvEjjxuLvLuyF",
+          "name": "ukanilakshit77"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2999a857-bc96-4bef-817f-cf509d759f97",
+              "name": "email_body",
+              "value": "={{ $('Gmail Trigger').item.json.html }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1136,
+        1696
+      ],
+      "id": "99383a5a-6245-409a-8c33-50b4a308d9b1",
+      "name": "Set Varaible"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-5-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "={{ $('Set Varaible').item.json.email_body }}"
+            },
+            {
+              "role": "system",
+              "content": "=You are a data extraction assistant for ShowGroundsLive horse show schedule emails.\n\nExtract data from the provided HTML email following these rules:\n\n1. **Horse field**: Split \"1148 - DIAZETTA\" → horse_id: \"1148\", horse_name: \"DIAZETTA\"\n2. **Class field**: Split \"1065 - $15,000 NAL 1.35m Junior...\" → class_id: \"1065\", class_name: \"$15,000 NAL 1.35m Junior...\"\n3. **Order field**: \"14 of 23\" → order_position: 14, order_total: 23. \"unk\" → null for both\n4. **Date format**: Convert \"01/25/2026\" to \"2026-01-25\"\n5. **Preserve**: Original time format, ring order, entry order, and name capitalization"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "textFormat": {
+            "textOptions": {
+              "type": "json_schema",
+              "verbosity": "low",
+              "schema": "={\n  \"type\": \"object\",\n  \"properties\": {\n    \"recipient_name\": {\n      \"type\": \"string\",\n      \"description\": \"Full name of the recipient extracted from 'Dear NAME' greeting\"\n    },\n    \"recipient_email\": {\n      \"type\": [\"string\", \"null\"],\n      \"description\": \"Email address from the To: field if present, null if not found\"\n    },\n    \"show_date\": {\n      \"type\": \"string\",\n      \"description\": \"Show date in YYYY-MM-DD format\"\n    },\n    \"generated_at\": {\n      \"type\": \"string\",\n      \"description\": \"Timestamp when schedule was generated, from 'As of' field\"\n    },\n    \"schedule\": {\n      \"type\": \"array\",\n      \"description\": \"Array of rings with their scheduled entries\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"ring\": {\n            \"type\": \"string\",\n            \"description\": \"Name of the ring\"\n          },\n          \"entries\": {\n            \"type\": \"array\",\n            \"description\": \"Array of scheduled class entries for this ring\",\n            \"items\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"time\": {\n                  \"type\": \"string\",\n                  \"description\": \"Scheduled time in HH:MM AM/PM format\"\n                },\n                \"horse_id\": {\n                  \"type\": \"string\",\n                  \"description\": \"Horse ID number only\"\n                },\n                \"horse_name\": {\n                  \"type\": \"string\",\n                  \"description\": \"Horse name only\"\n                },\n                \"rider\": {\n                  \"type\": \"string\",\n                  \"description\": \"Full name of the rider\"\n                },\n                \"class_id\": {\n                  \"type\": \"string\",\n                  \"description\": \"Class ID number only\"\n                },\n                \"class_name\": {\n                  \"type\": \"string\",\n                  \"description\": \"Class name without the ID prefix\"\n                },\n                \"order_position\": {\n                  \"type\": [\"integer\", \"null\"],\n                  \"description\": \"Position in order, null if unknown\"\n                },\n                \"order_total\": {\n                  \"type\": [\"integer\", \"null\"],\n                  \"description\": \"Total entries in class, null if unknown\"\n                }\n              },\n              \"required\": [\"time\", \"horse_id\", \"horse_name\", \"rider\", \"class_id\", \"class_name\", \"order_position\", \"order_total\"],\n              \"additionalProperties\": false\n            }\n          }\n        },\n        \"required\": [\"ring\", \"entries\"],\n        \"additionalProperties\": false\n      }\n    },\n    \"inactive_horses\": {\n      \"type\": \"array\",\n      \"description\": \"Array of horses marked as inactive for the show date\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"id\": {\n            \"type\": \"string\",\n            \"description\": \"Horse ID number only\"\n          },\n          \"name\": {\n            \"type\": \"string\",\n            \"description\": \"Horse name only\"\n          }\n        },\n        \"required\": [\"id\", \"name\"],\n        \"additionalProperties\": false\n      }\n    },\n    \"total_active_entries\": {\n      \"type\": \"integer\",\n      \"description\": \"Total count of all scheduled entries across all rings\"\n    },\n    \"total_inactive_horses\": {\n      \"type\": \"integer\",\n      \"description\": \"Total count of inactive horses\"\n    }\n  },\n  \"required\": [\"recipient_name\", \"recipient_email\", \"show_date\", \"generated_at\", \"schedule\", \"inactive_horses\", \"total_active_entries\", \"total_inactive_horses\"],\n  \"additionalProperties\": false\n}",
+              "description": "Extracted horse show schedule data from ShowGroundsLive email including ring schedules, class entries, and inactive horses.",
+              "strict": true
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        2992,
+        1968
+      ],
+      "id": "beb84b71-4dc8-4aee-89e2-b6c4f18ae0a0",
+      "name": "Extract Horse Information",
+      "credentials": {
+        "openAiApi": {
+          "id": "U0FfOj4uWFY6nYAE",
+          "name": "Pankaj OpenAI Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Horse Extract Claude chat - https://claude.ai/chat/50c17c7f-9ec8-4ece-a7d3-200e958b5430\n\nSchema Design Claude Chat - https://claude.ai/chat/9a8dc017-2b80-496e-aa2a-86966e650029",
+        "height": 80,
+        "width": 672
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        1776
+      ],
+      "id": "85a6fa7a-6f50-472f-8ff9-b23cf75e2d43",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e1e8c2a5-ac82-4a5b-b193-b862af86c9a2",
+              "name": "show_date",
+              "value": "={{ $('Extract Horse Information').item.json.output[0].content[0].text.show_date }}",
+              "type": "string"
+            },
+            {
+              "id": "8cdc5210-d16f-4742-9ff5-9e0cc725c93f",
+              "name": "schedule_entries",
+              "value": "={{ $('Extract Horse Information').item.json.output[0].content[0].text.schedule }}",
+              "type": "array"
+            },
+            {
+              "id": "4a50a2d1-e619-4e8b-8433-909e61ee2bf6",
+              "name": "inactive_horse",
+              "value": "={{ $('Extract Horse Information').item.json.output[0].content[0].text.inactive_horses }}",
+              "type": "array"
+            },
+            {
+              "id": "6ca031d9-8271-4311-b3cc-97de833a4e67",
+              "name": "total_active_entries",
+              "value": "={{ $('Extract Horse Information').item.json.output[0].content[0].text.total_active_entries }}",
+              "type": "number"
+            },
+            {
+              "id": "f3a3dd8a-f22b-4a33-a808-99bca75ca47d",
+              "name": "total_inactive_horses",
+              "value": "={{ $('Extract Horse Information').item.json.output[0].content[0].text.total_inactive_horses }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3520,
+        1968
+      ],
+      "id": "2aadecc5-6d6e-49ae-b74e-c900dae756c8",
+      "name": "Extract from OpenAI"
+    },
+    {
+      "parameters": {
+        "content": "#### SQL Table Script\n\n-- ============================================\n-- Horse Farm Management System\n-- PostgreSQL Database Schema - Phase 1 & 2\n-- ============================================\n\n-- Enable UUID extension\nCREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";\n\n-- ============================================\n-- CORE ENTITIES\n-- ============================================\n\n-- Farms Table\nCREATE TABLE farms (\n    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n    name VARCHAR(255) NOT NULL,\n    settings JSONB,\n    created_at TIMESTAMP DEFAULT NOW(),\n    updated_at TIMESTAMP\n);\n\n-- Horses Table\nCREATE TABLE horses (\n    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n    farm_id UUID NOT NULL,\n    name VARCHAR(255) NOT NULL,\n    back_number VARCHAR(50),\n    status VARCHAR(50) DEFAULT 'active',\n    metadata JSONB,\n    created_at TIMESTAMP DEFAULT NOW(),\n    updated_at TIMESTAMP,\n    CONSTRAINT fk_horses_farm FOREIGN KEY (farm_id) REFERENCES farms(id) ON DELETE CASCADE\n);\n\n-- Riders Table\nCREATE TABLE riders (\n    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n    farm_id UUID NOT NULL,\n    name VARCHAR(255) NOT NULL,\n    country VARCHAR(100),\n    metadata JSONB,\n    created_at TIMESTAMP DEFAULT NOW(),\n    updated_at TIMESTAMP,\n    CONSTRAINT fk_riders_farm FOREIGN KEY (farm_id) REFERENCES farms(id) ON DELETE CASCADE\n);\n\n-- ============================================\n-- INDEPENDENT ENTITIES (Enum-like)\n-- ============================================\n\n-- Shows Table\nCREATE TABLE shows (\n    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n    external_id VARCHAR(100),\n    name VARCHAR(500) NOT NULL,\n    date DATE,\n    venue VARCHAR(255),\n    metadata JSONB,\n    created_at TIMESTAMP DEFAULT NOW(),\n    updated_at TIMESTAMP\n);\n\n-- Events Table\nCREATE TABLE events (\n    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n    name VARCHAR(255) NOT NULL,\n    description TEXT,\n    created_at TIMESTAMP DEFAULT NOW(),\n    updated_at TIMESTAMP\n);\n\n-- Classes Table\nCREATE TABLE classes (\n    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n    external_id VARCHAR(100),\n    name VARCHAR(500) NOT NULL,\n    sponsor VARCHAR(255),\n    prize_money DECIMAL(10, 2),\n    metadata JSONB,\n    created_at TIMESTAMP DEFAULT NOW(),\n    updated_at TIMESTAMP\n);\n\n-- ============================================\n-- ENTRIES (Combines Horse + Rider + Show + Event + Class)\n-- ============================================\n\nCREATE TABLE entries (\n    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n    horse_id UUID NOT NULL,\n    rider_id UUID,\n    show_id UUID,\n    event_id UUID,\n    class_id UUID,\n    status VARCHAR(50) DEFAULT 'active',\n    estimated_start TIMESTAMP,\n    actual_start TIMESTAMP,\n    order_number INTEGER,\n    order_total INTEGER,\n    round1_faults DECIMAL(5, 2),\n    round1_time DECIMAL(8, 3),\n    jumpoff_faults DECIMAL(5, 2),\n    jumpoff_time DECIMAL(8, 3),\n    final_rank INTEGER,\n    created_at TIMESTAMP DEFAULT NOW(),\n    updated_at TIMESTAMP,\n    CONSTRAINT fk_entries_horse FOREIGN KEY (horse_id) REFERENCES horses(id) ON DELETE CASCADE,\n    CONSTRAINT fk_entries_rider FOREIGN KEY (rider_id) REFERENCES riders(id) ON DELETE SET NULL,\n    CONSTRAINT fk_entries_show FOREIGN KEY (show_id) REFERENCES shows(id) ON DELETE SET NULL,\n    CONSTRAINT fk_entries_event FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE SET NULL,\n    CONSTRAINT fk_entries_class FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE SET NULL\n);\n\n-- ============================================\n-- LOCATION TRACKING\n-- ============================================\n\n-- Locations Table\nCREATE TABLE locations (\n    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n    farm_id UUID,\n    name VARCHAR(255) NOT NULL,\n    type VARCHAR(50) NOT NULL,\n    description TEXT,\n    created_at TIMESTAMP DEFAULT NOW(),\n    updated_at TIMESTAMP,\n    CONSTRAINT fk_locations_farm FOREIGN KEY (farm_id) REFERENCES farms(id) ON DELETE CASCADE\n);\n\n-- Horse Location History Table\nCREATE TABLE horse_location_history (\n    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n    horse_id UUID NOT NULL,\n    location_id UUID NOT NULL,\n    show_id UUID,\n    event_id UUID,\n    class_id UUID,\n    timestamp TIMESTAMP NOT NULL DEFAULT NOW(),\n    CONSTRAINT fk_location_history_horse FOREIGN KEY (horse_id) REFERENCES horses(id) ON DELETE CASCADE,\n    CONSTRAINT fk_location_history_location FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE CASCADE,\n    CONSTRAINT fk_location_history_show FOREIGN KEY (show_id) REFERENCES shows(id) ON DELETE SET NULL,\n    CONSTRAINT fk_location_history_event FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE SET NULL,\n    CONSTRAINT fk_location_history_class FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE SET NULL\n);\n\n-- ============================================\n-- INDEXES FOR PERFORMANCE\n-- ============================================\n\n-- Horses indexes\nCREATE INDEX idx_horses_farm_id ON horses(farm_id);\nCREATE INDEX idx_horses_status ON horses(status);\nCREATE INDEX idx_horses_back_number ON horses(back_number);\n\n-- Riders indexes\nCREATE INDEX idx_riders_farm_id ON riders(farm_id);\n\n-- Shows indexes\nCREATE INDEX idx_shows_date ON shows(date);\nCREATE INDEX idx_shows_external_id ON shows(external_id);\n\n-- Classes indexes\nCREATE INDEX idx_classes_external_id ON classes(external_id);\n\n-- Entries indexes\nCREATE INDEX idx_entries_horse_id ON entries(horse_id);\nCREATE INDEX idx_entries_rider_id ON entries(rider_id);\nCREATE INDEX idx_entries_show_id ON entries(show_id);\nCREATE INDEX idx_entries_event_id ON entries(event_id);\nCREATE INDEX idx_entries_class_id ON entries(class_id);\nCREATE INDEX idx_entries_status ON entries(status);\n\n-- Locations indexes\nCREATE INDEX idx_locations_farm_id ON locations(farm_id);\nCREATE INDEX idx_locations_type ON locations(type);\n\n-- Horse Location History indexes\nCREATE INDEX idx_horse_location_history_horse_id ON horse_location_history(horse_id);\nCREATE INDEX idx_horse_location_history_timestamp ON horse_location_history(timestamp);\nCREATE INDEX idx_horse_location_history_horse_timestamp ON horse_location_history(horse_id, timestamp DESC);\n\n-- ============================================\n-- COMMENTS FOR DOCUMENTATION\n-- ============================================\n\nCOMMENT ON TABLE farms IS 'Multi-tenant farm support';\nCOMMENT ON TABLE horses IS 'Horses belonging to a farm';\nCOMMENT ON TABLE riders IS 'Riders belonging to a farm';\nCOMMENT ON TABLE shows IS 'Independent - Show/competition dates';\nCOMMENT ON TABLE events IS 'Independent - Event names (International Ring, Denemethy, etc.)';\nCOMMENT ON TABLE classes IS 'Independent - Class names ($15,000 Junior Jumper, etc.)';\nCOMMENT ON TABLE entries IS 'Combines Horse + Rider + Show + Event + Class';\nCOMMENT ON TABLE locations IS 'Physical locations (Farm, Vet, Event Venue)';\nCOMMENT ON TABLE horse_location_history IS 'Tracks horse movements with show/event/class context';\n\nCOMMENT ON COLUMN horses.status IS 'active, inactive';\nCOMMENT ON COLUMN entries.status IS 'active, inactive, scratched, completed';\nCOMMENT ON COLUMN locations.type IS 'physical (Farm, Vet, Training) OR event_venue';",
+        "height": 144,
+        "width": 672
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        1888
+      ],
+      "id": "07058dc9-55bb-4f3b-858e-684c53742036",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "tableId": "shows",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "=ShowGround - {{ $('Main Variable').item.json.show_date }}"
+            },
+            {
+              "fieldId": "date",
+              "fieldValue": "={{ $('Main Variable').item.json.show_date }}"
+            },
+            {
+              "fieldId": "farm_id",
+              "fieldValue": "={{ $('set farm variable').item.json.farm_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2368,
+        2048
+      ],
+      "id": "b360633b-7d55-4001-9966-ff2b36123efe",
+      "name": "Create Show",
+      "credentials": {
+        "supabaseApi": {
+          "id": "DlSBIG5mMOIe3gqc",
+          "name": "ukanilakshit77 - Farm Management"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "shows",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "date",
+              "keyValue": "={{ $('Main Variable').item.json.show_date }}"
+            },
+            {
+              "keyName": "farm_id",
+              "keyValue": "={{ $('set farm variable').item.json.farm_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2000,
+        1968
+      ],
+      "id": "c5ca8a28-3c87-42c6-bf44-03965ce93855",
+      "name": "Get Show Entry",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "DlSBIG5mMOIe3gqc",
+          "name": "ukanilakshit77 - Farm Management"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1c7af84f-c21e-4583-b41a-e23335e7790c",
+              "leftValue": "={{ $('Get Show Entry').item.json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2176,
+        1968
+      ],
+      "id": "95799586-382b-4857-9507-ccc61c845c5e",
+      "name": "Check if show exist"
+    },
+    {
+      "parameters": {
+        "tableId": "farms",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $('Main Variable').item.json.farm_name }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2416,
+        1776
+      ],
+      "id": "c1def29f-8b31-402f-a48f-668fbc028a7d",
+      "name": "Create Farm",
+      "credentials": {
+        "supabaseApi": {
+          "id": "DlSBIG5mMOIe3gqc",
+          "name": "ukanilakshit77 - Farm Management"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "farms",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "name",
+              "keyValue": "={{ $('Main Variable').item.json.farm_name }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2000,
+        1696
+      ],
+      "id": "6f63ffda-9ab2-406f-9ba4-e0cb7e1207f2",
+      "name": "Get Farm Entry",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "DlSBIG5mMOIe3gqc",
+          "name": "ukanilakshit77 - Farm Management"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1c7af84f-c21e-4583-b41a-e23335e7790c",
+              "leftValue": "={{ $('Get Farm Entry').item.json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2192,
+        1696
+      ],
+      "id": "4fdf20c2-cfdd-4982-b16c-ff7f36eb41a0",
+      "name": "Check if farm exist"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b9eff5d6-0087-4561-8bc3-93b61a082718",
+              "name": "farm_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2640,
+        1680
+      ],
+      "id": "93cb5cf7-7314-46e2-8d33-7c55e4166304",
+      "name": "set farm variable"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "events",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "farm_id",
+              "keyValue": "={{ $('set farm variable').item.json.farm_id }}"
+            },
+            {
+              "keyName": "name",
+              "keyValue": "={{ $('Loop event entries').item.json.ring }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        4000,
+        2496
+      ],
+      "id": "a0d6f409-68e8-445d-9be9-b2efc45cb422",
+      "name": "Get Event entry",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "DlSBIG5mMOIe3gqc",
+          "name": "ukanilakshit77 - Farm Management"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "events",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "farm_id",
+              "fieldValue": "={{ $('set farm variable').item.json.farm_id }}"
+            },
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $('Loop event entries').item.json.ring }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        4432,
+        2608
+      ],
+      "id": "1ca4b914-637d-42e4-8729-76625e0836e8",
+      "name": "Create Event Entry",
+      "credentials": {
+        "supabaseApi": {
+          "id": "DlSBIG5mMOIe3gqc",
+          "name": "ukanilakshit77 - Farm Management"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3331a75d-324c-45be-92bb-df3a430efc5a",
+              "name": "event_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4624,
+        2480
+      ],
+      "id": "d1debf3e-6a48-4c54-b1a2-ad0b46d81a41",
+      "name": "Set Event Variable"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "badb44be-c15b-4935-adf2-0584ee59d0b9",
+              "leftValue": "={{ $('Get Event entry').item.json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        4208,
+        2496
+      ],
+      "id": "0a101a46-57f3-42d6-85e1-ed5ddbac4fb5",
+      "name": "Check Event Exist"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        3552,
+        2272
+      ],
+      "id": "52ef9e92-02f1-41ab-bb48-8b6b79843a94",
+      "name": "Loop event entries"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "classes",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "farm_id",
+              "keyValue": "={{ $('set farm variable').item.json.farm_id }}"
+            },
+            {
+              "keyName": "name",
+              "keyValue": "={{ $('Loop event entries').item.json.class_name }}"
+            },
+            {
+              "keyName": "external_class_id",
+              "keyValue": "={{ $('Loop event entries').item.json.class_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        4016,
+        2800
+      ],
+      "id": "f821b2e2-6bbf-4c27-a9c2-1901ce611106",
+      "name": "Get Class entry",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "DlSBIG5mMOIe3gqc",
+          "name": "ukanilakshit77 - Farm Management"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "badb44be-c15b-4935-adf2-0584ee59d0b9",
+              "leftValue": "={{ $('Get Class entry').item.json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        4208,
+        2800
+      ],
+      "id": "3fe68160-f055-4a5a-9db6-e497a077197d",
+      "name": "Check Class Exist"
+    },
+    {
+      "parameters": {
+        "tableId": "classes",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "farm_id",
+              "fieldValue": "={{ $('set farm variable').item.json.farm_id }}"
+            },
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $('Loop event entries').item.json.class_name }}"
+            },
+            {
+              "fieldId": "external_class_id",
+              "fieldValue": "={{ $('Loop event entries').item.json.class_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        4432,
+        2912
+      ],
+      "id": "26539081-4c47-46c3-88e7-43c0c3172ea5",
+      "name": "Create Class Entry",
+      "credentials": {
+        "supabaseApi": {
+          "id": "DlSBIG5mMOIe3gqc",
+          "name": "ukanilakshit77 - Farm Management"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3331a75d-324c-45be-92bb-df3a430efc5a",
+              "name": "class_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4624,
+        2784
+      ],
+      "id": "0f13a577-0613-44b6-a5cf-75d363b57524",
+      "name": "Set Class Variable"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "horses",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "farm_id",
+              "keyValue": "={{ $('set farm variable').item.json.farm_id }}"
+            },
+            {
+              "keyName": "name",
+              "keyValue": "={{ $('Loop event entries').item.json.horse_name }}"
+            },
+            {
+              "keyName": "back_number",
+              "keyValue": "={{ $('Loop event entries').item.json.horse_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        4016,
+        3088
+      ],
+      "id": "cad3094a-c7f9-41dd-9788-535564921f28",
+      "name": "Get Horse entry",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "DlSBIG5mMOIe3gqc",
+          "name": "ukanilakshit77 - Farm Management"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "badb44be-c15b-4935-adf2-0584ee59d0b9",
+              "leftValue": "={{ $('Get Horse entry').item.json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        4208,
+        3088
+      ],
+      "id": "36303680-f4f6-4573-aa8b-d7f3ae1ba520",
+      "name": "Check Horse Exist"
+    },
+    {
+      "parameters": {
+        "tableId": "horses",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "farm_id",
+              "fieldValue": "={{ $('set farm variable').item.json.farm_id }}"
+            },
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $('Loop event entries').item.json.horse_name }}"
+            },
+            {
+              "fieldId": "back_number",
+              "fieldValue": "={{ $('Loop event entries').item.json.horse_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        4432,
+        3200
+      ],
+      "id": "6ed53a06-78fa-40ba-9e8c-eca79e70aecd",
+      "name": "Create Horse Entry",
+      "credentials": {
+        "supabaseApi": {
+          "id": "DlSBIG5mMOIe3gqc",
+          "name": "ukanilakshit77 - Farm Management"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3331a75d-324c-45be-92bb-df3a430efc5a",
+              "name": "horse_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4624,
+        3072
+      ],
+      "id": "c51601ce-ec15-4a31-b8d4-d0cbe5cda7fd",
+      "name": "Set Horse Variable"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "riders",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "farm_id",
+              "keyValue": "={{ $('set farm variable').item.json.farm_id }}"
+            },
+            {
+              "keyName": "name",
+              "keyValue": "={{ $('Loop event entries').item.json.rider }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        4016,
+        3408
+      ],
+      "id": "3fa5361d-9c5d-4f25-a631-d80d1423a726",
+      "name": "Get Rider entry",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "DlSBIG5mMOIe3gqc",
+          "name": "ukanilakshit77 - Farm Management"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "badb44be-c15b-4935-adf2-0584ee59d0b9",
+              "leftValue": "={{ $('Get Rider entry').item.json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        4208,
+        3408
+      ],
+      "id": "66a49267-7537-4e3c-a90b-970e3114f64f",
+      "name": "Check Rider Exist"
+    },
+    {
+      "parameters": {
+        "tableId": "riders",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "farm_id",
+              "fieldValue": "={{ $('set farm variable').item.json.farm_id }}"
+            },
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $('Loop event entries').item.json.rider }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        4432,
+        3520
+      ],
+      "id": "8b1b1e1b-28c0-4570-95a9-ad1f6f1a6dc9",
+      "name": "Create Rider Entry",
+      "credentials": {
+        "supabaseApi": {
+          "id": "DlSBIG5mMOIe3gqc",
+          "name": "ukanilakshit77 - Farm Management"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3331a75d-324c-45be-92bb-df3a430efc5a",
+              "name": "rider_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4624,
+        3392
+      ],
+      "id": "3dd3763e-269e-45c9-bbb4-9af1f314d488",
+      "name": "Set Rider Variable"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "entries",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "horse_id",
+              "keyValue": "={{ $('Set Horse Variable').item.json.horse_id }}"
+            },
+            {
+              "keyName": "rider_id",
+              "keyValue": "={{ $('Set Rider Variable').item.json.rider_id }}"
+            },
+            {
+              "keyName": "show_id",
+              "keyValue": "={{ $('Set Show Variable').item.json.show_id }}"
+            },
+            {
+              "keyName": "event_id",
+              "keyValue": "={{ $('Set Event Variable').item.json.event_id }}"
+            },
+            {
+              "keyName": "class_id",
+              "keyValue": "={{ $('Set Class Variable').item.json.class_id }}"
+            },
+            {
+              "keyName": "status",
+              "keyValue": "active"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        4016,
+        3744
+      ],
+      "id": "cd687e30-9ee1-43b6-a8b7-6eb059f9dda6",
+      "name": "Get Entries Table entry",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "DlSBIG5mMOIe3gqc",
+          "name": "ukanilakshit77 - Farm Management"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "badb44be-c15b-4935-adf2-0584ee59d0b9",
+              "leftValue": "={{ $('Get Entries Table entry').item.json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        4208,
+        3744
+      ],
+      "id": "dc051275-3a8f-4071-b3f4-9f89ebe26f10",
+      "name": "Check Entries Table Exist"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3331a75d-324c-45be-92bb-df3a430efc5a",
+              "name": "entries_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4624,
+        3728
+      ],
+      "id": "9f122e14-0660-44b8-aa47-cb63faa9b9ca",
+      "name": "Set Entries Table Variable"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3331a75d-324c-45be-92bb-df3a430efc5a",
+              "name": "show_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "ef120d63-1cbf-4288-a2f5-2975efdb9c70",
+              "name": "is_show_metadata",
+              "value": "={{ $json.metadata }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2544,
+        1968
+      ],
+      "id": "c7ec3fb8-5b84-4aad-8114-358a787f87e9",
+      "name": "Set Show Variable"
+    },
+    {
+      "parameters": {
+        "tableId": "entries",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "horse_id",
+              "fieldValue": "={{ $('Set Horse Variable').item.json.horse_id }}"
+            },
+            {
+              "fieldId": "rider_id",
+              "fieldValue": "={{ $('Set Rider Variable').item.json.rider_id }}"
+            },
+            {
+              "fieldId": "show_id",
+              "fieldValue": "={{ $('Set Show Variable').item.json.show_id }}"
+            },
+            {
+              "fieldId": "event_id",
+              "fieldValue": "={{ $('Set Event Variable').item.json.event_id }}"
+            },
+            {
+              "fieldId": "class_id",
+              "fieldValue": "={{ $('Set Class Variable').item.json.class_id }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "active"
+            },
+            {
+              "fieldId": "estimated_start",
+              "fieldValue": "={{ $('Loop event entries').item.json.time }}"
+            },
+            {
+              "fieldId": "order_number",
+              "fieldValue": "={{ $('Loop event entries').item.json.order_position }}"
+            },
+            {
+              "fieldId": "order_total",
+              "fieldValue": "={{ $('Loop event entries').item.json.order_total }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        4416,
+        3872
+      ],
+      "id": "41e4b84b-ea1a-417c-9a76-7c5ad412060e",
+      "name": "Create Entries Table entry",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "DlSBIG5mMOIe3gqc",
+          "name": "ukanilakshit77 - Farm Management"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the incoming data - already schedule_entries array\nconst scheduleEntries = $('Proper Extract Data').first().json.schedule_entries;\nconst flattened = [];\n\n// Loop over each ring object\nfor (const ringData of scheduleEntries) {\n  const ringName = ringData.ring;\n  \n  // Inner loop: iterate over entries within that ring\n  for (const entry of ringData.entries) {\n    flattened.push({\n      json: {\n        ring: ringName,\n        ...entry\n      }\n    });\n  }\n}\n\nreturn flattened;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3328,
+        2272
+      ],
+      "id": "c144f7bc-282b-4239-9594-da0e8de3f9b2",
+      "name": "Flatten Schedule entries"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "21cc40ca-0bb5-492b-a0e6-e4f1a57d0d36",
+              "name": "inactive_horse",
+              "value": "={{ $('Proper Extract Data').item.json.inactive_horse }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4112,
+        2256
+      ],
+      "id": "18bea7d0-0aa5-4410-885f-20e1a6a9f787",
+      "name": "Inactive Horse variable"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        3888,
+        2256
+      ],
+      "id": "b68a489c-48c7-44fd-98bb-fa210df00fae",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "inactive_horse",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        4320,
+        2256
+      ],
+      "id": "8707212b-4f83-491f-93aa-387eaf6167ee",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        4528,
+        2256
+      ],
+      "id": "941207a9-5d6b-4391-b709-571927b639c5",
+      "name": "Loop inactive hourse"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "badb44be-c15b-4935-adf2-0584ee59d0b9",
+              "leftValue": "={{ $('Get Horse entry 1').item.json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        5040,
+        2272
+      ],
+      "id": "d7eb41f6-97bb-4901-be31-e1d7faedfbef",
+      "name": "Check Horse Exist1"
+    },
+    {
+      "parameters": {
+        "tableId": "horses",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "farm_id",
+              "fieldValue": "={{ $('set farm variable').item.json.farm_id }}"
+            },
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $('Loop inactive hourse').item.json.name }}"
+            },
+            {
+              "fieldId": "back_number",
+              "fieldValue": "={{ $('Loop inactive hourse').item.json.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        5264,
+        2384
+      ],
+      "id": "6eaac6f8-0527-4c98-b3ad-9a815f978f2d",
+      "name": "Create Horse Entry1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "DlSBIG5mMOIe3gqc",
+          "name": "ukanilakshit77 - Farm Management"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3331a75d-324c-45be-92bb-df3a430efc5a",
+              "name": "horse_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        5456,
+        2256
+      ],
+      "id": "9b6124d1-1d2a-4634-a4ea-f785bd80ad12",
+      "name": "Set Horse Variable1"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "horses",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "farm_id",
+              "keyValue": "={{ $('set farm variable').item.json.farm_id }}"
+            },
+            {
+              "keyName": "name",
+              "keyValue": "={{ $('Loop inactive hourse').item.json.name }}"
+            },
+            {
+              "keyName": "back_number",
+              "keyValue": "={{ $('Loop inactive hourse').item.json.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        4848,
+        2272
+      ],
+      "id": "25460feb-70db-43f8-b55b-5e36997faf12",
+      "name": "Get Horse entry 1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "DlSBIG5mMOIe3gqc",
+          "name": "ukanilakshit77 - Farm Management"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "entries",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "horse_id",
+              "keyValue": "={{ $('Set Horse Variable1').item.json.horse_id }}"
+            },
+            {
+              "keyName": "show_id",
+              "keyValue": "={{ $('Set Show Variable').item.json.show_id }}"
+            },
+            {
+              "keyName": "status",
+              "keyValue": "inactive"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        5728,
+        2256
+      ],
+      "id": "4125852e-957f-4d26-8037-df14a42fb32c",
+      "name": "Get Entries Table entry1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "DlSBIG5mMOIe3gqc",
+          "name": "ukanilakshit77 - Farm Management"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "badb44be-c15b-4935-adf2-0584ee59d0b9",
+              "leftValue": "={{ $('Get Entries Table entry1').item.json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        5920,
+        2256
+      ],
+      "id": "e8d7a1d8-bffe-4f46-9862-862b5a541adb",
+      "name": "Check Entries Table Exist1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3331a75d-324c-45be-92bb-df3a430efc5a",
+              "name": "entries_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        6336,
+        2240
+      ],
+      "id": "427f1dd1-a8e1-436a-b8a4-1ada3e456cc4",
+      "name": "Set Entries Table Variable1"
+    },
+    {
+      "parameters": {
+        "tableId": "entries",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "horse_id",
+              "fieldValue": "={{ $('Set Horse Variable1').item.json.horse_id }}"
+            },
+            {
+              "fieldId": "show_id",
+              "fieldValue": "={{ $('Set Show Variable').item.json.show_id }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "inactive"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        6128,
+        2384
+      ],
+      "id": "097bdf7b-c4b1-4345-8e80-2dc048155ca5",
+      "name": "Create Entries Table entry1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "DlSBIG5mMOIe3gqc",
+          "name": "ukanilakshit77 - Farm Management"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        4848,
+        2112
+      ],
+      "id": "c4948878-8d30-4e5d-9abf-e1bef4edf4da",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "content": "#### Work to do in Gmail Extraction (Completed)\n- For same email store the extraction somewhere and reuse it \n- Error handling, if workflow fail\n  - Then run the schedule and run the workflow again till the workflow pass\n  \n#### To be Done\n- Create dashboard \n  - Show log\n  - Show horse entry according to show ",
+        "height": 240,
+        "width": 592
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1472,
+        1360
+      ],
+      "id": "a64b4e7a-96b2-4b04-ae74-7582a567f490",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const cheerio = require('cheerio');\n\nconst html = $input.first().json.email_body;\nconst $ = cheerio.load(html);\n\nconst bodyText = $('body').text();\n\n// Extract Show Date\nconst showDateMatch = bodyText.match(/schedule for[^\\d]*(\\d{2}\\/\\d{2}\\/\\d{4})/i);\nconst showDate = showDateMatch ? showDateMatch[1] : '';\n\n// Convert to YYYY-MM-DD format for Supabase\nconst [month, day, year] = showDate.split('/');\nconst formattedDate = `${year}-${month}-${day}`;\n\nreturn [{\n  json: {\n    show_date: formattedDate\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        1696
+      ],
+      "id": "9fd20adc-6e99-4613-95a9-bd7584528210",
+      "name": "Extract Show Date From HTML Mail "
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "shows",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Set Show Variable').item.json.show_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "metadata",
+              "fieldValue": "={{ $json.output[0].content[0] }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3312,
+        1968
+      ],
+      "id": "92404f86-540e-43d7-8ecf-b916c8408696",
+      "name": "Update a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "DlSBIG5mMOIe3gqc",
+          "name": "ukanilakshit77 - Farm Management"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b53df457-644a-4791-b946-14c2cce5057c",
+              "leftValue": "={{ $json.is_show_metadata }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2736,
+        1968
+      ],
+      "id": "da39fd53-831d-4e8e-9f7c-7240b3b3df66",
+      "name": "Does Metadata exist?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e1e8c2a5-ac82-4a5b-b193-b862af86c9a2",
+              "name": "show_date",
+              "value": "={{ $json.show_date }}",
+              "type": "string"
+            },
+            {
+              "id": "8cdc5210-d16f-4742-9ff5-9e0cc725c93f",
+              "name": "schedule_entries",
+              "value": "={{ $json.schedule_entries }}",
+              "type": "array"
+            },
+            {
+              "id": "4a50a2d1-e619-4e8b-8433-909e61ee2bf6",
+              "name": "inactive_horse",
+              "value": "={{ $json.inactive_horse }}",
+              "type": "array"
+            },
+            {
+              "id": "6ca031d9-8271-4311-b3cc-97de833a4e67",
+              "name": "total_active_entries",
+              "value": "={{ $json.total_active_entries }}",
+              "type": "number"
+            },
+            {
+              "id": "f3a3dd8a-f22b-4a33-a808-99bca75ca47d",
+              "name": "total_inactive_horses",
+              "value": "={{ $json.total_inactive_horses }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3104,
+        2272
+      ],
+      "id": "5a9db0b5-b467-4acf-9719-b0665564f159",
+      "name": "Proper Extract Data"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e1e8c2a5-ac82-4a5b-b193-b862af86c9a2",
+              "name": "show_date",
+              "value": "={{ $('Set Show Variable').item.json.is_show_metadata.text.show_date }}",
+              "type": "string"
+            },
+            {
+              "id": "8cdc5210-d16f-4742-9ff5-9e0cc725c93f",
+              "name": "schedule_entries",
+              "value": "={{ $('Set Show Variable').item.json.is_show_metadata.text.schedule }}",
+              "type": "array"
+            },
+            {
+              "id": "4a50a2d1-e619-4e8b-8433-909e61ee2bf6",
+              "name": "inactive_horse",
+              "value": "={{ $('Set Show Variable').item.json.is_show_metadata.text.inactive_horses }}",
+              "type": "array"
+            },
+            {
+              "id": "6ca031d9-8271-4311-b3cc-97de833a4e67",
+              "name": "total_active_entries",
+              "value": "={{ $('Set Show Variable').item.json.is_show_metadata.text.total_active_entries }}",
+              "type": "number"
+            },
+            {
+              "id": "f3a3dd8a-f22b-4a33-a808-99bca75ca47d",
+              "name": "total_inactive_horses",
+              "value": "={{ $('Set Show Variable').item.json.is_show_metadata.text.total_inactive_horses }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2912,
+        2384
+      ],
+      "id": "932b15d6-ca53-4f18-bb64-1d4a5be99671",
+      "name": "Data From Metadata Show Table"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        5056,
+        2112
+      ],
+      "id": "b408a6d6-bc28-4e2d-927a-063d8f57ee88",
+      "name": "Limit1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "shows",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Set Show Variable').item.json.show_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "is_extraction_complete",
+              "fieldValue": "true"
+            },
+            {
+              "fieldId": "updated_at",
+              "fieldValue": "={{ $now }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        5280,
+        2112
+      ],
+      "id": "27bd2dc8-4e71-4d92-84bc-25460fb5f60c",
+      "name": "Mark Show Data Extraction Complete",
+      "credentials": {
+        "supabaseApi": {
+          "id": "DlSBIG5mMOIe3gqc",
+          "name": "ukanilakshit77 - Farm Management"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "db60adec-b3d2-47e6-87c0-2a6f3e8a86de",
+              "name": "show_date",
+              "value": "={{ $json.show_date }}",
+              "type": "string"
+            },
+            {
+              "id": "575a31a3-de5f-4fd4-87ef-086e77682a2e",
+              "name": "farm_name",
+              "value": "Niket Client Farm",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1664,
+        1840
+      ],
+      "id": "fee6db45-38bd-40fa-afbe-6c26e174f32f",
+      "name": "Main Variable"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "cb2ff2cf-6c4f-42a7-a54a-2c1fecc30176",
+              "leftValue": "={{ $json.is_extraction_complete }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        1360,
+        2016
+      ],
+      "id": "84741cc1-a0f4-4aed-92d2-dab58d17af49",
+      "name": "Is Extraction Not Completed"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "*/10 7-10 * * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        944,
+        2016
+      ],
+      "id": "c713840b-4263-4007-bb61-9692d42610eb",
+      "name": "Every 10 min from 7:00 AM to 10:50 AM"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT TO_CHAR(date, 'YYYY-MM-DD') as show_date, is_extraction_complete\n  FROM shows \n  ORDER BY \n  created_at DESC LIMIT 1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1152,
+        2016
+      ],
+      "id": "22bf2c55-c5c4-4dc5-9ab6-cca1a70e4b24",
+      "name": "Get Latest Show entry",
+      "credentials": {
+        "postgres": {
+          "id": "U41quTJpfw9an1uL",
+          "name": "ukanilakshit77 - Farm Management"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Varaible",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Varaible": {
+      "main": [
+        [
+          {
+            "node": "Extract Show Date From HTML Mail ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Horse Information": {
+      "main": [
+        [
+          {
+            "node": "Update a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Proper Extract Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Show": {
+      "main": [
+        [
+          {
+            "node": "Set Show Variable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Show Entry": {
+      "main": [
+        [
+          {
+            "node": "Check if show exist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if show exist": {
+      "main": [
+        [
+          {
+            "node": "Set Show Variable",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Show",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Farm": {
+      "main": [
+        [
+          {
+            "node": "set farm variable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Farm Entry": {
+      "main": [
+        [
+          {
+            "node": "Check if farm exist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if farm exist": {
+      "main": [
+        [
+          {
+            "node": "set farm variable",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Farm",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set farm variable": {
+      "main": [
+        [
+          {
+            "node": "Get Show Entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Event entry": {
+      "main": [
+        [
+          {
+            "node": "Check Event Exist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Event Entry": {
+      "main": [
+        [
+          {
+            "node": "Set Event Variable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Event Variable": {
+      "main": [
+        [
+          {
+            "node": "Get Class entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Event Exist": {
+      "main": [
+        [
+          {
+            "node": "Set Event Variable",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Event Entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop event entries": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Event entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Class entry": {
+      "main": [
+        [
+          {
+            "node": "Check Class Exist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Class Exist": {
+      "main": [
+        [
+          {
+            "node": "Set Class Variable",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Class Entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Class Entry": {
+      "main": [
+        [
+          {
+            "node": "Set Class Variable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Class Variable": {
+      "main": [
+        [
+          {
+            "node": "Get Horse entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Horse entry": {
+      "main": [
+        [
+          {
+            "node": "Check Horse Exist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Horse Exist": {
+      "main": [
+        [
+          {
+            "node": "Set Horse Variable",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Horse Entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Horse Entry": {
+      "main": [
+        [
+          {
+            "node": "Set Horse Variable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Horse Variable": {
+      "main": [
+        [
+          {
+            "node": "Get Rider entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Rider entry": {
+      "main": [
+        [
+          {
+            "node": "Check Rider Exist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Rider Exist": {
+      "main": [
+        [
+          {
+            "node": "Set Rider Variable",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Rider Entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Rider Entry": {
+      "main": [
+        [
+          {
+            "node": "Set Rider Variable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Rider Variable": {
+      "main": [
+        [
+          {
+            "node": "Get Entries Table entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Entries Table entry": {
+      "main": [
+        [
+          {
+            "node": "Check Entries Table Exist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Entries Table Exist": {
+      "main": [
+        [
+          {
+            "node": "Set Entries Table Variable",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Entries Table entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Entries Table Variable": {
+      "main": [
+        [
+          {
+            "node": "Loop event entries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Show Variable": {
+      "main": [
+        [
+          {
+            "node": "Does Metadata exist?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Entries Table entry": {
+      "main": [
+        [
+          {
+            "node": "Set Entries Table Variable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Flatten Schedule entries": {
+      "main": [
+        [
+          {
+            "node": "Loop event entries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inactive Horse variable": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Inactive Horse variable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop inactive hourse",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop inactive hourse": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Horse entry 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Horse Exist1": {
+      "main": [
+        [
+          {
+            "node": "Set Horse Variable1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Horse Entry1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Horse Entry1": {
+      "main": [
+        [
+          {
+            "node": "Set Horse Variable1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Horse Variable1": {
+      "main": [
+        [
+          {
+            "node": "Get Entries Table entry1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Horse entry 1": {
+      "main": [
+        [
+          {
+            "node": "Check Horse Exist1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Entries Table entry1": {
+      "main": [
+        [
+          {
+            "node": "Check Entries Table Exist1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Entries Table Exist1": {
+      "main": [
+        [
+          {
+            "node": "Set Entries Table Variable1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Entries Table entry1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Entries Table Variable1": {
+      "main": [
+        [
+          {
+            "node": "Loop inactive hourse",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Entries Table entry1": {
+      "main": [
+        [
+          {
+            "node": "Set Entries Table Variable1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No Operation, do nothing": {
+      "main": [
+        [
+          {
+            "node": "Limit1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Show Date From HTML Mail ": {
+      "main": [
+        [
+          {
+            "node": "Main Variable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a row": {
+      "main": [
+        [
+          {
+            "node": "Extract from OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Does Metadata exist?": {
+      "main": [
+        [
+          {
+            "node": "Extract Horse Information",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Data From Metadata Show Table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Proper Extract Data": {
+      "main": [
+        [
+          {
+            "node": "Flatten Schedule entries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data From Metadata Show Table": {
+      "main": [
+        [
+          {
+            "node": "Proper Extract Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit1": {
+      "main": [
+        [
+          {
+            "node": "Mark Show Data Extraction Complete",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Main Variable": {
+      "main": [
+        [
+          {
+            "node": "Get Farm Entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Extraction Not Completed": {
+      "main": [
+        [
+          {
+            "node": "Main Variable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Every 10 min from 7:00 AM to 10:50 AM": {
+      "main": [
+        [
+          {
+            "node": "Get Latest Show entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Latest Show entry": {
+      "main": [
+        [
+          {
+            "node": "Is Extraction Not Completed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Gmail Trigger": [
+      {
+        "json": {
+          "id": "19c2e32f04ae2376",
+          "threadId": "19c2e32f04ae2376",
+          "labelIds": [
+            "UNREAD",
+            "CATEGORY_PERSONAL",
+            "INBOX"
+          ],
+          "sizeEstimate": 26358,
+          "headers": {
+            "delivered-to": "Delivered-To: ukanilakshit77@gmail.com",
+            "received": "Received: from mail-sor-f41.google.com (mail-sor-f41.google.com. [209.85.220.41])\r\n        by mx.google.com with SMTPS id a640c23a62f3a-b8e9fcfab42sor132852766b.3.2026.02.05.06.26.56\r\n        for <ukanilakshit77@gmail.com>\r\n        (Google Transport Security);\r\n        Thu, 05 Feb 2026 06:26:56 -0800 (PST)",
+            "x-received": "X-Received: by 2002:a17:907:84d:b0:b87:322d:a8bd with SMTP id\r\n a640c23a62f3a-b8e9f078e99mr485172366b.24.1770301615160; Thu, 05 Feb 2026\r\n 06:26:55 -0800 (PST)",
+            "arc-seal": "ARC-Seal: i=1; a=rsa-sha256; t=1770301615; cv=none;\r\n        d=google.com; s=arc-20240605;\r\n        b=Ns8fSu/ZdjwxvpU2rWpnFyE0BNehCUTaUaZmHat/wIXoTSSbjEwNXMs/ZPsHudbDnJ\r\n         /QIyZOViiFKrxKKKZMJNsk/4qQ4Mrnl1gG9O61CwwWmhj8Fqz47PEzZq4dXPbj04Kj4F\r\n         W/rxzSG0o5WHccVFsM86paef4X2V08X3AF5UddMguwRiq+DiZ5GBJLGYixohNog+yRz7\r\n         hOwHRT2mtI0bky3Dhe7bGtoM9hg8VzJpt2sthKrDhDhehsbFOLUYricOPBtLwEBJHfxF\r\n         WzF77Z2c8wpSdttdpRFWOKwClu3TrBqT2wdriY/aezantZ9ptR6l9RSS0IGoVsot6c8Q\r\n         H8wg==",
+            "arc-message-signature": "ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;\r\n        h=to:subject:message-id:date:from:in-reply-to:references:mime-version\r\n         :dkim-signature;\r\n        bh=0e7PYoekT0Fxd2Fth9Eoxth5YWF6Z2y3NxIEHlwDtHo=;\r\n        fh=dOiuy0ZEzDl89CqFgSorAi9dEZGgwRu1s1woPTMTKdg=;\r\n        b=YqZeWJbDphMnFKzagHjkPuF8e74ZB8z1iJ89jTa4qsyPymM/VTU1zqyOeLfTZvtekI\r\n         qGCEPPyeOo8Nuv7YIgXANK9d2yp6O3TmulMLXs0rLuULZuDx6NkS4i9LGMW7SGOdkW/v\r\n         zthntOM8JRQjcoGUlLjpAnOZriQnVHs2cDRA9caZUoLYZGg26lUkhuPxWeoAHdKyuOa7\r\n         y3lHb9wqVAPbtPIXLS2GVdF4lRX0AmaMxIDU0mCw3Ljs8UBQpGiSGbdss4oyfjv3b/bq\r\n         TurZyJ+jPpUbMI48bqn0mg16njbLIXxJBtdi9wcDNGg+5jAc8ufeEHl+X5ARDwenoRpM\r\n         Z7tg==;\r\n        dara=google.com",
+            "arc-authentication-results": "ARC-Authentication-Results: i=1; mx.google.com; arc=none",
+            "return-path": "Return-Path: <lakshitukani77@gmail.com>",
+            "received-spf": "Received-SPF: pass (google.com: domain of lakshitukani77@gmail.com designates 209.85.220.41 as permitted sender) client-ip=209.85.220.41;",
+            "authentication-results": "Authentication-Results: mx.google.com;\r\n       dkim=pass header.i=@gmail.com header.s=20230601 header.b=Rv6LIdxC;\r\n       arc=pass (i=1);\r\n       spf=pass (google.com: domain of lakshitukani77@gmail.com designates 209.85.220.41 as permitted sender) smtp.mailfrom=lakshitukani77@gmail.com;\r\n       dmarc=pass (p=NONE sp=QUARANTINE dis=NONE) header.from=gmail.com;\r\n       dara=pass header.i=@gmail.com",
+            "dkim-signature": "DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=gmail.com; s=20230601; t=1770301615; x=1770906415; dara=google.com;\r\n        h=to:subject:message-id:date:from:in-reply-to:references:mime-version\r\n         :from:to:cc:subject:date:message-id:reply-to;\r\n        bh=0e7PYoekT0Fxd2Fth9Eoxth5YWF6Z2y3NxIEHlwDtHo=;\r\n        b=Rv6LIdxCD3kxaauKC2S+7cBNdnvtAfS5R2fMuyxv+NzH+05zOKLeJV2J9dI9S9sTYF\r\n         kLeUJD6IGbGrqWdEZLz+fEyGrSEDaOJ5E9TlabEPGmwQMzaOM7DxHnsR8OBI+ewgwmUf\r\n         Cr0SENn5cMlDACM1K3hhQ9Bb2kvsXOnR/bY1YPaMzWLWwgLJRbkcn0iMNB1Ih9+ehVsX\r\n         gTjtoH0z5aV0PnkobDBpM5dsr+ykY0WsmSUXYSuCWPraPJxOr3mwnaCZHAHbFZaE5SF3\r\n         DwTN8bnYpyzsWUGrMhrlsPDyCyFqNSLHD449IA0QlHdLncwDZQyTSgkLGaLFtXYF/Nsj\r\n         80nw==",
+            "x-google-dkim-signature": "X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=1e100.net; s=20230601; t=1770301615; x=1770906415;\r\n        h=to:subject:message-id:date:from:in-reply-to:references:mime-version\r\n         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id\r\n         :reply-to;\r\n        bh=0e7PYoekT0Fxd2Fth9Eoxth5YWF6Z2y3NxIEHlwDtHo=;\r\n        b=gfTIfOA8DSOQALpho1JhP8v/7gCQq9rucJA+qmVEd+5YdfU1QybK1fjYu2875QziiE\r\n         wGN+5ctKPXWe3aw5ZfLJjrzmJjm4NEkyoTqV8HyoIXO9FW0weRlXnn3QAfE9rkbQI5fD\r\n         wdiA21UdbPQDbEEJHM6jCOHH0zbmuUv1sCBzjO8HXVqSTUYy8DKztWKAEiQ7Ednq9+Lg\r\n         yFGhfhfv0AJdzX1SQ/xz2ADSx96nmbtHl+YDni2FQQcgQJ4Mpd+uFekkg1IrRb5FTVaF\r\n         RU1ne3T8J+DuEoEWwOs/672pXuDIJiSQJfIH6NK21kpwdQDLCAiPw1AXt2hZypGj1vbc\r\n         +9mg==",
+            "x-gm-message-state": "X-Gm-Message-State: AOJu0YwVnpFP+GeFz0jaxSsMSBWorREkVn7v19Cp8IYbJ2ATnl3C6EBQ\r\n\tzD/lKvRSfqDW5tgU9gADYAtxaFhjTpE4BwGkIJzMX1z7hXD9vOsOjiOVnVjbDgxawdiclARPkYs\r\n\tnzh5Xzis9Zw2b2uqA3YG/IFl/c4M0oHUS5Q==",
+            "x-gm-gg": "X-Gm-Gg: AZuq6aKxcIV5YThB3z4DDRpMwbjO8XsT76HKeDnBfd+XIwRjbxCfFzuck1377QqAxBt\r\n\tq9jsQdVir8fizTZhb6WRmJqFep9wqCGuwzbZ9/WWVJizcAUb7Z+EcM36pvAbwk4Fv8VoY8UKrjX\r\n\tPZHUanX6htGPyhWNhuMynXWfdgDzCy5UAG7yUx+LnonyhiNRoYCSg5xGR5hy9WGhBvsmTd8Wt1a\r\n\t84XN21y+n5cotCbmlVze+fCswNuAnRYzFBy5bQ1OVzQGF7wpFawQ+nIfZH95z3kI/ZAoX+CEA==",
+            "mime-version": "MIME-Version: 1.0",
+            "references": "References: <yF2W36vKQtKnWYLwTsdtnA@geopod-ismtpd-62> <FC89EB14-9A2E-4279-BE89-77B8D2377E59@gmail.com>\r\n <CAH+FX6CSuS4tBp=UuLQW8j6GscYyE+QycdU0SbhoQ58+E+CNAA@mail.gmail.com>",
+            "in-reply-to": "In-Reply-To: <CAH+FX6CSuS4tBp=UuLQW8j6GscYyE+QycdU0SbhoQ58+E+CNAA@mail.gmail.com>",
+            "from": "From: lakshit ukani <lakshitukani77@gmail.com>",
+            "date": "Date: Thu, 5 Feb 2026 19:56:42 +0530",
+            "x-gm-features": "X-Gm-Features: AZwV_Qh7KmcwoM4IGaV_F3fLU1uSLQsNEl4UpBNLdPLdSlO6c9uiGxL5SIqvUDE",
+            "message-id": "Message-ID: <CAEvJBwum0_2S=F02mgKaBr3BpveK16=TJKuVGEAeR_exqy9gYQ@mail.gmail.com>",
+            "subject": "Subject: Fwd: ShowGroundsMail - Schedule for 02/04/2026",
+            "to": "To: ukanilakshit77@gmail.com",
+            "content-type": "Content-Type: multipart/alternative; boundary=\"000000000000eac156064a1476c9\""
+          },
+          "html": "<div dir=\"ltr\"><br><div class=\"gmail_quote gmail_quote_container\"><div dir=\"ltr\"><div class=\"gmail_quote\"><div style=\"line-break:after-white-space\"><div><br><blockquote type=\"cite\"><br><div> <div style=\"display:inline-block;clear:both;width:100%\"><table cellspacing=\"0\" style=\"width:100%\">\n\t<tbody>\n\t\t<tr>\n\t\t\t<td style=\"background-color:rgb(153,153,153)\"> </td>\n\t\t\t<td style=\"width:500px;background-color:rgb(153,153,153)\"> </td>\n\t\t\t<td style=\"background-color:rgb(153,153,153);text-align:right\"><a href=\"http://url2174.showgroundslive.com/ls/click?upn=u001.DdB1oJwTEmMIQf7Mzr6ZZPMXnMyZPBIwqtr7kmOpF-2FcjoWKfWDxNpnOe-2FKFCORmGPqDb_MlZp2qmha5zi7UB4q84KFWG17I3E0yTMgVTdrjD-2FD9dHbs57iajyU2eeC4TGFQbifLK4xXinj25GMwmgzpxXf5-2BF0hI7lpwH2WOG-2FsT5yX8gAB8URCvUHD-2BqIDCKo1WLFhBKWYD-2BUHVqQ29r9WT80-2FHoPYybrl11CwqcumrhACT2ut-2F-2B2m6SfIW-2F3u-2BLlZgvHxGcCjLZOTudiQmqW-2FwOZB-2BcWu9fN9Tv6tnBlpMeNcWR-2Fpu0hdlOzzGMMHc6-2FM4OgmWOdEjFECyxOdPZnsgA5g-3D-3D\" style=\"margin:0px;padding:0px;color:rgb(43,166,203)\" target=\"_blank\"><img alt=\"Tranparet_logo-original\" src=\"http://assets.postageapp.com/000/001/680/Tranparet_Logo-original.png\" style=\"margin:0px;padding:0px;max-width:100%;float:right;border-width:0px;border-style:solid;width:150px;height:63px\"></a></td>\n\t\t</tr>\n\t</tbody>\n</table>\n</div> <div id=\"m_5458317201053869539m_2895669816953922524emailbody\"><p>Dear EMILY SMITH,</p><p>Welcome to ShowGrounds email alerts. As of 02/03/2026 8:00 PM, these are your classes and schedule for the show day 02/04/2026. Please note that all times are estimates only. It is your responsibility to be present at the ring for your classes.</p><p><strong>E.R. Mische Grand Hunter</strong></p><table border=\"1\" cellpadding=\"3\" cellspacing=\"0\" style=\"width:100%\"><tbody><tr bgcolor=\"#B6CADB\"><td>Class Time</td><td>Horse</td><td>Rider</td><td>Class Name</td><td>Order</td></tr><tr bgcolor=\"#FFFFCC\"><td>12:45 PM</td><td>1119 - CHECKPOINT</td><td>CHRISTINE KEAR</td><td>2012 -  $630 Performance Hunter 3&#39;6&quot;</td><td>33 of 66</td></tr><tr bgcolor=\"#FFFFFF\"><td>12:45 PM</td><td>1119 - CHECKPOINT</td><td>OWEN GAJOCH</td><td>2013 -  $750 Performance Hunter 3&#39;6&quot; Handy</td><td>34 of 66</td></tr></tbody></table><p><strong>Mogavero</strong></p><table border=\"1\" cellpadding=\"3\" cellspacing=\"0\" style=\"width:100%\"><tbody><tr bgcolor=\"#B6CADB\"><td>Class Time</td><td>Horse</td><td>Rider</td><td>Class Name</td><td>Order</td></tr><tr bgcolor=\"#FFFFCC\"><td>9:15 AM</td><td>6064 - DIARON&#39;S PITSCHER RP</td><td>RICHARD VOGEL</td><td>1009 -  $2,000 1.30m Open Jumper II2d</td><td>18 of 90</td></tr></tbody></table><p><strong>Ring 6</strong></p><table border=\"1\" cellpadding=\"3\" cellspacing=\"0\" style=\"width:100%\"><tbody><tr bgcolor=\"#B6CADB\"><td>Class Time</td><td>Horse</td><td>Rider</td><td>Class Name</td><td>Order</td></tr><tr bgcolor=\"#FFFFCC\"><td>10:50 AM</td><td>1131 - ECBALLIUM DE MARS</td><td>HUGH TURNER</td><td>1104 -  1.0m Training Jumper (Table II)</td><td>42 of 69</td></tr></tbody></table><p><strong>Inactive Horses for 02/04/2026</strong></p><p id=\"m_5458317201053869539m_2895669816953922524inactive_horses\">1100 - EFENDI<br>1101 - CLASS ACT<br>1102 - MONTVERDI<br>1103 - CLIP DE LA HAYE Z<br>1104 - PIPPA BLUE<br>1105 - OSTWIND 59<br>1106 - AMAZING<br>1107 - MONTENDRO 5<br>1108 - CAYMAN<br>1109 - CARINO B<br>1110 - VIETTI<br>1112 - NO SECRET<br>1113 - KINGDOM Z<br>1114 - CHAGOLANDO PS<br>1115 - CURANDERO<br>1116 - STAKATO CORNET<br>1117 - SABRE<br>1118 - GRISBY DE POILLEY<br>1120 - ALL STAR<br>1121 - CORALLO<br>1122 - OUTER BANKS<br>1123 - POKER FACE VAN &#39;T HAGENHOF<br>1124 - ONATELLA V.D VINKHOEVE<br>1125 - MONTALCINO<br>1126 - CHRIS CRAFT<br>1127 - DEVISE DU SALBEY<br>1128 - CLIC ES PATRONS<br>1130 - GEORGINA W<br>1132 - COLTRANE<br>1133 - JACK SPARROWS<br>1134 - INTO THE BLUE<br>1135 - QWANTREAU<br>1136 - EROS VAN DE SCHRALE HAMME Z<br>1137 - KICK OFF<br>1138 - CALL ME CASSY<br>1139 - KINTARO VDL<br>1140 - ALMA DE CAL SALOM<br>1141 - CHAKI Z<br>1142 - CHINO<br>1143 - KS DIPLOMAT<br>1146 - ALL TOO WELL<br>1147 - FIRST IMPRESSION<br>1148 - DIAZETTA<br>1150 - CLEVELAND Z<br>1151 - PETRUSKA VD DONKHOEVE<br>1152 - PST DE MUZE<br>1153 - DOLORES BH<br>1154 - JAZZY D<br>1165 - CHOCO M<br>1166 - KENDRICK<br>1167 - REDDINGTON<br>1169 - GAGARIN<br>1971 - MASERATI<br></p><p>If you have questions regarding your schedule please contact the show office. Thank you for using ShowGroundsLive and have a great day at the show.</p><p>Thanks,<br>\nThe ShowGroundsLive Team</p><p>If you wish to not receive shows schedule, please click <a href=\"http://url2174.showgroundslive.com/ls/click?upn=u001.DdB1oJwTEmMIQf7Mzr6ZZJxXLE9Mi9ZANMxILRRCNkzdGsSBvdkN02UM4ovK5jaGp2rttGn9kZbKXhXlnbBuZZZ02TnhB4lzThJ3zxnNevghBsRg89S3W9bc9qpECfnFWE77R-2BsZFiWNWndk7Wl-2FWoW0YOKMyOLeRw763GfLpVI-3DEqYl_MlZp2qmha5zi7UB4q84KFWG17I3E0yTMgVTdrjD-2FD9dHbs57iajyU2eeC4TGFQbifLK4xXinj25GMwmgzpxXf5-2BF0hI7lpwH2WOG-2FsT5yX8gAB8URCvUHD-2BqIDCKo1WL8Qh4v4wKOczQTlIeegDKrv7nMil1sEn0-2BKzNcqSMXlLszWypV5ZjBdOce2ajmSwQ4OP77Ig314P7UBKZ8U97LA3wKe7DMQmaBMvLq1-2BGMT2-2Bze0KTLeqZgyeVEiHBwk-2BpqYa0fkOOXgZzqk-2FIWbbmQ-3D-3D\" target=\"_blank\"> here</a></p>\n</div>\n <table style=\"margin:0px;padding:0px;font-family:&#39;Helvetica Neue&#39;,Helvetica,Helvetica,Arial,sans-serif;width:100%\"> <tbody style=\"margin:0px;padding:0px\"> <tr style=\"margin:0px;padding:0px\"> <td style=\"margin:0px;padding:0px\"> </td> <td bgcolor=\"#FFFFFF\" style=\"margin:0px auto!important;padding:0px;display:block!important;max-width:600px!important;clear:both!important\"> <div style=\"margin:0px auto;padding:15px;max-width:600px\">  <table style=\"margin:0px;padding:0px;width:600px\"> <tbody style=\"margin:0px;padding:0px\"> <tr style=\"margin:0px;padding:0px\"> <td style=\"margin:0px;padding:0px\"> <div style=\"margin:0px;padding:0px\"><br style=\"margin:5px;padding:5px\"> <a href=\"http://url2174.showgroundslive.com/ls/click?upn=u001.zMQh0ZhWc-2F8JxNtR1nwlVSaylp1ttDguuJFLgqI3ZjETXX5-2FCRoiAYsYt7TX4yHqQUGh47fTo9a1vGGrS9kAM9yz5f0O37moYnYIIvHqT34-3DZWyW_MlZp2qmha5zi7UB4q84KFWG17I3E0yTMgVTdrjD-2FD9dHbs57iajyU2eeC4TGFQbifLK4xXinj25GMwmgzpxXf5-2BF0hI7lpwH2WOG-2FsT5yX8gAB8URCvUHD-2BqIDCKo1WLbLSw01FZMvIi0VwPOjhiY2OHDu-2B76ytx-2BQGAc0NxArCKIVMrRDCnTuyiHxD63cIENgMA-2FRKJlzxpZMFv2JgTTqXLRLxvU4B6rtfvAoL3-2FzO7inXGC3UrFQp-2Fck-2BZ-2BvIC2n9xLJD7okUERSDzSIsSaQ-3D-3D\" target=\"_blank\"><img alt=\"Download_on_the_app_store_badge_us-uk_135x40-original\" src=\"http://assets.postageapp.com/000/001/681/Download_on_the_App_Store_Badge_US-UK_135x40-original.png\"> </a> Don&#39;t have the ShowGrounds App? Click the Link to get it now. <table style=\"margin:0px;padding:0px;background-color:rgb(235,235,235);width:596px\" width=\"100%\"> <tbody style=\"margin:0px;padding:0px\"> <tr style=\"margin:0px;padding:0px\"> <td style=\"margin:0px;padding:0px\"> <table align=\"left\" style=\"margin:0px;padding:0px;width:280px;float:left;min-width:279px\"> <tbody style=\"margin:0px;padding:0px\"> <tr style=\"margin:0px;padding:0px\"> <td style=\"margin:0px;padding:15px\"> <h5 style=\"margin:0px 0px 15px;padding:0px;font-family:HelveticaNeue-Light,&#39;Helvetica Neue Light&#39;,&#39;Helvetica Neue&#39;,Helvetica,Arial,&#39;Lucida Grande&#39;,sans-serif;line-height:1.1;font-size:17px\">Connect with Us:</h5><p style=\"margin:0px 0px 10px;padding:0px;font-size:14px;line-height:1.6\"><a href=\"http://url2174.showgroundslive.com/ls/click?upn=u001.DdB1oJwTEmMIQf7Mzr6ZZLeVv7mOpsuUeip-2FhP46Axl98pHbEQO8HuXWkLtr-2FcCyE5Nu-2FxQ-2F4EeL8aKAH6WPIg-3D-3DcuyE_MlZp2qmha5zi7UB4q84KFWG17I3E0yTMgVTdrjD-2FD9dHbs57iajyU2eeC4TGFQbifLK4xXinj25GMwmgzpxXf5-2BF0hI7lpwH2WOG-2FsT5yX8gAB8URCvUHD-2BqIDCKo1WLf1iUX-2BFK9suDWSMHiIHaWdUPfUBNSMPCw-2BJSBcsihEsZsSlfgpehgDky4d89x4QqNfAi5eaJ9XvpbPVYA7wUbj4ZrDNStPk0F-2BAAWJlBmk1iXOQ7kcwhqzE7yT4Fa-2BgHBO2kYB-2FWlchrTzALYnMvXQ-3D-3D\" style=\"margin:0px 0px 10px;padding:3px 7px;color:rgb(255,255,255);background-color:rgb(59,89,152)!important;font-size:12px;text-decoration:none;font-weight:bold;display:block;text-align:center\" target=\"_blank\">Facebook</a> <a href=\"http://url2174.showgroundslive.com/ls/click?upn=u001.zMQh0ZhWc-2F8JxNtR1nwlVTouxJrRAsBBELbaZDd967-2BVL6hkjygbqcNEwQDM0F7XICqF_MlZp2qmha5zi7UB4q84KFWG17I3E0yTMgVTdrjD-2FD9dHbs57iajyU2eeC4TGFQbifLK4xXinj25GMwmgzpxXf5-2BF0hI7lpwH2WOG-2FsT5yX8gAB8URCvUHD-2BqIDCKo1WL0YfeP-2BH6rI3fg7qdSaz58TN3yCC8NE9eEULA6a0uh4l6YxlAKlVTGzScijs-2BG7pU81Ezn-2BEdomachSsNgVgs-2FpkCPQZmz2jDLsnGrPAa-2F4fb4ICGuVzty1YD1zi2rNVRIHaSxdXIlHsLtEUmyUV6rQ-3D-3D\" style=\"margin:0px 0px 10px;padding:3px 7px;color:rgb(255,255,255);background-color:rgb(29,172,237)!important;font-size:12px;text-decoration:none;font-weight:bold;display:block;text-align:center\" target=\"_blank\"> Twitter</a></p> </td> </tr> </tbody> </table> <table align=\"left\" style=\"margin:0px;padding:0px;width:280px;float:left;min-width:279px\"> <tbody style=\"margin:0px;padding:0px\"> <tr style=\"margin:0px;padding:0px\"> <td style=\"margin:0px;padding:15px\"> <h5 style=\"margin:0px 0px 15px;padding:0px;font-family:HelveticaNeue-Light,&#39;Helvetica Neue Light&#39;,&#39;Helvetica Neue&#39;,Helvetica,Arial,&#39;Lucida Grande&#39;,sans-serif;line-height:1.1;font-size:17px\">Contact Info:</h5><p style=\"margin:0px 0px 10px;padding:0px;font-size:14px;line-height:1.6\">Phone: <b style=\"margin:0px;padding:0px\"> 413-625-3177</b><br style=\"margin:0px;padding:0px\"> Email: <a href=\"mailto:support@showgroundslive.com?subject=Support%20Request\" style=\"margin:0px;padding:0px;color:rgb(43,166,203)\" target=\"_blank\"> support@showgroundslive.com</a></p> </td> </tr> </tbody> </table> </td> </tr> </tbody> </table> </div> </td> </tr> </tbody> </table> </div> </td> <td style=\"margin:0px;padding:0px\"> </td> </tr> </tbody> </table> <table style=\"margin:0px;padding:0px;font-family:&#39;Helvetica Neue&#39;,Helvetica,Helvetica,Arial,sans-serif;width:100%;clear:both!important\"> <tbody style=\"margin:0px;padding:0px\"> <tr style=\"margin:0px;padding:0px\"> <td style=\"margin:0px;padding:0px\"> </td> <td style=\"margin:0px auto!important;padding:0px;display:block!important;max-width:600px!important;clear:both!important\"> <div style=\"margin:0px auto;padding:15px;max-width:600px\"> <table style=\"margin:0px;padding:0px;width:600px\"> <tbody style=\"margin:0px;padding:0px\"> <tr style=\"margin:0px;padding:0px\"> <td style=\"text-align:center;margin:0px;padding:0px\"><p style=\"margin:0px 0px 10px;padding:0px;font-size:14px;line-height:1.6\"><a href=\"http://url2174.showgroundslive.com/ls/click?upn=u001.DdB1oJwTEmMIQf7Mzr6ZZMY3bfcdgXf8jf1GOIstSBUHbWh0CKTjBauWSqkFOQ6hM3V8IHhzCKI4Cjvpp6FnMg-3D-3DWgbZ_MlZp2qmha5zi7UB4q84KFWG17I3E0yTMgVTdrjD-2FD9dHbs57iajyU2eeC4TGFQbifLK4xXinj25GMwmgzpxXf5-2BF0hI7lpwH2WOG-2FsT5yX8gAB8URCvUHD-2BqIDCKo1WLWz0AQmqVsntrwatpmC-2BgE1UzaK8k0wtMkiMSbjklBWD92qa03908BDztLCfEZtK8FtV6pGB9y54nlmSjFdXQPAkeMAfbisqcNUvpBlbu3zVRXfWD66xEXmqXi-2FKUia-2FEX9JZB5vvOHv90eb514eYkw-3D-3D\" style=\"margin:0px;padding:0px;color:rgb(43,166,203)\" target=\"_blank\">Terms</a> | <a href=\"http://url2174.showgroundslive.com/ls/click?upn=u001.DdB1oJwTEmMIQf7Mzr6ZZMY3bfcdgXf8jf1GOIstSBUPDGrYWTveKPnbhk9zwwSgimFq6Mbv6yIZMJNCeCCa-2Bg-3D-3D_byP_MlZp2qmha5zi7UB4q84KFWG17I3E0yTMgVTdrjD-2FD9dHbs57iajyU2eeC4TGFQbifLK4xXinj25GMwmgzpxXf5-2BF0hI7lpwH2WOG-2FsT5yX8gAB8URCvUHD-2BqIDCKo1WL6HOnYavmhaPz-2FDAyM-2BfpXXSJZTcMmONEOCJhNDrQ2cK634el5PGsLYngCi1UpCSqK7dcQNk6aUNHUommcAVajrorvVdft4sHQthRFfLjbecjLaTCNek2vSim1-2BSGZX6mf5ldrblpEBzaOmAb-2F4sm-2Fw-3D-3D\" style=\"margin:0px;padding:0px;color:rgb(43,166,203)\" target=\"_blank\"> Privacy</a></p> </td> </tr> </tbody> </table> </div> </td> <td style=\"margin:0px;padding:0px\"> </td> </tr> </tbody> </table> <img src=\"http://url2174.showgroundslive.com/wf/open?upn=u001.2rMgHYdNlIPV46Irfa32YEBU5VLKaEre26ii-2BuW-2FgPU4kyc2jdG8yBY1oldQ1oWLRJBwnL5wZxns67RE6eLJQxmWMGhx1bXpo5BfQCslLU8mg6r-2B-2FgplKJGiCvfBT7QkHC3ySBeKjeX2aCA0QCIq06Xva4wnUEXi2fZi-2FDJykTO1qG2eSA-2F5DNVnd5zgXQc8MsGle-2FcxkQNwJs4mENV3sGdM95-2BbIoqM6wkoSTNJit9ixazAHAXMLzi6FQCw72JXGVRLdwtDZTvU4r4HG5LHGg-3D-3D\" alt=\"\" width=\"1\" height=\"1\" border=\"0\" style=\"height:1px!important;width:1px!important;border-width:0!important;margin-top:0!important;margin-bottom:0!important;margin-right:0!important;margin-left:0!important;padding-top:0!important;padding-bottom:0!important;padding-right:0!important;padding-left:0!important\">\n</div></blockquote></div><br></div></div></div>\n</div></div>\n",
+          "text": "    [image: Tranparet_logo-original]\n<http://url2174.showgroundslive.com/ls/click?upn=u001.DdB1oJwTEmMIQf7Mzr6ZZPMXnMyZPBIwqtr7kmOpF-2FcjoWKfWDxNpnOe-2FKFCORmGPqDb_MlZp2qmha5zi7UB4q84KFWG17I3E0yTMgVTdrjD-2FD9dHbs57iajyU2eeC4TGFQbifLK4xXinj25GMwmgzpxXf5-2BF0hI7lpwH2WOG-2FsT5yX8gAB8URCvUHD-2BqIDCKo1WLFhBKWYD-2BUHVqQ29r9WT80-2FHoPYybrl11CwqcumrhACT2ut-2F-2B2m6SfIW-2F3u-2BLlZgvHxGcCjLZOTudiQmqW-2FwOZB-2BcWu9fN9Tv6tnBlpMeNcWR-2Fpu0hdlOzzGMMHc6-2FM4OgmWOdEjFECyxOdPZnsgA5g-3D-3D>\n\nDear EMILY SMITH,\n\nWelcome to ShowGrounds email alerts. As of 02/03/2026 8:00 PM, these are\nyour classes and schedule for the show day 02/04/2026. Please note that all\ntimes are estimates only. It is your responsibility to be present at the\nring for your classes.\n\n*E.R. Mische Grand Hunter*\nClass Time Horse Rider Class Name Order\n12:45 PM 1119 - CHECKPOINT CHRISTINE KEAR 2012 - $630 Performance Hunter\n3'6\" 33 of 66\n12:45 PM 1119 - CHECKPOINT OWEN GAJOCH 2013 - $750 Performance Hunter 3'6\"\nHandy 34 of 66\n\n*Mogavero*\nClass Time Horse Rider Class Name Order\n9:15 AM 6064 - DIARON'S PITSCHER RP RICHARD VOGEL 1009 - $2,000 1.30m Open\nJumper II2d 18 of 90\n\n*Ring 6*\nClass Time Horse Rider Class Name Order\n10:50 AM 1131 - ECBALLIUM DE MARS HUGH TURNER 1104 - 1.0m Training Jumper\n(Table II) 42 of 69\n\n*Inactive Horses for 02/04/2026*\n\n1100 - EFENDI\n1101 - CLASS ACT\n1102 - MONTVERDI\n1103 - CLIP DE LA HAYE Z\n1104 - PIPPA BLUE\n1105 - OSTWIND 59\n1106 - AMAZING\n1107 - MONTENDRO 5\n1108 - CAYMAN\n1109 - CARINO B\n1110 - VIETTI\n1112 - NO SECRET\n1113 - KINGDOM Z\n1114 - CHAGOLANDO PS\n1115 - CURANDERO\n1116 - STAKATO CORNET\n1117 - SABRE\n1118 - GRISBY DE POILLEY\n1120 - ALL STAR\n1121 - CORALLO\n1122 - OUTER BANKS\n1123 - POKER FACE VAN 'T HAGENHOF\n1124 - ONATELLA V.D VINKHOEVE\n1125 - MONTALCINO\n1126 - CHRIS CRAFT\n1127 - DEVISE DU SALBEY\n1128 - CLIC ES PATRONS\n1130 - GEORGINA W\n1132 - COLTRANE\n1133 - JACK SPARROWS\n1134 - INTO THE BLUE\n1135 - QWANTREAU\n1136 - EROS VAN DE SCHRALE HAMME Z\n1137 - KICK OFF\n1138 - CALL ME CASSY\n1139 - KINTARO VDL\n1140 - ALMA DE CAL SALOM\n1141 - CHAKI Z\n1142 - CHINO\n1143 - KS DIPLOMAT\n1146 - ALL TOO WELL\n1147 - FIRST IMPRESSION\n1148 - DIAZETTA\n1150 - CLEVELAND Z\n1151 - PETRUSKA VD DONKHOEVE\n1152 - PST DE MUZE\n1153 - DOLORES BH\n1154 - JAZZY D\n1165 - CHOCO M\n1166 - KENDRICK\n1167 - REDDINGTON\n1169 - GAGARIN\n1971 - MASERATI\n\nIf you have questions regarding your schedule please contact the show\noffice. Thank you for using ShowGroundsLive and have a great day at the\nshow.\n\nThanks,\nThe ShowGroundsLive Team\n\nIf you wish to not receive shows schedule, please click here\n<http://url2174.showgroundslive.com/ls/click?upn=u001.DdB1oJwTEmMIQf7Mzr6ZZJxXLE9Mi9ZANMxILRRCNkzdGsSBvdkN02UM4ovK5jaGp2rttGn9kZbKXhXlnbBuZZZ02TnhB4lzThJ3zxnNevghBsRg89S3W9bc9qpECfnFWE77R-2BsZFiWNWndk7Wl-2FWoW0YOKMyOLeRw763GfLpVI-3DEqYl_MlZp2qmha5zi7UB4q84KFWG17I3E0yTMgVTdrjD-2FD9dHbs57iajyU2eeC4TGFQbifLK4xXinj25GMwmgzpxXf5-2BF0hI7lpwH2WOG-2FsT5yX8gAB8URCvUHD-2BqIDCKo1WL8Qh4v4wKOczQTlIeegDKrv7nMil1sEn0-2BKzNcqSMXlLszWypV5ZjBdOce2ajmSwQ4OP77Ig314P7UBKZ8U97LA3wKe7DMQmaBMvLq1-2BGMT2-2Bze0KTLeqZgyeVEiHBwk-2BpqYa0fkOOXgZzqk-2FIWbbmQ-3D-3D>\n\n\n\n\n[image: Download_on_the_app_store_badge_us-uk_135x40-original]\n<http://url2174.showgroundslive.com/ls/click?upn=u001.zMQh0ZhWc-2F8JxNtR1nwlVSaylp1ttDguuJFLgqI3ZjETXX5-2FCRoiAYsYt7TX4yHqQUGh47fTo9a1vGGrS9kAM9yz5f0O37moYnYIIvHqT34-3DZWyW_MlZp2qmha5zi7UB4q84KFWG17I3E0yTMgVTdrjD-2FD9dHbs57iajyU2eeC4TGFQbifLK4xXinj25GMwmgzpxXf5-2BF0hI7lpwH2WOG-2FsT5yX8gAB8URCvUHD-2BqIDCKo1WLbLSw01FZMvIi0VwPOjhiY2OHDu-2B76ytx-2BQGAc0NxArCKIVMrRDCnTuyiHxD63cIENgMA-2FRKJlzxpZMFv2JgTTqXLRLxvU4B6rtfvAoL3-2FzO7inXGC3UrFQp-2Fck-2BZ-2BvIC2n9xLJD7okUERSDzSIsSaQ-3D-3D>\nDon't have the ShowGrounds App? Click the Link to get it now.\nConnect with Us:\n\nFacebook\n<http://url2174.showgroundslive.com/ls/click?upn=u001.DdB1oJwTEmMIQf7Mzr6ZZLeVv7mOpsuUeip-2FhP46Axl98pHbEQO8HuXWkLtr-2FcCyE5Nu-2FxQ-2F4EeL8aKAH6WPIg-3D-3DcuyE_MlZp2qmha5zi7UB4q84KFWG17I3E0yTMgVTdrjD-2FD9dHbs57iajyU2eeC4TGFQbifLK4xXinj25GMwmgzpxXf5-2BF0hI7lpwH2WOG-2FsT5yX8gAB8URCvUHD-2BqIDCKo1WLf1iUX-2BFK9suDWSMHiIHaWdUPfUBNSMPCw-2BJSBcsihEsZsSlfgpehgDky4d89x4QqNfAi5eaJ9XvpbPVYA7wUbj4ZrDNStPk0F-2BAAWJlBmk1iXOQ7kcwhqzE7yT4Fa-2BgHBO2kYB-2FWlchrTzALYnMvXQ-3D-3D>\nTwitter\n<http://url2174.showgroundslive.com/ls/click?upn=u001.zMQh0ZhWc-2F8JxNtR1nwlVTouxJrRAsBBELbaZDd967-2BVL6hkjygbqcNEwQDM0F7XICqF_MlZp2qmha5zi7UB4q84KFWG17I3E0yTMgVTdrjD-2FD9dHbs57iajyU2eeC4TGFQbifLK4xXinj25GMwmgzpxXf5-2BF0hI7lpwH2WOG-2FsT5yX8gAB8URCvUHD-2BqIDCKo1WL0YfeP-2BH6rI3fg7qdSaz58TN3yCC8NE9eEULA6a0uh4l6YxlAKlVTGzScijs-2BG7pU81Ezn-2BEdomachSsNgVgs-2FpkCPQZmz2jDLsnGrPAa-2F4fb4ICGuVzty1YD1zi2rNVRIHaSxdXIlHsLtEUmyUV6rQ-3D-3D>\nContact Info:\n\nPhone: * 413-625-3177*\nEmail: support@showgroundslive.com\n<support@showgroundslive.com?subject=Support%20Request>\n\n\n\nTerms\n<http://url2174.showgroundslive.com/ls/click?upn=u001.DdB1oJwTEmMIQf7Mzr6ZZMY3bfcdgXf8jf1GOIstSBUHbWh0CKTjBauWSqkFOQ6hM3V8IHhzCKI4Cjvpp6FnMg-3D-3DWgbZ_MlZp2qmha5zi7UB4q84KFWG17I3E0yTMgVTdrjD-2FD9dHbs57iajyU2eeC4TGFQbifLK4xXinj25GMwmgzpxXf5-2BF0hI7lpwH2WOG-2FsT5yX8gAB8URCvUHD-2BqIDCKo1WLWz0AQmqVsntrwatpmC-2BgE1UzaK8k0wtMkiMSbjklBWD92qa03908BDztLCfEZtK8FtV6pGB9y54nlmSjFdXQPAkeMAfbisqcNUvpBlbu3zVRXfWD66xEXmqXi-2FKUia-2FEX9JZB5vvOHv90eb514eYkw-3D-3D>\n| Privacy\n<http://url2174.showgroundslive.com/ls/click?upn=u001.DdB1oJwTEmMIQf7Mzr6ZZMY3bfcdgXf8jf1GOIstSBUPDGrYWTveKPnbhk9zwwSgimFq6Mbv6yIZMJNCeCCa-2Bg-3D-3D_byP_MlZp2qmha5zi7UB4q84KFWG17I3E0yTMgVTdrjD-2FD9dHbs57iajyU2eeC4TGFQbifLK4xXinj25GMwmgzpxXf5-2BF0hI7lpwH2WOG-2FsT5yX8gAB8URCvUHD-2BqIDCKo1WL6HOnYavmhaPz-2FDAyM-2BfpXXSJZTcMmONEOCJhNDrQ2cK634el5PGsLYngCi1UpCSqK7dcQNk6aUNHUommcAVajrorvVdft4sHQthRFfLjbecjLaTCNek2vSim1-2BSGZX6mf5ldrblpEBzaOmAb-2F4sm-2Fw-3D-3D>\n",
+          "textAsHtml": "<p>[image: Tranparet_logo-original]<br/>&lt;<a href=\"http://url2174.showgroundslive.com/ls/click?upn=u001.DdB1oJwTEmMIQf7Mzr6ZZPMXnMyZPBIwqtr7kmOpF-2FcjoWKfWDxNpnOe-2FKFCORmGPqDb_MlZp2qmha5zi7UB4q84KFWG17I3E0yTMgVTdrjD-2FD9dHbs57iajyU2eeC4TGFQbifLK4xXinj25GMwmgzpxXf5-2BF0hI7lpwH2WOG-2FsT5yX8gAB8URCvUHD-2BqIDCKo1WLFhBKWYD-2BUHVqQ29r9WT80-2FHoPYybrl11CwqcumrhACT2ut-2F-2B2m6SfIW-2F3u-2BLlZgvHxGcCjLZOTudiQmqW-2FwOZB-2BcWu9fN9Tv6tnBlpMeNcWR-2Fpu0hdlOzzGMMHc6-2FM4OgmWOdEjFECyxOdPZnsgA5g-3D-3D\">http://url2174.showgroundslive.com/ls/click?upn=u001.DdB1oJwTEmMIQf7Mzr6ZZPMXnMyZPBIwqtr7kmOpF-2FcjoWKfWDxNpnOe-2FKFCORmGPqDb_MlZp2qmha5zi7UB4q84KFWG17I3E0yTMgVTdrjD-2FD9dHbs57iajyU2eeC4TGFQbifLK4xXinj25GMwmgzpxXf5-2BF0hI7lpwH2WOG-2FsT5yX8gAB8URCvUHD-2BqIDCKo1WLFhBKWYD-2BUHVqQ29r9WT80-2FHoPYybrl11CwqcumrhACT2ut-2F-2B2m6SfIW-2F3u-2BLlZgvHxGcCjLZOTudiQmqW-2FwOZB-2BcWu9fN9Tv6tnBlpMeNcWR-2Fpu0hdlOzzGMMHc6-2FM4OgmWOdEjFECyxOdPZnsgA5g-3D-3D</a>&gt;</p><p>Dear EMILY SMITH,</p><p>Welcome to ShowGrounds email alerts. As of 02/03/2026 8:00 PM, these are<br/>your classes and schedule for the show day 02/04/2026. Please note that all<br/>times are estimates only. It is your responsibility to be present at the<br/>ring for your classes.</p><p>*E.R. Mische Grand Hunter*<br/>Class Time Horse Rider Class Name Order<br/>12:45 PM 1119 - CHECKPOINT CHRISTINE KEAR 2012 - $630 Performance Hunter<br/>3&apos;6&quot; 33 of 66<br/>12:45 PM 1119 - CHECKPOINT OWEN GAJOCH 2013 - $750 Performance Hunter 3&apos;6&quot;<br/>Handy 34 of 66</p><p>*Mogavero*<br/>Class Time Horse Rider Class Name Order<br/>9:15 AM 6064 - DIARON&apos;S PITSCHER RP RICHARD VOGEL 1009 - $2,000 1.30m Open<br/>Jumper II2d 18 of 90</p><p>*Ring 6*<br/>Class Time Horse Rider Class Name Order<br/>10:50 AM 1131 - ECBALLIUM DE MARS HUGH TURNER 1104 - 1.0m Training Jumper<br/>(Table II) 42 of 69</p><p>*Inactive Horses for 02/04/2026*</p><p>1100 - EFENDI<br/>1101 - CLASS ACT<br/>1102 - MONTVERDI<br/>1103 - CLIP DE LA HAYE Z<br/>1104 - PIPPA BLUE<br/>1105 - OSTWIND 59<br/>1106 - AMAZING<br/>1107 - MONTENDRO 5<br/>1108 - CAYMAN<br/>1109 - CARINO B<br/>1110 - VIETTI<br/>1112 - NO SECRET<br/>1113 - KINGDOM Z<br/>1114 - CHAGOLANDO PS<br/>1115 - CURANDERO<br/>1116 - STAKATO CORNET<br/>1117 - SABRE<br/>1118 - GRISBY DE POILLEY<br/>1120 - ALL STAR<br/>1121 - CORALLO<br/>1122 - OUTER BANKS<br/>1123 - POKER FACE VAN &apos;T HAGENHOF<br/>1124 - ONATELLA V.D VINKHOEVE<br/>1125 - MONTALCINO<br/>1126 - CHRIS CRAFT<br/>1127 - DEVISE DU SALBEY<br/>1128 - CLIC ES PATRONS<br/>1130 - GEORGINA W<br/>1132 - COLTRANE<br/>1133 - JACK SPARROWS<br/>1134 - INTO THE BLUE<br/>1135 - QWANTREAU<br/>1136 - EROS VAN DE SCHRALE HAMME Z<br/>1137 - KICK OFF<br/>1138 - CALL ME CASSY<br/>1139 - KINTARO VDL<br/>1140 - ALMA DE CAL SALOM<br/>1141 - CHAKI Z<br/>1142 - CHINO<br/>1143 - KS DIPLOMAT<br/>1146 - ALL TOO WELL<br/>1147 - FIRST IMPRESSION<br/>1148 - DIAZETTA<br/>1150 - CLEVELAND Z<br/>1151 - PETRUSKA VD DONKHOEVE<br/>1152 - PST DE MUZE<br/>1153 - DOLORES BH<br/>1154 - JAZZY D<br/>1165 - CHOCO M<br/>1166 - KENDRICK<br/>1167 - REDDINGTON<br/>1169 - GAGARIN<br/>1971 - MASERATI</p><p>If you have questions regarding your schedule please contact the show<br/>office. Thank you for using ShowGroundsLive and have a great day at the<br/>show.</p><p>Thanks,<br/>The ShowGroundsLive Team</p><p>If you wish to not receive shows schedule, please click here<br/>&lt;<a href=\"http://url2174.showgroundslive.com/ls/click?upn=u001.DdB1oJwTEmMIQf7Mzr6ZZJxXLE9Mi9ZANMxILRRCNkzdGsSBvdkN02UM4ovK5jaGp2rttGn9kZbKXhXlnbBuZZZ02TnhB4lzThJ3zxnNevghBsRg89S3W9bc9qpECfnFWE77R-2BsZFiWNWndk7Wl-2FWoW0YOKMyOLeRw763GfLpVI-3DEqYl_MlZp2qmha5zi7UB4q84KFWG17I3E0yTMgVTdrjD-2FD9dHbs57iajyU2eeC4TGFQbifLK4xXinj25GMwmgzpxXf5-2BF0hI7lpwH2WOG-2FsT5yX8gAB8URCvUHD-2BqIDCKo1WL8Qh4v4wKOczQTlIeegDKrv7nMil1sEn0-2BKzNcqSMXlLszWypV5ZjBdOce2ajmSwQ4OP77Ig314P7UBKZ8U97LA3wKe7DMQmaBMvLq1-2BGMT2-2Bze0KTLeqZgyeVEiHBwk-2BpqYa0fkOOXgZzqk-2FIWbbmQ-3D-3D\">http://url2174.showgroundslive.com/ls/click?upn=u001.DdB1oJwTEmMIQf7Mzr6ZZJxXLE9Mi9ZANMxILRRCNkzdGsSBvdkN02UM4ovK5jaGp2rttGn9kZbKXhXlnbBuZZZ02TnhB4lzThJ3zxnNevghBsRg89S3W9bc9qpECfnFWE77R-2BsZFiWNWndk7Wl-2FWoW0YOKMyOLeRw763GfLpVI-3DEqYl_MlZp2qmha5zi7UB4q84KFWG17I3E0yTMgVTdrjD-2FD9dHbs57iajyU2eeC4TGFQbifLK4xXinj25GMwmgzpxXf5-2BF0hI7lpwH2WOG-2FsT5yX8gAB8URCvUHD-2BqIDCKo1WL8Qh4v4wKOczQTlIeegDKrv7nMil1sEn0-2BKzNcqSMXlLszWypV5ZjBdOce2ajmSwQ4OP77Ig314P7UBKZ8U97LA3wKe7DMQmaBMvLq1-2BGMT2-2Bze0KTLeqZgyeVEiHBwk-2BpqYa0fkOOXgZzqk-2FIWbbmQ-3D-3D</a>&gt;</p><p>[image: Download_on_the_app_store_badge_us-uk_135x40-original]<br/>&lt;<a href=\"http://url2174.showgroundslive.com/ls/click?upn=u001.zMQh0ZhWc-2F8JxNtR1nwlVSaylp1ttDguuJFLgqI3ZjETXX5-2FCRoiAYsYt7TX4yHqQUGh47fTo9a1vGGrS9kAM9yz5f0O37moYnYIIvHqT34-3DZWyW_MlZp2qmha5zi7UB4q84KFWG17I3E0yTMgVTdrjD-2FD9dHbs57iajyU2eeC4TGFQbifLK4xXinj25GMwmgzpxXf5-2BF0hI7lpwH2WOG-2FsT5yX8gAB8URCvUHD-2BqIDCKo1WLbLSw01FZMvIi0VwPOjhiY2OHDu-2B76ytx-2BQGAc0NxArCKIVMrRDCnTuyiHxD63cIENgMA-2FRKJlzxpZMFv2JgTTqXLRLxvU4B6rtfvAoL3-2FzO7inXGC3UrFQp-2Fck-2BZ-2BvIC2n9xLJD7okUERSDzSIsSaQ-3D-3D\">http://url2174.showgroundslive.com/ls/click?upn=u001.zMQh0ZhWc-2F8JxNtR1nwlVSaylp1ttDguuJFLgqI3ZjETXX5-2FCRoiAYsYt7TX4yHqQUGh47fTo9a1vGGrS9kAM9yz5f0O37moYnYIIvHqT34-3DZWyW_MlZp2qmha5zi7UB4q84KFWG17I3E0yTMgVTdrjD-2FD9dHbs57iajyU2eeC4TGFQbifLK4xXinj25GMwmgzpxXf5-2BF0hI7lpwH2WOG-2FsT5yX8gAB8URCvUHD-2BqIDCKo1WLbLSw01FZMvIi0VwPOjhiY2OHDu-2B76ytx-2BQGAc0NxArCKIVMrRDCnTuyiHxD63cIENgMA-2FRKJlzxpZMFv2JgTTqXLRLxvU4B6rtfvAoL3-2FzO7inXGC3UrFQp-2Fck-2BZ-2BvIC2n9xLJD7okUERSDzSIsSaQ-3D-3D</a>&gt;<br/>Don&apos;t have the ShowGrounds App? Click the Link to get it now.<br/>Connect with Us:</p><p>Facebook<br/>&lt;<a href=\"http://url2174.showgroundslive.com/ls/click?upn=u001.DdB1oJwTEmMIQf7Mzr6ZZLeVv7mOpsuUeip-2FhP46Axl98pHbEQO8HuXWkLtr-2FcCyE5Nu-2FxQ-2F4EeL8aKAH6WPIg-3D-3DcuyE_MlZp2qmha5zi7UB4q84KFWG17I3E0yTMgVTdrjD-2FD9dHbs57iajyU2eeC4TGFQbifLK4xXinj25GMwmgzpxXf5-2BF0hI7lpwH2WOG-2FsT5yX8gAB8URCvUHD-2BqIDCKo1WLf1iUX-2BFK9suDWSMHiIHaWdUPfUBNSMPCw-2BJSBcsihEsZsSlfgpehgDky4d89x4QqNfAi5eaJ9XvpbPVYA7wUbj4ZrDNStPk0F-2BAAWJlBmk1iXOQ7kcwhqzE7yT4Fa-2BgHBO2kYB-2FWlchrTzALYnMvXQ-3D-3D\">http://url2174.showgroundslive.com/ls/click?upn=u001.DdB1oJwTEmMIQf7Mzr6ZZLeVv7mOpsuUeip-2FhP46Axl98pHbEQO8HuXWkLtr-2FcCyE5Nu-2FxQ-2F4EeL8aKAH6WPIg-3D-3DcuyE_MlZp2qmha5zi7UB4q84KFWG17I3E0yTMgVTdrjD-2FD9dHbs57iajyU2eeC4TGFQbifLK4xXinj25GMwmgzpxXf5-2BF0hI7lpwH2WOG-2FsT5yX8gAB8URCvUHD-2BqIDCKo1WLf1iUX-2BFK9suDWSMHiIHaWdUPfUBNSMPCw-2BJSBcsihEsZsSlfgpehgDky4d89x4QqNfAi5eaJ9XvpbPVYA7wUbj4ZrDNStPk0F-2BAAWJlBmk1iXOQ7kcwhqzE7yT4Fa-2BgHBO2kYB-2FWlchrTzALYnMvXQ-3D-3D</a>&gt;<br/>Twitter<br/>&lt;<a href=\"http://url2174.showgroundslive.com/ls/click?upn=u001.zMQh0ZhWc-2F8JxNtR1nwlVTouxJrRAsBBELbaZDd967-2BVL6hkjygbqcNEwQDM0F7XICqF_MlZp2qmha5zi7UB4q84KFWG17I3E0yTMgVTdrjD-2FD9dHbs57iajyU2eeC4TGFQbifLK4xXinj25GMwmgzpxXf5-2BF0hI7lpwH2WOG-2FsT5yX8gAB8URCvUHD-2BqIDCKo1WL0YfeP-2BH6rI3fg7qdSaz58TN3yCC8NE9eEULA6a0uh4l6YxlAKlVTGzScijs-2BG7pU81Ezn-2BEdomachSsNgVgs-2FpkCPQZmz2jDLsnGrPAa-2F4fb4ICGuVzty1YD1zi2rNVRIHaSxdXIlHsLtEUmyUV6rQ-3D-3D\">http://url2174.showgroundslive.com/ls/click?upn=u001.zMQh0ZhWc-2F8JxNtR1nwlVTouxJrRAsBBELbaZDd967-2BVL6hkjygbqcNEwQDM0F7XICqF_MlZp2qmha5zi7UB4q84KFWG17I3E0yTMgVTdrjD-2FD9dHbs57iajyU2eeC4TGFQbifLK4xXinj25GMwmgzpxXf5-2BF0hI7lpwH2WOG-2FsT5yX8gAB8URCvUHD-2BqIDCKo1WL0YfeP-2BH6rI3fg7qdSaz58TN3yCC8NE9eEULA6a0uh4l6YxlAKlVTGzScijs-2BG7pU81Ezn-2BEdomachSsNgVgs-2FpkCPQZmz2jDLsnGrPAa-2F4fb4ICGuVzty1YD1zi2rNVRIHaSxdXIlHsLtEUmyUV6rQ-3D-3D</a>&gt;<br/>Contact Info:</p><p>Phone: * 413-625-3177*<br/>Email: <a href=\"mailto:support@showgroundslive.com\">support@showgroundslive.com</a><br/>&lt;<a href=\"mailto:support@showgroundslive.com\">support@showgroundslive.com</a>?subject=Support%20Request&gt;</p><p>Terms<br/>&lt;<a href=\"http://url2174.showgroundslive.com/ls/click?upn=u001.DdB1oJwTEmMIQf7Mzr6ZZMY3bfcdgXf8jf1GOIstSBUHbWh0CKTjBauWSqkFOQ6hM3V8IHhzCKI4Cjvpp6FnMg-3D-3DWgbZ_MlZp2qmha5zi7UB4q84KFWG17I3E0yTMgVTdrjD-2FD9dHbs57iajyU2eeC4TGFQbifLK4xXinj25GMwmgzpxXf5-2BF0hI7lpwH2WOG-2FsT5yX8gAB8URCvUHD-2BqIDCKo1WLWz0AQmqVsntrwatpmC-2BgE1UzaK8k0wtMkiMSbjklBWD92qa03908BDztLCfEZtK8FtV6pGB9y54nlmSjFdXQPAkeMAfbisqcNUvpBlbu3zVRXfWD66xEXmqXi-2FKUia-2FEX9JZB5vvOHv90eb514eYkw-3D-3D\">http://url2174.showgroundslive.com/ls/click?upn=u001.DdB1oJwTEmMIQf7Mzr6ZZMY3bfcdgXf8jf1GOIstSBUHbWh0CKTjBauWSqkFOQ6hM3V8IHhzCKI4Cjvpp6FnMg-3D-3DWgbZ_MlZp2qmha5zi7UB4q84KFWG17I3E0yTMgVTdrjD-2FD9dHbs57iajyU2eeC4TGFQbifLK4xXinj25GMwmgzpxXf5-2BF0hI7lpwH2WOG-2FsT5yX8gAB8URCvUHD-2BqIDCKo1WLWz0AQmqVsntrwatpmC-2BgE1UzaK8k0wtMkiMSbjklBWD92qa03908BDztLCfEZtK8FtV6pGB9y54nlmSjFdXQPAkeMAfbisqcNUvpBlbu3zVRXfWD66xEXmqXi-2FKUia-2FEX9JZB5vvOHv90eb514eYkw-3D-3D</a>&gt;<br/>| Privacy<br/>&lt;<a href=\"http://url2174.showgroundslive.com/ls/click?upn=u001.DdB1oJwTEmMIQf7Mzr6ZZMY3bfcdgXf8jf1GOIstSBUPDGrYWTveKPnbhk9zwwSgimFq6Mbv6yIZMJNCeCCa-2Bg-3D-3D_byP_MlZp2qmha5zi7UB4q84KFWG17I3E0yTMgVTdrjD-2FD9dHbs57iajyU2eeC4TGFQbifLK4xXinj25GMwmgzpxXf5-2BF0hI7lpwH2WOG-2FsT5yX8gAB8URCvUHD-2BqIDCKo1WL6HOnYavmhaPz-2FDAyM-2BfpXXSJZTcMmONEOCJhNDrQ2cK634el5PGsLYngCi1UpCSqK7dcQNk6aUNHUommcAVajrorvVdft4sHQthRFfLjbecjLaTCNek2vSim1-2BSGZX6mf5ldrblpEBzaOmAb-2F4sm-2Fw-3D-3D\">http://url2174.showgroundslive.com/ls/click?upn=u001.DdB1oJwTEmMIQf7Mzr6ZZMY3bfcdgXf8jf1GOIstSBUPDGrYWTveKPnbhk9zwwSgimFq6Mbv6yIZMJNCeCCa-2Bg-3D-3D_byP_MlZp2qmha5zi7UB4q84KFWG17I3E0yTMgVTdrjD-2FD9dHbs57iajyU2eeC4TGFQbifLK4xXinj25GMwmgzpxXf5-2BF0hI7lpwH2WOG-2FsT5yX8gAB8URCvUHD-2BqIDCKo1WL6HOnYavmhaPz-2FDAyM-2BfpXXSJZTcMmONEOCJhNDrQ2cK634el5PGsLYngCi1UpCSqK7dcQNk6aUNHUommcAVajrorvVdft4sHQthRFfLjbecjLaTCNek2vSim1-2BSGZX6mf5ldrblpEBzaOmAb-2F4sm-2Fw-3D-3D</a>&gt;</p>",
+          "subject": "Fwd: ShowGroundsMail - Schedule for 02/04/2026",
+          "references": [
+            "<yF2W36vKQtKnWYLwTsdtnA@geopod-ismtpd-62>",
+            "<FC89EB14-9A2E-4279-BE89-77B8D2377E59@gmail.com>",
+            "<CAH+FX6CSuS4tBp=UuLQW8j6GscYyE+QycdU0SbhoQ58+E+CNAA@mail.gmail.com>"
+          ],
+          "date": "2026-02-05T14:26:42.000Z",
+          "to": {
+            "value": [
+              {
+                "address": "ukanilakshit77@gmail.com",
+                "name": ""
+              }
+            ],
+            "html": "<span class=\"mp_address_group\"><a href=\"mailto:ukanilakshit77@gmail.com\" class=\"mp_address_email\">ukanilakshit77@gmail.com</a></span>",
+            "text": "ukanilakshit77@gmail.com"
+          },
+          "from": {
+            "value": [
+              {
+                "address": "lakshitukani77@gmail.com",
+                "name": "lakshit ukani"
+              }
+            ],
+            "html": "<span class=\"mp_address_group\"><span class=\"mp_address_name\">lakshit ukani</span> &lt;<a href=\"mailto:lakshitukani77@gmail.com\" class=\"mp_address_email\">lakshitukani77@gmail.com</a>&gt;</span>",
+            "text": "\"lakshit ukani\" <lakshitukani77@gmail.com>"
+          },
+          "messageId": "<CAEvJBwum0_2S=F02mgKaBr3BpveK16=TJKuVGEAeR_exqy9gYQ@mail.gmail.com>",
+          "inReplyTo": "<CAH+FX6CSuS4tBp=UuLQW8j6GscYyE+QycdU0SbhoQ58+E+CNAA@mail.gmail.com>"
+        }
+      }
+    ],
+    "Extract Show Date From HTML Mail ": [
+      {
+        "json": {
+          "show_date": "2026-02-04"
+        }
+      }
+    ]
+  },
+  "versionId": "98118526-55ec-4776-8358-e7452bfa57dc",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-02-05T13:02:11.207Z",
+      "createdAt": "2026-02-05T13:02:11.207Z",
+      "role": "workflow:owner",
+      "workflowId": "U_YJ5akvD5NAJHESM11lg",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
