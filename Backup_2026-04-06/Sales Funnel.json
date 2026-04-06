@@ -1,0 +1,1600 @@
+{
+  "updatedAt": "2026-02-05T13:02:06.313Z",
+  "createdAt": "2025-10-29T07:20:31.519Z",
+  "id": "EgwggYwBO2pBvj3C",
+  "name": "Sales Funnel",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message",
+          "callback_query"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -720,
+        96
+      ],
+      "id": "e9e08b4e-91ee-4d04-afc2-79393373d5bf",
+      "name": "Telegram Trigger",
+      "webhookId": "957eed74-8164-4045-87b6-cb8683cbcbba",
+      "credentials": {
+        "telegramApi": {
+          "id": "pnVJWgtRZIJoPjzP",
+          "name": "Sales Funnel Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot8476524447:AAHXPrGI-K8ok1_0lH6CDEo190ObeZJhzJI/setMyCommands",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"commands\": [\n    {\n      \"command\": \"visit\",\n      \"description\": \"Log a new shop visit\"\n    },\n    {\n      \"command\": \"newshop\",\n      \"description\": \"Add a new shop\"\n    },\n    {\n      \"command\": \"updateshop\",\n      \"description\": \"Update shop Entry\"\n    },\n    {\n      \"command\": \"listshops\",\n      \"description\": \"View all shops\"\n    },\n    {\n      \"command\": \"report\",\n      \"description\": \"Generate report\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -208,
+        -400
+      ],
+      "id": "51de2b0d-cfed-4ead-b174-ef1570e74526",
+      "name": "Register Command"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        -400
+      ],
+      "id": "7b3ed4fb-8371-45ff-8678-cc7d055e02e1",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "/newshop",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "b6702310-dee0-4a96-9625-cec32b863299"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Add Shop"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ce95cc5a-6b5f-4c0f-9539-86d49fe0f27b",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "/updateshop",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "List of Shops"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d4175e61-b539-42de-9c82-772d36ff6b06",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "/listshops",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "List Shop"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a0a2296e-6f10-4b05-9e1c-cc9ac5d7070a",
+                    "leftValue": "={{ $json.callback_query }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Update Shop"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "bb8fd1ad-4153-4d90-8faf-4bb516db4313",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "/start",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Start Msg"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -384,
+        64
+      ],
+      "id": "3f68b1ad-cfc0-4aef-b552-0ae3119ae2f2",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "formTitle": "Add New Shop",
+        "formDescription": "Fill this Form to add new shop",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Shop Name",
+              "placeholder": "Add Shop Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Address",
+              "placeholder": "Address of Shop"
+            },
+            {
+              "fieldLabel": "City",
+              "placeholder": "City in which Shop is located"
+            },
+            {
+              "fieldLabel": "State",
+              "placeholder": "State in Which Shop is located"
+            },
+            {
+              "fieldLabel": "Postal Code",
+              "placeholder": "Postal Code in which Shop Is located"
+            },
+            {
+              "fieldLabel": "Country",
+              "placeholder": "Country in which Shop is located"
+            },
+            {
+              "fieldLabel": "Contact Person Name",
+              "placeholder": "Contact Person Name"
+            },
+            {
+              "fieldLabel": "Contact Phone Number",
+              "placeholder": "Contact Phone Number"
+            },
+            {
+              "fieldLabel": "Contact Email Address",
+              "fieldType": "email",
+              "placeholder": "Contact Email Address"
+            },
+            {
+              "fieldLabel": "Notes",
+              "placeholder": "Any Additional Notes you want to add"
+            },
+            {
+              "fieldName": "chat_id",
+              "fieldType": "hiddenField"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -608,
+        688
+      ],
+      "id": "e37780b4-e3a3-4e90-83d3-4df1abc4b692",
+      "name": "Add New Shop Form",
+      "webhookId": "741ca889-2ccc-4edf-8672-4edde4e47619"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot8476524447:AAHXPrGI-K8ok1_0lH6CDEo190ObeZJhzJI/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chat_id\": \"{{ $json.message.chat.id }}\",\n  \"text\": \"🧾 Click the button below to fill out the new shop form:\",\n  \"reply_markup\": {\n    \"inline_keyboard\": [\n      [\n        {\n          \"text\": \"📝 Add New Shop\",\n          \"url\": \"https://n8n.srv894857.hstgr.cloud/form/741ca889-2ccc-4edf-8672-4edde4e47619?chat_id={{$json.message.chat.id}}&telegram_unique_id={{$json.message.from.id}}&mode=create\"\n        }\n      ]\n    ]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        16,
+        -80
+      ],
+      "id": "22b17707-29cc-4f93-9499-63f7c295853c",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=✅ New Shop Added Successfully!\n🏪 Name: {{ $json.fields.name }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1424,
+        -304
+      ],
+      "id": "3d0d523d-cf73-4296-8e66-b1d6c2e1dc40",
+      "name": "Send Confirmation message",
+      "webhookId": "34368d5f-cb5e-4ffd-9749-82dd490c84b2",
+      "credentials": {
+        "telegramApi": {
+          "id": "pnVJWgtRZIJoPjzP",
+          "name": "Sales Funnel Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appfYooeKcJkbtPpD",
+          "mode": "list",
+          "cachedResultName": "Sales Funnel",
+          "cachedResultUrl": "https://airtable.com/appfYooeKcJkbtPpD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblzDopBGU9Xqp6Z8",
+          "mode": "list",
+          "cachedResultName": "Shops",
+          "cachedResultUrl": "https://airtable.com/appfYooeKcJkbtPpD/tblzDopBGU9Xqp6Z8"
+        },
+        "filterByFormula": "=({telegram_unique_id}={{ $json.message.from.id }})",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        144,
+        176
+      ],
+      "id": "17b79083-0a5d-409f-a141-a0e0a3d38eb4",
+      "name": "Search records",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "T7yxqTbXYpbUVPcS",
+          "name": "Ukani lakshit Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $json.message.chat.id }}",
+        "message": "🧾 Click the button below to fill out the new shop form:",
+        "responseType": "customForm",
+        "defineForm": "json",
+        "jsonOutput": "=[\n  {\n    \"fieldLabel\": \"Shop Name\",\n    \"fieldType\": \"text\",\n    \"placeholder\": \"Add Shop Name\",\n    \"requiredField\": true\n  },\n  {\n    \"fieldLabel\": \"Address\",\n    \"fieldType\": \"textarea\",\n    \"placeholder\": \"Address of Shop\",\n    \"requiredField\": false\n  },\n  {\n    \"fieldLabel\": \"City\",\n    \"fieldType\": \"text\",\n    \"placeholder\": \"City in which Shop is located\",\n    \"requiredField\": false\n  },\n  {\n    \"fieldLabel\": \"State\",\n    \"fieldType\": \"text\",\n    \"placeholder\": \"State in which Shop is located\",\n    \"requiredField\": false\n  },\n  {\n    \"fieldLabel\": \"Postal Code\",\n    \"fieldType\": \"text\",\n    \"placeholder\": \"Postal Code of the Shop\",\n    \"requiredField\": false\n  },\n  {\n    \"fieldLabel\": \"Country\",\n    \"fieldType\": \"text\",\n    \"placeholder\": \"Country in which Shop is located\",\n    \"requiredField\": false\n  },\n  {\n    \"fieldLabel\": \"Contact Person Name\",\n    \"fieldType\": \"text\",\n    \"placeholder\": \"Contact Person Name\",\n    \"requiredField\": false\n  },\n  {\n    \"fieldLabel\": \"Contact Phone Number\",\n    \"fieldType\": \"text\",\n    \"placeholder\": \"Contact Phone Number (include country code)\",\n    \"requiredField\": false\n  },\n  {\n    \"fieldLabel\": \"Contact Email Address\",\n    \"fieldType\": \"email\",\n    \"placeholder\": \"Contact Email Address\",\n    \"requiredField\": false\n  },\n  {\n    \"fieldLabel\": \"Notes\",\n    \"fieldType\": \"textarea\",\n    \"placeholder\": \"Any additional notes you want to add\",\n    \"requiredField\": false\n  }\n]\n",
+        "options": {
+          "messageButtonLabel": "📝 Add New Shop",
+          "responseFormTitle": "📝 Add New Shop",
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        976,
+        -304
+      ],
+      "id": "ef8e3e91-592c-4a58-a7f8-e007176240aa",
+      "name": "Send message and wait for response",
+      "webhookId": "3bafc8d0-5e33-4f59-a7d3-39cae55e81a4",
+      "credentials": {
+        "telegramApi": {
+          "id": "pnVJWgtRZIJoPjzP",
+          "name": "Sales Funnel Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot8476524447:AAHXPrGI-K8ok1_0lH6CDEo190ObeZJhzJI/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chat_id\": \"{{ $node['Telegram Trigger'].json.message.chat.id }}\",\n  \"text\": \"🏪 Select a shop to update:\",\n  \"reply_markup\": {\n    \"inline_keyboard\": {{ JSON.stringify($json.inline_keyboard) }}\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        736,
+        32
+      ],
+      "id": "fd6bdfd7-4595-4fc4-8e18-d4364674fc64",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Function node\n// This function expects input items from Airtable (or a single item\n// whose json is an array or has a .records array).\n// It returns one item with json.inline_keyboard\n\n// collect input payload(s)\nconst rawItems = items; // 'items' is provided by n8n Function node\n\n// helper to extract records regardless of shape\nlet records = [];\n\n// Case A: single item whose .json is an array (you pasted raw array)\nif (rawItems.length === 1 && Array.isArray(rawItems[0].json)) {\n  records = rawItems[0].json;\n}\n// Case B: single item with `.json.records`\nelse if (rawItems.length === 1 && Array.isArray(rawItems[0].json.records)) {\n  records = rawItems[0].json.records;\n}\n// Case C: each item is one record (common n8n output from Airtable node)\nelse {\n  for (let it of rawItems) {\n    if (it.json && (it.json.id || it.json.name || it.json.fields)) {\n      // normalize: if fields exist, merge fields to top-level for convenience\n      const r = Object.assign({}, it.json);\n      if (r.fields && typeof r.fields === 'object') {\n        // copy fields (but keep id if present)\n        r.fields = r.fields; // keep for later\n      }\n      records.push(r);\n    } else {\n      // fallback - if json is simple, add it\n      records.push(it.json);\n    }\n  }\n}\n\n// build inline keyboard (2 buttons per row)\nconst keyboard = [];\nfor (let i = 0; i < records.length; i += 2) {\n  const row = [];\n  for (let j = i; j < i + 2 && j < records.length; j++) {\n    const r = records[j];\n\n    // label: prefer r.name, or r.fields.name, or r.fields[\"Name\"]\n    const label =\n      (r.name && String(r.name)) ||\n      (r.fields && (r.fields.name || r.fields.Name)) ||\n      `${j + 1}`;\n\n    // id: prefer numeric/simple id if available\n    const id =\n      (r.id && String(r.id)) ||\n      (r.recordId && String(r.recordId)) ||\n      (r.fields && (r.fields.id || r.fields.recordId)) ||\n      String(j + 1);\n\n    // build callback_data - keep it short (must be <=64 bytes)\n    let callback = `${id}`;\n    if (callback.length > 60) {\n      // safety: truncate id part\n      const shortId = id.slice(0, 40);\n      callback = `${shortId}`;\n    }\n\n    row.push({\n      text: label,\n      callback_data: callback\n    });\n  }\n  keyboard.push(row);\n}\n\n// return inline_keyboard in json (single item)\nreturn [\n  {\n    json: {\n      inline_keyboard: keyboard\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        32
+      ],
+      "id": "e1da4dc5-6fb3-4bcf-9c2b-e622a684cdf8",
+      "name": "Format data "
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+        "message": "🧾 Click the button below to update shop information:",
+        "responseType": "customForm",
+        "defineForm": "json",
+        "jsonOutput": "=[\n  {\n    \"fieldLabel\": \"Shop Name\",\n    \"fieldType\": \"text\",\n    \"placeholder\": \"Add Shop Name\",\n    \"requiredField\": true,\n    \"defaultValue\": \"Laxmi Shop\"\n  },\n  {\n    \"fieldLabel\": \"Address\",\n    \"fieldType\": \"textarea\",\n    \"placeholder\": \"Address of Shop\",\n    \"requiredField\": false\n  },\n  {\n    \"fieldLabel\": \"City\",\n    \"fieldType\": \"text\",\n    \"placeholder\": \"City in which Shop is located\",\n    \"requiredField\": false\n  },\n  {\n    \"fieldLabel\": \"State\",\n    \"fieldType\": \"text\",\n    \"placeholder\": \"State in which Shop is located\",\n    \"requiredField\": false\n  },\n  {\n    \"fieldLabel\": \"Postal Code\",\n    \"fieldType\": \"text\",\n    \"placeholder\": \"Postal Code of the Shop\",\n    \"requiredField\": false\n  },\n  {\n    \"fieldLabel\": \"Country\",\n    \"fieldType\": \"text\",\n    \"placeholder\": \"Country in which Shop is located\",\n    \"requiredField\": false\n  },\n  {\n    \"fieldLabel\": \"Contact Person Name\",\n    \"fieldType\": \"text\",\n    \"placeholder\": \"Contact Person Name\",\n    \"requiredField\": false\n  },\n  {\n    \"fieldLabel\": \"Contact Phone Number\",\n    \"fieldType\": \"text\",\n    \"placeholder\": \"Contact Phone Number (include country code)\",\n    \"requiredField\": false\n  },\n  {\n    \"fieldLabel\": \"Contact Email Address\",\n    \"fieldType\": \"email\",\n    \"placeholder\": \"Contact Email Address\",\n    \"requiredField\": false\n  },\n  {\n    \"fieldLabel\": \"Notes\",\n    \"fieldType\": \"textarea\",\n    \"placeholder\": \"Any additional notes you want to add\",\n    \"requiredField\": false\n  }\n]\n",
+        "options": {
+          "messageButtonLabel": "📝 Update Shop Information",
+          "responseFormTitle": "📝 Update Shop Information",
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        416,
+        352
+      ],
+      "id": "0a184ced-e706-47cd-9c3f-cca674b3816d",
+      "name": "Send message and wait for response1",
+      "webhookId": "3bafc8d0-5e33-4f59-a7d3-39cae55e81a4",
+      "credentials": {
+        "telegramApi": {
+          "id": "pnVJWgtRZIJoPjzP",
+          "name": "Sales Funnel Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Add New Shop Form').item.json.formQueryParameters.chat_id }}",
+        "text": "=✅ New Shop Added !\n🏪 Name: {{ $json.fields.name }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1360,
+        -512
+      ],
+      "id": "301d8b8c-e24e-447c-a157-8924bacf727e",
+      "name": "Send Confirmation message1",
+      "webhookId": "34368d5f-cb5e-4ffd-9749-82dd490c84b2",
+      "credentials": {
+        "telegramApi": {
+          "id": "pnVJWgtRZIJoPjzP",
+          "name": "Sales Funnel Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot8476524447:AAHXPrGI-K8ok1_0lH6CDEo190ObeZJhzJI/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chat_id\": \"{{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}\",\n  \"text\": \"🧾 Click the button below to update shop information:\",\n  \"reply_markup\": {\n    \"inline_keyboard\": [\n      [\n        {\n          \"text\": \"📝 Update Shop Information\",\n          \"url\": \"https://n8n.srv894857.hstgr.cloud/form/741ca889-2ccc-4edf-8672-4edde4e47619?chat_id={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}&telegram_unique_id={{ $json.telegram_unique_id }}&Shop%20Name={{ $json.name }}&Address={{ $json.address }}&City={{ $json.city }}&State={{ $json.state }}&Postal%20Code={{ String($json.postal_code) }}&Country={{ $json.country }}&Contact%20Person%20Name={{ $json.contact_name }}&Contact%20Phone%20Number={{ $json.contact_phone }}&Contact%20Email%20Address={{ $json.contact_email }}&Notes={{ $json.notes }}&mode=update&record_id={{ $json.id }}\"\n        }\n      ]\n    ]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        112,
+        352
+      ],
+      "id": "f2b65f8f-5e81-4cf7-9c42-771021abc02c",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Add New Shop Form').item.json.formQueryParameters.chat_id }}",
+        "text": "={{ $('Add New Shop Form').item.json.formQueryParameters.mode === 'update' ? '✅ Shop information updated.' : ($('Add New Shop Form').item.json.formQueryParameters.mode === 'create' ? '✅  New shop added.' : '') }}\n🏪 Name: {{ $json.fields.name }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        96,
+        688
+      ],
+      "id": "5065c9e5-eb20-4927-ba31-99677bcdd6d6",
+      "name": "Send Confirmation message2",
+      "webhookId": "34368d5f-cb5e-4ffd-9749-82dd490c84b2",
+      "credentials": {
+        "telegramApi": {
+          "id": "pnVJWgtRZIJoPjzP",
+          "name": "Sales Funnel Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appfYooeKcJkbtPpD",
+          "mode": "list",
+          "cachedResultName": "Sales Funnel",
+          "cachedResultUrl": "https://airtable.com/appfYooeKcJkbtPpD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblzDopBGU9Xqp6Z8",
+          "mode": "list",
+          "cachedResultName": "Shops",
+          "cachedResultUrl": "https://airtable.com/appfYooeKcJkbtPpD/tblzDopBGU9Xqp6Z8"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ $json.data[\"Shop Name\"] }}",
+            "address": "={{ $json.data.Address }}",
+            "city": "={{ $json.data.City }}",
+            "state": "={{ $json.data.State }}",
+            "postal_code": "={{ $json.data[\"Postal Code\"] }}",
+            "country": "={{ $json.data.Country }}",
+            "contact_name": "={{ $json.data[\"Contact Person Name\"] }}",
+            "contact_phone": "={{ $json.data[\"Contact Phone Number\"] }}",
+            "contact_email": "={{ $json.data[\"Contact Email Address\"] }}",
+            "notes": "={{ $json.data.Notes }}",
+            "telegram_unique_id": "={{ String($('Telegram Trigger').item.json.message.from.id) }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "telegram_unique_id",
+              "displayName": "telegram_unique_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "address",
+              "displayName": "address",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "state",
+              "displayName": "state",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "postal_code",
+              "displayName": "postal_code",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "country",
+              "displayName": "country",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "contact_name",
+              "displayName": "contact_name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "contact_phone",
+              "displayName": "contact_phone",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "contact_email",
+              "displayName": "contact_email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "notes",
+              "displayName": "notes",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "created_by",
+              "displayName": "created_by",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Shop Visits",
+              "displayName": "Shop Visits",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1200,
+        -304
+      ],
+      "id": "0210d6a9-4a49-411e-baaf-f99d5927e4ee",
+      "name": "Create a record 5",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "T7yxqTbXYpbUVPcS",
+          "name": "Ukani lakshit Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appfYooeKcJkbtPpD",
+          "mode": "list",
+          "cachedResultName": "Sales Funnel",
+          "cachedResultUrl": "https://airtable.com/appfYooeKcJkbtPpD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblzDopBGU9Xqp6Z8",
+          "mode": "list",
+          "cachedResultName": "Shops",
+          "cachedResultUrl": "https://airtable.com/appfYooeKcJkbtPpD/tblzDopBGU9Xqp6Z8"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ $json['Shop Name'] }}",
+            "address": "={{ $json.Address }}",
+            "city": "={{ $json.City }}",
+            "state": "={{ $json.State }}",
+            "postal_code": "={{ $json['Postal Code'] }}",
+            "country": "={{ $json.Country }}",
+            "contact_name": "={{ $json['Contact Person Name'] }}",
+            "contact_phone": "={{ $json['Contact Phone Number'] }}",
+            "contact_email": "={{ $json['Contact Email Address'] }}",
+            "notes": "={{ $json.Notes }}",
+            "telegram_unique_id": "={{ $json.formQueryParameters.telegram_unique_id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "telegram_unique_id",
+              "displayName": "telegram_unique_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "address",
+              "displayName": "address",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "state",
+              "displayName": "state",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "postal_code",
+              "displayName": "postal_code",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "country",
+              "displayName": "country",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "contact_name",
+              "displayName": "contact_name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "contact_phone",
+              "displayName": "contact_phone",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "contact_email",
+              "displayName": "contact_email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "notes",
+              "displayName": "notes",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "created_by",
+              "displayName": "created_by",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Shop Visits",
+              "displayName": "Shop Visits",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1024,
+        -512
+      ],
+      "id": "5100d4e3-2365-4c80-a50d-db000adc740c",
+      "name": "Create a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "T7yxqTbXYpbUVPcS",
+          "name": "Ukani lakshit Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appfYooeKcJkbtPpD",
+          "mode": "list",
+          "cachedResultName": "Sales Funnel",
+          "cachedResultUrl": "https://airtable.com/appfYooeKcJkbtPpD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblzDopBGU9Xqp6Z8",
+          "mode": "list",
+          "cachedResultName": "Shops",
+          "cachedResultUrl": "https://airtable.com/appfYooeKcJkbtPpD/tblzDopBGU9Xqp6Z8"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "telegram_unique_id": "={{ $json.formQueryParameters.telegram_unique_id }}",
+            "name": "={{ $json['Shop Name'] }}",
+            "address": "={{ $json.Address }}",
+            "city": "={{ $json.City }}",
+            "state": "={{ $json.State }}",
+            "postal_code": "={{ $json['Postal Code'] }}",
+            "country": "={{ $json.Country }}",
+            "contact_name": "={{ $json['Contact Person Name'] }}",
+            "contact_phone": "={{ $json['Contact Phone Number'] }}",
+            "contact_email": "={{ $json['Contact Email Address'] }}",
+            "notes": "={{ $json.Notes }}",
+            "id": "={{ $json.formQueryParameters.record_id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "unique_id",
+              "displayName": "unique_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "telegram_unique_id",
+              "displayName": "telegram_unique_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "address",
+              "displayName": "address",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "state",
+              "displayName": "state",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "postal_code",
+              "displayName": "postal_code",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "country",
+              "displayName": "country",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "contact_name",
+              "displayName": "contact_name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "contact_phone",
+              "displayName": "contact_phone",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "contact_email",
+              "displayName": "contact_email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "notes",
+              "displayName": "notes",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "created_by",
+              "displayName": "created_by",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -288,
+        688
+      ],
+      "id": "183beb26-241e-4e6c-8957-8c9a971b0ffd",
+      "name": "Create or update a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "T7yxqTbXYpbUVPcS",
+          "name": "Ukani lakshit Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "value": "appfYooeKcJkbtPpD",
+          "mode": "list",
+          "cachedResultName": "Sales Funnel",
+          "cachedResultUrl": "https://airtable.com/appfYooeKcJkbtPpD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblzDopBGU9Xqp6Z8",
+          "mode": "list",
+          "cachedResultName": "Shops",
+          "cachedResultUrl": "https://airtable.com/appfYooeKcJkbtPpD/tblzDopBGU9Xqp6Z8"
+        },
+        "id": "={{ $json.callback_query.data }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -128,
+        352
+      ],
+      "id": "92de5c7d-8860-426a-8d6f-3c0f35a88ab8",
+      "name": "Get a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "T7yxqTbXYpbUVPcS",
+          "name": "Ukani lakshit Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1b3f2d4e-02fc-489e-83ab-6aa6ae61451d",
+              "leftValue": "={{ $(\"Search records\").item.json }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        352,
+        176
+      ],
+      "id": "96607554-663d-4a56-a28b-2b86011a6f8a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot8476524447:AAHXPrGI-K8ok1_0lH6CDEo190ObeZJhzJI/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chat_id\": \"{{ $node['Telegram Trigger'].json.message.chat.id }}\",\n  \"text\": \"🏪 No Shops has been added\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        592,
+        208
+      ],
+      "id": "b2ecc638-2f9a-447b-85c7-f523e4985a3a",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot8476524447:AAHXPrGI-K8ok1_0lH6CDEo190ObeZJhzJI/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chat_id\": \"{{ $json.message.chat.id }}\",\n  \"text\": \"🧾 Select Any one option /newshop\",\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -160,
+        512
+      ],
+      "id": "65de83a2-a7f2-45d9-a343-805ae5442eb7",
+      "name": "HTTP Request4",
+      "disabled": true
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Register Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Search records",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Search records",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get a record",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Add New Shop Form": {
+      "main": [
+        [
+          {
+            "node": "Create or update a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search records": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message and wait for response": {
+      "main": [
+        [
+          {
+            "node": "Create a record 5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        []
+      ]
+    },
+    "Format data ": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        []
+      ]
+    },
+    "Create a record 5": {
+      "main": [
+        [
+          {
+            "node": "Send Confirmation message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a record": {
+      "main": [
+        [
+          {
+            "node": "Send Confirmation message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create or update a record": {
+      "main": [
+        [
+          {
+            "node": "Send Confirmation message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a record": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Format data ",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Add New Shop Form": [
+      {
+        "json": {
+          "Shop Name": "Mosmi Shop",
+          "Address": "Mira road",
+          "City": "Thane",
+          "State": "",
+          "Postal Code": "401107",
+          "Country": "",
+          "Contact Person Name": "",
+          "Contact Phone Number": "",
+          "Contact Email Address": "",
+          "Notes": "",
+          "chat_id": "5948224724",
+          "submittedAt": "2025-10-29T14:13:44.200+01:00",
+          "formMode": "production",
+          "formQueryParameters": {
+            "chat_id": "5948224724",
+            "telegram_unique_id": "5948224724",
+            "Shop Name": "Mosmi Shop",
+            "Address": "",
+            "City": "",
+            "State": "",
+            "Postal Code": "undefined",
+            "Country": "",
+            "Contact Person Name": "",
+            "Contact Phone Number": "",
+            "Contact Email Address": "",
+            "Notes": "",
+            "mode": "update",
+            "record_id": "recCBZVzAqW4Wc4j2"
+          }
+        }
+      }
+    ],
+    "Create or update a record": [
+      {
+        "json": {
+          "id": "recCBZVzAqW4Wc4j2",
+          "createdTime": "2025-10-29T13:13:14.000Z",
+          "fields": {
+            "name": "Mosmi Shop",
+            "address": "Mira road",
+            "city": "Thane",
+            "postal_code": "401107",
+            "created_at": "2025-10-29T13:13:14.000Z",
+            "updated_at": "2025-10-29T13:13:45.000Z",
+            "unique_id": 15,
+            "created_by": {
+              "id": "usrGCPekqYLgKjcmz",
+              "email": "ukanilakshit77@gmail.com",
+              "name": "lakshit ukani"
+            },
+            "telegram_unique_id": "5948224724"
+          }
+        }
+      }
+    ],
+    "Telegram Trigger": [
+      {
+        "json": {
+          "update_id": 471052049,
+          "message": {
+            "message_id": 168,
+            "from": {
+              "id": 5948224724,
+              "is_bot": false,
+              "first_name": "Lakshit",
+              "last_name": "Ukani",
+              "username": "lakshit1996",
+              "language_code": "en"
+            },
+            "chat": {
+              "id": 5948224724,
+              "first_name": "Lakshit",
+              "last_name": "Ukani",
+              "username": "lakshit1996",
+              "type": "private"
+            },
+            "date": 1762168775,
+            "text": "/listshops",
+            "entities": [
+              {
+                "offset": 0,
+                "length": 10,
+                "type": "bot_command"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "versionId": "24bda39b-38a5-497d-adb7-f0a18b7f90b5",
+  "activeVersionId": null,
+  "triggerCount": 2,
+  "shared": [
+    {
+      "updatedAt": "2025-10-29T07:20:31.523Z",
+      "createdAt": "2025-10-29T07:20:31.523Z",
+      "role": "workflow:owner",
+      "workflowId": "EgwggYwBO2pBvj3C",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": null,
+  "tags": [
+    {
+      "updatedAt": "2025-11-14T10:19:51.673Z",
+      "createdAt": "2025-11-14T10:19:51.673Z",
+      "id": "ZeV32hHhoNphIlCK",
+      "name": "mayank"
+    }
+  ]
+}
