@@ -1,0 +1,245 @@
+{
+  "updatedAt": "2025-09-17T18:46:22.000Z",
+  "createdAt": "2025-09-17T18:42:17.137Z",
+  "id": "LPNdLWkdHow3Wvmw",
+  "name": "Perplexity Research Tool",
+  "active": true,
+  "isArchived": true,
+  "nodes": [
+    {
+      "id": "workflow-trigger",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        120,
+        300
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "perplexity-api",
+      "name": "Perplexity API Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        320,
+        300
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.perplexity.ai/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyContentType": "json",
+        "jsonBody": "{\n  \"model\": \"llama-3.1-sonar-large-128k-online\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a helpful research assistant. Provide comprehensive, accurate information with citations. Focus on recent developments and always include source URLs when available.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ $json.query || $json.search_terms || $json.topic }}\"\n    }\n  ],\n  \"max_tokens\": 4000,\n  \"temperature\": 0.2,\n  \"search_domain_filter\": [\"techcrunch.com\", \"venturebeat.com\", \"arstechnica.com\", \"mit.edu\", \"openai.com\", \"anthropic.com\", \"deepmind.com\"],\n  \"return_citations\": true,\n  \"search_recency_filter\": \"day\"\n}",
+        "options": {
+          "timeout": 60000,
+          "retry": {
+            "enabled": true,
+            "maxTries": 3
+          }
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "process-response",
+      "name": "Process Perplexity Response",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        520,
+        300
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "research_content",
+              "value": "{{ $json.choices[0].message.content }}"
+            },
+            {
+              "name": "model_used",
+              "value": "{{ $json.model }}"
+            },
+            {
+              "name": "usage_tokens",
+              "value": "{{ $json.usage.total_tokens }}"
+            },
+            {
+              "name": "research_timestamp",
+              "value": "{{ $now }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Perplexity API Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Perplexity API Request": {
+      "main": [
+        [
+          {
+            "node": "Process Perplexity Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "66ef27f3-90f0-4c8f-a808-3dda4fb8c7d1",
+  "activeVersionId": "66ef27f3-90f0-4c8f-a808-3dda4fb8c7d1",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-09-17T18:42:17.146Z",
+      "createdAt": "2025-09-17T18:42:17.146Z",
+      "role": "workflow:owner",
+      "workflowId": "LPNdLWkdHow3Wvmw",
+      "projectId": "iOyc3VpWKvgHH9fv"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2025-11-27T19:11:12.017Z",
+    "createdAt": "2025-11-27T19:11:12.017Z",
+    "versionId": "66ef27f3-90f0-4c8f-a808-3dda4fb8c7d1",
+    "workflowId": "LPNdLWkdHow3Wvmw",
+    "nodes": [
+      {
+        "id": "workflow-trigger",
+        "name": "Execute Workflow Trigger",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "position": [
+          120,
+          300
+        ],
+        "parameters": {},
+        "typeVersion": 1
+      },
+      {
+        "id": "perplexity-api",
+        "name": "Perplexity API Request",
+        "type": "n8n-nodes-base.httpRequest",
+        "position": [
+          320,
+          300
+        ],
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.perplexity.ai/chat/completions",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "bodyContentType": "json",
+          "jsonBody": "{\n  \"model\": \"llama-3.1-sonar-large-128k-online\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a helpful research assistant. Provide comprehensive, accurate information with citations. Focus on recent developments and always include source URLs when available.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ $json.query || $json.search_terms || $json.topic }}\"\n    }\n  ],\n  \"max_tokens\": 4000,\n  \"temperature\": 0.2,\n  \"search_domain_filter\": [\"techcrunch.com\", \"venturebeat.com\", \"arstechnica.com\", \"mit.edu\", \"openai.com\", \"anthropic.com\", \"deepmind.com\"],\n  \"return_citations\": true,\n  \"search_recency_filter\": \"day\"\n}",
+          "options": {
+            "timeout": 60000,
+            "retry": {
+              "enabled": true,
+              "maxTries": 3
+            }
+          }
+        },
+        "typeVersion": 4.2
+      },
+      {
+        "id": "process-response",
+        "name": "Process Perplexity Response",
+        "type": "n8n-nodes-base.set",
+        "position": [
+          520,
+          300
+        ],
+        "parameters": {
+          "values": {
+            "string": [
+              {
+                "name": "research_content",
+                "value": "{{ $json.choices[0].message.content }}"
+              },
+              {
+                "name": "model_used",
+                "value": "{{ $json.model }}"
+              },
+              {
+                "name": "usage_tokens",
+                "value": "{{ $json.usage.total_tokens }}"
+              },
+              {
+                "name": "research_timestamp",
+                "value": "{{ $now }}"
+              }
+            ]
+          }
+        },
+        "typeVersion": 3.4
+      }
+    ],
+    "connections": {
+      "Execute Workflow Trigger": {
+        "main": [
+          [
+            {
+              "node": "Perplexity API Request",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Perplexity API Request": {
+        "main": [
+          [
+            {
+              "node": "Process Perplexity Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "tags": []
+}
